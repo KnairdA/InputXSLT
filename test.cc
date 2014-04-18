@@ -19,13 +19,13 @@ int main() {
 	transformer.installExternalFunction(
 		customNamespace,
 		xalan::XalanDOMString("read-file"),
-		FunctionReadFile()
+		InputXSLT::FunctionReadFile()
 	);
 
 	transformer.installExternalFunction(
 		customNamespace,
 		xalan::XalanDOMString("read-xml-file"),
-		FunctionReadXmlFile()
+		InputXSLT::FunctionReadXmlFile()
 	);
 
 	xalan::XSLTInputSource  input("../dummy/in.xml");

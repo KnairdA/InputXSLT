@@ -7,17 +7,17 @@
 
 #include "utility.h"
 
-namespace xalan = xalanc_1_11;
+namespace InputXSLT {
 
 class FunctionReadFile : public xalan::Function {
 	public:
 		virtual xalan::XObjectPtr execute(
-			xalan::XPathExecutionContext&      executionContext,
-			xalan::XalanNode*                  context,
-			const xalan::Function::XObjectArgVectorType& args,
+			xalan::XPathExecutionContext&                executionContext,
+			xalan::XalanNode*                            context,
+			const xalan::Function::XObjectArgVectorType& arguments,
 			const xalan::Locator*              locator
 		) const {
-			if ( args.size() != 1 ) {
+			if ( arguments.size() != 1 ) {
 				xalan::XPathExecutionContext::GetAndReleaseCachedString guard(
 					executionContext
 				);
@@ -25,21 +25,21 @@ class FunctionReadFile : public xalan::Function {
 				generalError(executionContext, context, locator);
 			}
 
-			xalan::CharVectorType tmpFileName;
-			std::string fileName;
+			xalan::CharVectorType fileNameVector;
+			std::string fileNameString;
 
-			args[0]->str().transcode(tmpFileName);
+			arguments[0]->str().transcode(fileNameVector);
 
 			std::move(
-				tmpFileName.begin(),
-				tmpFileName.end(),
-				fileName.begin()
+				fileNameVector.begin(),
+				fileNameVector.end(),
+				fileNameString.begin()
 			);
 
-			std::string content(readFile(fileName));
-
 			return executionContext.getXObjectFactory().createString(
-				xalan::XalanDOMString(content.data())
+				xalan::XalanDOMString(
+					InputXSLT::readFile(fileNameString).data()
+				)
 			);
 		}
 
@@ -47,15 +47,16 @@ class FunctionReadFile : public xalan::Function {
 			return xalan::XalanCopyConstruct(manager, *this);
 		}
 
-	protected:
+		FunctionReadFile& operator=(const FunctionReadFile&) = delete;
+		bool operator==(const FunctionReadFile&) const       = delete;
+
+	private:
 		const xalan::XalanDOMString& getError(xalan::XalanDOMString& result) const {
 			result.assign("The read-file() function expects one argument.");
 
 			return result;
 		}
 
-	private:
-		FunctionReadFile& operator=(const FunctionReadFile&);
-		bool operator==(const FunctionReadFile&) const;
-
 };
+
+}

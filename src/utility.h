@@ -8,12 +8,16 @@
 #include <cstddef>
 #include <cstdio>
 
+namespace xalan = xalanc_1_11;
+
 namespace {
 
 const int OpenFlags   = O_RDONLY;
 const mode_t OpenMode = S_IRUSR | S_IWUSR;
 
 }
+
+namespace InputXSLT {
 
 std::string readFile(const std::string& path) {
 	int descriptor(
@@ -29,11 +33,11 @@ std::string readFile(const std::string& path) {
 		fstat(descriptor, &info);
 		const std::size_t size(info.st_size);
 
-		char* buffer(new char[size]);
+		char* const buffer(new char[size]);
 
 		ssize_t readSize(read(
 			descriptor,
-			reinterpret_cast<void*>(buffer),
+			static_cast<void*const>(buffer),
 			size
 		));
 
@@ -48,6 +52,8 @@ std::string readFile(const std::string& path) {
 
 		return content;
 	}
+}
+
 }
 
 #endif  // UTILITY_H_

@@ -8,17 +8,19 @@
 
 #include "utility.h"
 
-namespace xalan = xalanc_1_11;
+#include <memory>
+
+namespace InputXSLT {
 
 class FunctionReadXmlFile : public xalan::Function {
 	public:
 		virtual xalan::XObjectPtr execute(
-			xalan::XPathExecutionContext&      executionContext,
-			xalan::XalanNode*                  context,
-			const xalan::Function::XObjectArgVectorType& args,
-			const xalan::Locator*              locator
+			xalan::XPathExecutionContext&                executionContext,
+			xalan::XalanNode*                            context,
+			const xalan::Function::XObjectArgVectorType& arguments,
+			const xalan::Locator*                        locator
 		) const {
-			if ( args.size() != 1 ) {
+			if ( arguments.size() != 1 ) {
 				xalan::XPathExecutionContext::GetAndReleaseCachedString guard(
 					executionContext
 				);
@@ -26,14 +28,14 @@ class FunctionReadXmlFile : public xalan::Function {
 				generalError(executionContext, context, locator);
 			}
 
-			if ( this->liaison == nullptr ) {
-				const_cast<FunctionReadXmlFile*>(this)->liaison = new xalan::XercesParserLiaison();
+			if ( !this->parser_ ) {
+				this->parser_ = std::make_shared<xalan::XercesParserLiaison>();
 			}
 
-			xalan::XSLTInputSource file(args[0]->str());
-
 			return executionContext.getXObjectFactory().createNodeSet(
-				liaison->parseXMLStream(file)
+				this->parser_->parseXMLStream(
+					xalan::XSLTInputSource(arguments[0]->str())
+				)
 			);
 		}
 
@@ -41,17 +43,18 @@ class FunctionReadXmlFile : public xalan::Function {
 			return xalan::XalanCopyConstruct(manager, *this);
 		}
 
-	protected:
-		xalan::XercesParserLiaison* liaison = nullptr;
+		FunctionReadXmlFile& operator=(const FunctionReadXmlFile&) = delete;
+		bool operator==(const FunctionReadXmlFile&) const          = delete;
+
+	private:
+		mutable std::shared_ptr<xalan::XercesParserLiaison> parser_;
 
 		const xalan::XalanDOMString& getError(xalan::XalanDOMString& result) const {
-			result.assign("The read-file() function expects one argument.");
+			result.assign("The read-xml-file() function expects one argument.");
 
 			return result;
 		}
 
-	private:
-		FunctionReadXmlFile& operator=(const FunctionReadXmlFile&);
-		bool operator==(const FunctionReadXmlFile&) const;
-
 };
+
+}
