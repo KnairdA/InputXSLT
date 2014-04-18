@@ -15,15 +15,16 @@
 	<head>
 	</head>
 	<body>
-		<xsl:apply-templates select="items/item" />
+		<div id="raw">
+			<xsl:value-of select="external:read-file('../dummy/test.txt')" />
+		</div>
+		<ul>
+		<xsl:for-each select="external:read-xml-file('../dummy/test.txt')/tester/eintrag">
+			<li><xsl:value-of select="."/></li>
+		</xsl:for-each>
+		</ul>
 	</body>
 </html>
-</xsl:template>
-
-<xsl:template match="items/item">
-	<div id="{.}">
-		<xsl:value-of select="external:read-file('../dummy/test.txt')" />
-	</div>
 </xsl:template>
 
 </xsl:stylesheet>

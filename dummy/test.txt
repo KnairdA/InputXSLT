@@ -1,1 +1,7 @@
-Hello world!
+<?xml version="1.0"?>
+<tester>
+	<eintrag>Hello 1</eintrag>
+	<eintrag>Hello 2</eintrag>
+	<eintrag>Hello 3</eintrag>
+	<eintrag>Hello 4</eintrag>
+</tester>

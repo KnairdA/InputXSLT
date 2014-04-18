@@ -4,6 +4,7 @@
 #include <xalanc/XSLT/XSLTInputSource.hpp>
 
 #include "src/read_file_command.h"
+#include "src/read_xml_file_command.h"
 
 int main() {
 	xercesc::XMLPlatformUtils::Initialize();
@@ -18,7 +19,13 @@ int main() {
 	transformer.installExternalFunction(
 		customNamespace,
 		xalan::XalanDOMString("read-file"),
-		FunctionFileRead()
+		FunctionReadFile()
+	);
+
+	transformer.installExternalFunction(
+		customNamespace,
+		xalan::XalanDOMString("read-xml-file"),
+		FunctionReadXmlFile()
 	);
 
 	xalan::XSLTInputSource  input("../dummy/in.xml");

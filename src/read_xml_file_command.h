@@ -4,12 +4,13 @@
 #include <xalanc/XPath/XObjectFactory.hpp>
 #include <xalanc/XPath/Function.hpp>
 #include <xalanc/XPath/XObject.hpp>
+#include <xalanc/XercesParserLiaison/XercesParserLiaison.hpp>
 
 #include "utility.h"
 
 namespace xalan = xalanc_1_11;
 
-class FunctionReadFile : public xalan::Function {
+class FunctionReadXmlFile : public xalan::Function {
 	public:
 		virtual xalan::XObjectPtr execute(
 			xalan::XPathExecutionContext&      executionContext,
@@ -25,29 +26,24 @@ class FunctionReadFile : public xalan::Function {
 				generalError(executionContext, context, locator);
 			}
 
-			xalan::CharVectorType tmpFileName;
-			std::string fileName;
+			if ( this->liaison == nullptr ) {
+				const_cast<FunctionReadXmlFile*>(this)->liaison = new xalan::XercesParserLiaison();
+			}
 
-			args[0]->str().transcode(tmpFileName);
+			xalan::XSLTInputSource file(args[0]->str());
 
-			std::move(
-				tmpFileName.begin(),
-				tmpFileName.end(),
-				fileName.begin()
-			);
-
-			std::string content(readFile(fileName));
-
-			return executionContext.getXObjectFactory().createString(
-				xalan::XalanDOMString(content.data())
+			return executionContext.getXObjectFactory().createNodeSet(
+				liaison->parseXMLStream(file)
 			);
 		}
 
-		virtual FunctionReadFile* clone(xalan::MemoryManager& manager) const {
+		virtual FunctionReadXmlFile* clone(xalan::MemoryManager& manager) const {
 			return xalan::XalanCopyConstruct(manager, *this);
 		}
 
 	protected:
+		xalan::XercesParserLiaison* liaison = nullptr;
+
 		const xalan::XalanDOMString& getError(xalan::XalanDOMString& result) const {
 			result.assign("The read-file() function expects one argument.");
 
@@ -55,7 +51,7 @@ class FunctionReadFile : public xalan::Function {
 		}
 
 	private:
-		FunctionReadFile& operator=(const FunctionReadFile&);
-		bool operator==(const FunctionReadFile&) const;
+		FunctionReadXmlFile& operator=(const FunctionReadXmlFile&);
+		bool operator==(const FunctionReadXmlFile&) const;
 
 };

@@ -1,3 +1,6 @@
+#ifndef UTILITY_H_
+#define UTILITY_H_
+
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -46,3 +49,5 @@ std::string readFile(const std::string& path) {
 		return content;
 	}
 }
+
+#endif  // UTILITY_H_
