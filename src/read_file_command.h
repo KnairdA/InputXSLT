@@ -3,51 +3,52 @@
 #include <xalanc/XalanTransformer/XalanTransformer.hpp>
 #include <xalanc/XPath/XObjectFactory.hpp>
 #include <xalanc/XPath/Function.hpp>
+#include <xalanc/XPath/XObject.hpp>
 
 #include "utility.h"
 
-XALAN_USING_XALAN(Function)
-XALAN_USING_XALAN(Locator)
-XALAN_USING_XALAN(XPathExecutionContext)
-XALAN_USING_XALAN(XalanDOMString)
-XALAN_USING_XALAN(XalanNode)
-XALAN_USING_XALAN(XObjectPtr)
-XALAN_USING_XALAN(MemoryManager)
-XALAN_USING_XALAN(XalanCopyConstruct)
+namespace xalan = xalanc_1_11;
 
-class FunctionFileRead : public Function {
+class FunctionFileRead : public xalan::Function {
 	public:
-		virtual XObjectPtr execute(
-			XPathExecutionContext&          executionContext,
-			XalanNode*                      context,
-			const XObjectArgVectorType&     args,
-			const Locator*                  locator
+		virtual xalan::XObjectPtr execute(
+			xalan::XPathExecutionContext&      executionContext,
+			xalan::XalanNode*                  context,
+			const xalan::Function::XObjectArgVectorType& args,
+			const xalan::Locator*              locator
 		) const {
 			if ( args.size() != 1 ) {
-				XPathExecutionContext::GetAndReleaseCachedString guard(executionContext);
+				xalan::XPathExecutionContext::GetAndReleaseCachedString guard(
+					executionContext
+				);
 
 				generalError(executionContext, context, locator);
 			}
 
-			xalanc_1_11::CharVectorType tmpFileName;
+			xalan::CharVectorType tmpFileName;
 			std::string fileName;
 
 			args[0]->str().transcode(tmpFileName);
-			std::move(tmpFileName.begin(), tmpFileName.end(), fileName.begin());
+
+			std::move(
+				tmpFileName.begin(),
+				tmpFileName.end(),
+				fileName.begin()
+			);
 
 			std::string content(readFile(fileName));
 
 			return executionContext.getXObjectFactory().createString(
-				XalanDOMString(content.data())
+				xalan::XalanDOMString(content.data())
 			);
 		}
 
-		virtual FunctionFileRead* clone(MemoryManager& manager) const {
-			return XalanCopyConstruct(manager, *this);
+		virtual FunctionFileRead* clone(xalan::MemoryManager& manager) const {
+			return xalan::XalanCopyConstruct(manager, *this);
 		}
 
 	protected:
-		const XalanDOMString& getError(XalanDOMString& result) const {
+		const xalan::XalanDOMString& getError(xalan::XalanDOMString& result) const {
 			result.assign("The read-file() function expects one argument.");
 
 			return result;

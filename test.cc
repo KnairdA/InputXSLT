@@ -7,23 +7,23 @@
 
 int main() {
 	xercesc::XMLPlatformUtils::Initialize();
-	xalanc_1_11::XalanTransformer::initialize();
+	xalan::XalanTransformer::initialize();
 
-	const xalanc_1_11::XalanDOMString customNamespace(
+	const xalan::XalanDOMString customNamespace(
 		"http://ExternalFunction.xalan-c++.xml.apache.org"
 	);
 
-	xalanc_1_11::XalanTransformer transformer;
+	xalan::XalanTransformer transformer;
 
 	transformer.installExternalFunction(
 		customNamespace,
-		xalanc_1_11::XalanDOMString("read-file"),
+		xalan::XalanDOMString("read-file"),
 		FunctionFileRead()
 	);
 
-	xalanc_1_11::XSLTInputSource  input("dummy/in.xml");
-	xalanc_1_11::XSLTInputSource  tranformation("dummy/transform.xsl");
-	xalanc_1_11::XSLTResultTarget output("dummy/out.xml");
+	xalan::XSLTInputSource  input("dummy/in.xml");
+	xalan::XSLTInputSource  tranformation("dummy/transform.xsl");
+	xalan::XSLTResultTarget output("dummy/out.xml");
 
 	int result(transformer.transform(
 		input,
@@ -31,7 +31,7 @@ int main() {
 		output
 	));
 
-	xalanc_1_11::XalanTransformer::terminate();
+	xalan::XalanTransformer::terminate();
 
 	return result;
 }
