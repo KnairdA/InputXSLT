@@ -22,7 +22,7 @@
 
 <xsl:template match="items/item">
 	<div id="{.}">
-		<xsl:value-of select="external:read-file('dummy/test.txt')" />
+		<xsl:value-of select="external:read-file('../dummy/test.txt')" />
 	</div>
 </xsl:template>
 

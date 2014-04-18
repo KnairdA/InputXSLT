@@ -21,9 +21,9 @@ int main() {
 		FunctionFileRead()
 	);
 
-	xalan::XSLTInputSource  input("dummy/in.xml");
-	xalan::XSLTInputSource  tranformation("dummy/transform.xsl");
-	xalan::XSLTResultTarget output("dummy/out.xml");
+	xalan::XSLTInputSource  input("../dummy/in.xml");
+	xalan::XSLTInputSource  tranformation("../dummy/transform.xsl");
+	xalan::XSLTResultTarget output("out.xml");
 
 	int result(transformer.transform(
 		input,
