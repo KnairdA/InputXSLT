@@ -3,8 +3,8 @@
 #include <xalanc/XalanTransformer/XalanTransformer.hpp>
 #include <xalanc/XSLT/XSLTInputSource.hpp>
 
-#include "src/read_file_command.h"
-#include "src/read_xml_file_command.h"
+#include "function/read_file.h"
+#include "function/read_xml_file.h"
 
 int main() {
 	xercesc::XMLPlatformUtils::Initialize();

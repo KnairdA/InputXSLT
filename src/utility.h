@@ -1,59 +1,15 @@
-#ifndef UTILITY_H_
-#define UTILITY_H_
+#ifndef INPUTXSLT_SRC_UTILITY_H_
+#define INPUTXSLT_SRC_UTILITY_H_
 
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
+#include <string>
 
-#include <cstddef>
-#include <cstdio>
-
+namespace xalanc_1_11 { };
 namespace xalan = xalanc_1_11;
-
-namespace {
-
-const int OpenFlags   = O_RDONLY;
-const mode_t OpenMode = S_IRUSR | S_IWUSR;
-
-}
 
 namespace InputXSLT {
 
-std::string readFile(const std::string& path) {
-	int descriptor(
-		open(path.data(), OpenFlags, OpenMode)
-	);
-
-	if ( descriptor == -1 ) {
-		close(descriptor);
-
-		return "io error";
-	} else {
-		struct stat info;
-		fstat(descriptor, &info);
-		const std::size_t size(info.st_size);
-
-		char* const buffer(new char[size]);
-
-		ssize_t readSize(read(
-			descriptor,
-			static_cast<void*const>(buffer),
-			size
-		));
-
-		close(descriptor);
-
-		std::string content(
-			buffer,
-			readSize
-		);
-
-		delete[] buffer;
-
-		return content;
-	}
-}
+std::string readFile(const std::string&);
 
 }
 
-#endif  // UTILITY_H_
+#endif  // INPUTXSLT_SRC_UTILITY_H_

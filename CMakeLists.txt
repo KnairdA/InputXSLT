@@ -13,6 +13,9 @@ include_directories(
 add_executable(
 	test
 	test.cc
+	src/utility.cc
+	src/function/read_file.cc
+	src/function/read_xml_file.cc
 )
 
 target_link_libraries(
