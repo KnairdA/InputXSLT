@@ -14,6 +14,7 @@ add_executable(
 	test
 	test.cc
 	src/utility.cc
+	src/transformer_guard.cc
 	src/function/read_file.cc
 	src/function/read_xml_file.cc
 )

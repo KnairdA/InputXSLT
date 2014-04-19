@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace xalanc_1_11 { };
+namespace xalanc_1_11 { }
 namespace xalan = xalanc_1_11;
 
 namespace InputXSLT {
