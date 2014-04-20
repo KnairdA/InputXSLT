@@ -1,5 +1,7 @@
 #include "read_file.h"
 
+#include "boost/filesystem/fstream.hpp"
+
 #include <fstream>
 
 namespace InputXSLT {
@@ -24,24 +26,20 @@ xalan::XObjectPtr FunctionReadFile::execute(
 	xalan::CharVectorType castHelper;
 	arguments[0]->str().transcode(castHelper);
 
-	std::string fileName(this->path_);
-	fileName.reserve(fileName.size() + castHelper.size());
-
-	std::move(
+	const std::string fileName(
 		castHelper.begin(),
-		castHelper.end(),
-		fileName.end()
+		castHelper.end()
 	);
 
-	std::ifstream file(fileName);
+	boost::filesystem::ifstream file(this->path_ / fileName);
 
-	std::string content(
+	const std::string fileContent(
 		(std::istreambuf_iterator<char>(file)),
 		(std::istreambuf_iterator<char>())
 	);
 
 	return executionContext.getXObjectFactory().createString(
-		xalan::XalanDOMString(content.data())
+		xalan::XalanDOMString(fileContent.data())
 	);
 }
 

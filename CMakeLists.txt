@@ -22,4 +22,6 @@ target_link_libraries(
 	test
 	xalan-c
 	xerces-c
+	boost_system
+	boost_filesystem
 )
