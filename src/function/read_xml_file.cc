@@ -2,10 +2,12 @@
 
 namespace InputXSLT {
 
-FunctionReadXmlFile::FunctionReadXmlFile():
+FunctionReadXmlFile::FunctionReadXmlFile(const std::string& path):
+	path_(path),
 	parser_() { }
 
-FunctionReadXmlFile::FunctionReadXmlFile(const FunctionReadXmlFile&):
+FunctionReadXmlFile::FunctionReadXmlFile(const FunctionReadXmlFile& src):
+	path_(src.path_),
 	parser_() { }
 
 xalan::XObjectPtr FunctionReadXmlFile::execute(
@@ -22,9 +24,12 @@ xalan::XObjectPtr FunctionReadXmlFile::execute(
 		generalError(executionContext, context, locator);
 	}
 
+	xalan::XalanDOMString fileName(this->path_.data());
+	fileName.append(arguments[0]->str());
+
 	return executionContext.getXObjectFactory().createNodeSet(
 		this->parser_.parseXMLStream(
-			xalan::XSLTInputSource(arguments[0]->str())
+			xalan::XSLTInputSource(fileName)
 		)
 	);
 }

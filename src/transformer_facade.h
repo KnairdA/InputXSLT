@@ -1,23 +1,22 @@
-#ifndef INPUTXSLT_SRC_TRANSFORMER_GUARD_H_
-#define INPUTXSLT_SRC_TRANSFORMER_GUARD_H_
+#ifndef INPUTXSLT_SRC_TRANSFORMER_FACADE_H_
+#define INPUTXSLT_SRC_TRANSFORMER_FACADE_H_
 
 #include <string>
 
 #include <xalanc/XalanTransformer/XalanTransformer.hpp>
 #include <xalanc/XercesParserLiaison/XercesParserLiaison.hpp>
 
-#include "plattform_guard.h"
+#include "common.h"
 
 namespace InputXSLT {
 
-class TransformerGuard {
+class TransformerFacade {
 	public:
-		TransformerGuard();
+		TransformerFacade(const std::string&);
 
 		int execute(const std::string&, const std::string&);
 
 	private:
-		const PlattformGuard plattform_;
 		mutable xalan::XercesParserLiaison parser_;
 
 		xalan::XalanTransformer transformer_;
@@ -26,4 +25,4 @@ class TransformerGuard {
 
 }
 
-#endif  // INPUTXSLT_SRC_TRANSFORMER_GUARD_H_
+#endif  // INPUTXSLT_SRC_TRANSFORMER_FACADE_H_

@@ -2,9 +2,11 @@
 #define INPUTXSLT_SRC_PLATTFORM_GUARD_H_
 
 #include <xalanc/Include/PlatformDefinitions.hpp>
+#include <xalanc/XalanTransformer/XalanTransformer.hpp>
+
 #include <xercesc/util/PlatformUtils.hpp>
 
-namespace xalan = xalanc_1_11;
+#include "common.h"
 
 namespace InputXSLT {
 

@@ -1,6 +1,11 @@
 #include "read_file.h"
 
+#include "utility.h"
+
 namespace InputXSLT {
+
+FunctionReadFile::FunctionReadFile(const std::string& path):
+	path_(path) { }
 
 xalan::XObjectPtr FunctionReadFile::execute(
 	xalan::XPathExecutionContext&                executionContext,
@@ -16,20 +21,21 @@ xalan::XObjectPtr FunctionReadFile::execute(
 		generalError(executionContext, context, locator);
 	}
 
-	xalan::CharVectorType fileNameVector;
-	std::string fileNameString;
+	xalan::CharVectorType castHelper;
+	arguments[0]->str().transcode(castHelper);
 
-	arguments[0]->str().transcode(fileNameVector);
+	std::string fileName(this->path_);
+	fileName.reserve(fileName.size() + castHelper.size());
 
 	std::move(
-		fileNameVector.begin(),
-		fileNameVector.end(),
-		fileNameString.begin()
+		castHelper.begin(),
+		castHelper.end(),
+		fileName.end()
 	);
 
 	return executionContext.getXObjectFactory().createString(
 		xalan::XalanDOMString(
-			InputXSLT::readFile(fileNameString).data()
+			InputXSLT::readFile(fileName).data()
 		)
 	);
 }

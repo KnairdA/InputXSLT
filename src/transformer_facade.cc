@@ -1,4 +1,4 @@
-#include "transformer_guard.h"
+#include "transformer_facade.h"
 
 #include <xalanc/Include/PlatformDefinitions.hpp>
 #include <xercesc/util/PlatformUtils.hpp>
@@ -16,8 +16,7 @@
 
 namespace InputXSLT {
 
-TransformerGuard::TransformerGuard():
-	plattform_(),
+TransformerFacade::TransformerFacade(const std::string& path):
 	parser_(),
 	transformer_() {
 	const xalan::XalanDOMString customNamespace(
@@ -27,18 +26,18 @@ TransformerGuard::TransformerGuard():
 	this->transformer_.installExternalFunction(
 		customNamespace,
 		xalan::XalanDOMString("read-file"),
-		InputXSLT::FunctionReadFile()
+		InputXSLT::FunctionReadFile(path)
 	);
 
 	this->transformer_.installExternalFunction(
 		customNamespace,
 		xalan::XalanDOMString("read-xml-file"),
-		InputXSLT::FunctionReadXmlFile()
+		InputXSLT::FunctionReadXmlFile(path)
 	);
 
 }
 
-int TransformerGuard::execute(
+int TransformerFacade::execute(
 	const std::string& transformation,
 	const std::string& target
 ) {

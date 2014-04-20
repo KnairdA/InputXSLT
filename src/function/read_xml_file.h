@@ -9,13 +9,15 @@
 #include <xalanc/XPath/XObject.hpp>
 #include <xalanc/XercesParserLiaison/XercesParserLiaison.hpp>
 
-#include "utility.h"
+#include <string>
+
+#include "common.h"
 
 namespace InputXSLT {
 
 class FunctionReadXmlFile : public xalan::Function {
 	public:
-		FunctionReadXmlFile();
+		FunctionReadXmlFile(const std::string&);
 		FunctionReadXmlFile(const FunctionReadXmlFile&);
 
 		virtual xalan::XObjectPtr execute(
@@ -31,6 +33,7 @@ class FunctionReadXmlFile : public xalan::Function {
 		bool operator==(const FunctionReadXmlFile&) const          = delete;
 
 	private:
+		const std::string path_;
 		mutable xalan::XercesParserLiaison parser_;
 
 		const xalan::XalanDOMString& getError(xalan::XalanDOMString& result) const;

@@ -8,12 +8,16 @@
 #include <xalanc/XPath/Function.hpp>
 #include <xalanc/XPath/XObject.hpp>
 
-#include "utility.h"
+#include <string>
+
+#include "common.h"
 
 namespace InputXSLT {
 
 class FunctionReadFile : public xalan::Function {
 	public:
+		FunctionReadFile(const std::string&);
+
 		virtual xalan::XObjectPtr execute(
 			xalan::XPathExecutionContext&,
 			xalan::XalanNode*,
@@ -27,6 +31,8 @@ class FunctionReadFile : public xalan::Function {
 		bool operator==(const FunctionReadFile&) const       = delete;
 
 	private:
+		const std::string path_;
+
 		const xalan::XalanDOMString& getError(xalan::XalanDOMString&) const;
 
 };
