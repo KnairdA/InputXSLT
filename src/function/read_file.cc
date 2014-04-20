@@ -1,6 +1,6 @@
 #include "read_file.h"
 
-#include "utility.h"
+#include <fstream>
 
 namespace InputXSLT {
 
@@ -33,10 +33,15 @@ xalan::XObjectPtr FunctionReadFile::execute(
 		fileName.end()
 	);
 
+	std::ifstream file(fileName);
+
+	std::string content(
+		(std::istreambuf_iterator<char>(file)),
+		(std::istreambuf_iterator<char>())
+	);
+
 	return executionContext.getXObjectFactory().createString(
-		xalan::XalanDOMString(
-			InputXSLT::readFile(fileName).data()
-		)
+		xalan::XalanDOMString(content.data())
 	);
 }
 
