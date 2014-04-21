@@ -7,6 +7,7 @@
 #include <xalanc/XercesParserLiaison/XercesParserLiaison.hpp>
 
 #include "common.h"
+#include "support/filesystem_context.h"
 
 namespace InputXSLT {
 
@@ -17,6 +18,7 @@ class TransformerFacade {
 		int execute(const std::string&, const std::string&);
 
 	private:
+		const FilesystemContext fs_context_;
 		mutable xalan::XercesParserLiaison parser_;
 
 		xalan::XalanTransformer transformer_;

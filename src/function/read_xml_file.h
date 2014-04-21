@@ -7,17 +7,16 @@
 #include <xalanc/XPath/XObject.hpp>
 #include <xalanc/XercesParserLiaison/XercesParserLiaison.hpp>
 
-#include "boost/filesystem.hpp"
-
 #include <string>
 
 #include "common.h"
+#include "support/filesystem_context.h"
 
 namespace InputXSLT {
 
 class FunctionReadXmlFile : public xalan::Function {
 	public:
-		FunctionReadXmlFile(const std::string&);
+		FunctionReadXmlFile(const FilesystemContext&);
 		FunctionReadXmlFile(const FunctionReadXmlFile&);
 
 		virtual xalan::XObjectPtr execute(
@@ -33,7 +32,7 @@ class FunctionReadXmlFile : public xalan::Function {
 		bool operator==(const FunctionReadXmlFile&) const          = delete;
 
 	private:
-		const boost::filesystem::path path_;
+		const FilesystemContext& fs_context_;
 		mutable xalan::XercesParserLiaison parser_;
 
 		const xalan::XalanDOMString& getError(xalan::XalanDOMString& result) const;

@@ -17,6 +17,7 @@
 namespace InputXSLT {
 
 TransformerFacade::TransformerFacade(const std::string& path):
+	fs_context_(path),
 	parser_(),
 	transformer_() {
 	const xalan::XalanDOMString customNamespace(
@@ -26,15 +27,14 @@ TransformerFacade::TransformerFacade(const std::string& path):
 	this->transformer_.installExternalFunction(
 		customNamespace,
 		xalan::XalanDOMString("read-file"),
-		InputXSLT::FunctionReadFile(path)
+		InputXSLT::FunctionReadFile(this->fs_context_)
 	);
 
 	this->transformer_.installExternalFunction(
 		customNamespace,
 		xalan::XalanDOMString("read-xml-file"),
-		InputXSLT::FunctionReadXmlFile(path)
+		InputXSLT::FunctionReadXmlFile(this->fs_context_)
 	);
-
 }
 
 int TransformerFacade::execute(

@@ -4,12 +4,12 @@
 
 namespace InputXSLT {
 
-FunctionReadXmlFile::FunctionReadXmlFile(const std::string& path):
-	path_(path),
+FunctionReadXmlFile::FunctionReadXmlFile(const FilesystemContext& context):
+	fs_context_(context),
 	parser_() { }
 
 FunctionReadXmlFile::FunctionReadXmlFile(const FunctionReadXmlFile& src):
-	path_(src.path_),
+	fs_context_(src.fs_context_),
 	parser_() { }
 
 xalan::XObjectPtr FunctionReadXmlFile::execute(
@@ -23,18 +23,12 @@ xalan::XObjectPtr FunctionReadXmlFile::execute(
 			executionContext
 		);
 
-		generalError(executionContext, context, locator);
+		this->generalError(executionContext, context, locator);
 	}
 
-	xalan::CharVectorType castHelper;
-	arguments[0]->str().transcode(castHelper);
-
-	const std::string fileName(
-		castHelper.begin(),
-		castHelper.end()
+	boost::filesystem::ifstream file(
+		this->fs_context_.resolve(arguments[0]->str())
 	);
-
-	boost::filesystem::ifstream file(this->path_ / fileName);
 
 	return executionContext.getXObjectFactory().createNodeSet(
 		this->parser_.parseXMLStream(

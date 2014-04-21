@@ -6,8 +6,8 @@
 
 namespace InputXSLT {
 
-FunctionReadFile::FunctionReadFile(const std::string& path):
-	path_(path) { }
+FunctionReadFile::FunctionReadFile(const FilesystemContext& context):
+	fs_context_(context) { }
 
 xalan::XObjectPtr FunctionReadFile::execute(
 	xalan::XPathExecutionContext&                executionContext,
@@ -20,18 +20,12 @@ xalan::XObjectPtr FunctionReadFile::execute(
 			executionContext
 		);
 
-		generalError(executionContext, context, locator);
+		this->generalError(executionContext, context, locator);
 	}
 
-	xalan::CharVectorType castHelper;
-	arguments[0]->str().transcode(castHelper);
-
-	const std::string fileName(
-		castHelper.begin(),
-		castHelper.end()
+	boost::filesystem::ifstream file(
+		this->fs_context_.resolve(arguments[0]->str())
 	);
-
-	boost::filesystem::ifstream file(this->path_ / fileName);
 
 	const std::string fileContent(
 		(std::istreambuf_iterator<char>(file)),
