@@ -11,8 +11,12 @@
 #include <xercesc/dom/DOMDocument.hpp>
 #include <xercesc/dom/DOMImplementation.hpp>
 
+#include <iostream>
+
 #include "function/read_file.h"
 #include "function/read_xml_file.h"
+#include "function/read_directory.h"
+
 
 namespace InputXSLT {
 
@@ -34,6 +38,12 @@ TransformerFacade::TransformerFacade(const std::string& path):
 		customNamespace,
 		xalan::XalanDOMString("read-xml-file"),
 		InputXSLT::FunctionReadXmlFile(this->fs_context_)
+	);
+
+	this->transformer_.installExternalFunction(
+		customNamespace,
+		xalan::XalanDOMString("read-directory"),
+		InputXSLT::FunctionReadDirectory(this->fs_context_)
 	);
 }
 

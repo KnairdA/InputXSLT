@@ -18,11 +18,14 @@
 		<div id="raw">
 			<xsl:value-of select="external:read-file('test.txt')" />
 		</div>
-		<ul>
+		<ul id="xml">
 		<xsl:for-each select="external:read-xml-file('test.txt')/tester/eintrag">
 			<li><xsl:value-of select="."/></li>
 		</xsl:for-each>
 		</ul>
+		<div id="filelist">
+			<xsl:value-of select="external:read-directory('.')" />
+		</div>
 	</body>
 </html>
 </xsl:template>

@@ -16,6 +16,7 @@ add_executable(
 	src/transformer_facade.cc
 	src/function/read_file.cc
 	src/function/read_xml_file.cc
+	src/function/read_directory.cc
 	src/support/filesystem_context.cc
 )
 
