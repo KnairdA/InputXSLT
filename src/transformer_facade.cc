@@ -1,12 +1,9 @@
 #include "transformer_facade.h"
 
-#include <xalanc/Include/PlatformDefinitions.hpp>
-#include <xercesc/util/PlatformUtils.hpp>
-
 #include <xalanc/XSLT/XSLTInputSource.hpp>
 #include <xalanc/XalanTransformer/XalanTransformer.hpp>
-#include <xalanc/XalanTransformer/XercesDOMWrapperParsedSource.hpp>
 #include <xalanc/XercesParserLiaison/XercesDOMSupport.hpp>
+#include <xalanc/XalanTransformer/XercesDOMWrapperParsedSource.hpp>
 
 #include <xercesc/dom/DOMDocument.hpp>
 #include <xercesc/dom/DOMImplementation.hpp>
@@ -59,8 +56,7 @@ int TransformerFacade::execute(
 	xalan::XercesDOMWrapperParsedSource parsedInput(
 		inputDom,
 		this->parser_,
-		domSupport,
-		xalan::XalanDOMString("")
+		domSupport
 	);
 
 	xalan::XSLTInputSource transform(transformation.data());

@@ -23,9 +23,11 @@
 			<li><xsl:value-of select="."/></li>
 		</xsl:for-each>
 		</ul>
-		<div id="filelist">
-			<xsl:value-of select="external:read-directory('.')" />
-		</div>
+		<ul id="filelist">
+		<xsl:for-each select="external:read-directory('.')/content/file">
+			<li><xsl:value-of select="."/></li>
+		</xsl:for-each>
+		</ul>
 	</body>
 </html>
 </xsl:template>

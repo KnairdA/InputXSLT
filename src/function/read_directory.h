@@ -6,6 +6,8 @@
 #include <xalanc/XPath/Function.hpp>
 #include <xalanc/XPath/XObject.hpp>
 
+#include <xalanc/XercesParserLiaison/XercesParserLiaison.hpp>
+
 #include <string>
 
 #include "common.h"
@@ -16,6 +18,7 @@ namespace InputXSLT {
 class FunctionReadDirectory : public xalan::Function {
 	public:
 		FunctionReadDirectory(const FilesystemContext&);
+		FunctionReadDirectory(const FunctionReadDirectory&);
 
 		virtual xalan::XObjectPtr execute(
 			xalan::XPathExecutionContext&,
@@ -31,6 +34,7 @@ class FunctionReadDirectory : public xalan::Function {
 
 	private:
 		const FilesystemContext& fs_context_;
+		mutable xalan::XercesParserLiaison parser_;
 
 		const xalan::XalanDOMString& getError(xalan::XalanDOMString&) const;
 

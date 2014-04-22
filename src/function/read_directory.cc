@@ -1,11 +1,16 @@
 #include "read_directory.h"
 
-#include <iostream>
+#include <sstream>
 
 namespace InputXSLT {
 
 FunctionReadDirectory::FunctionReadDirectory(const FilesystemContext& context):
-	fs_context_(context) { }
+	fs_context_(context),
+	parser_() { }
+
+FunctionReadDirectory::FunctionReadDirectory(const FunctionReadDirectory& src):
+	fs_context_(src.fs_context_),
+	parser_() { }
 
 xalan::XObjectPtr FunctionReadDirectory::execute(
 	xalan::XPathExecutionContext&                executionContext,
@@ -21,16 +26,21 @@ xalan::XObjectPtr FunctionReadDirectory::execute(
 		this->generalError(executionContext, context, locator);
 	}
 
-	std::string files;
+	std::stringstream stream;
+	stream << "<content>";
 
 	this->fs_context_.iterate(
 		arguments[0]->str(),
-		[&files](const boost::filesystem::path& p) {
-		files += p.string() + "\n";
+		[&stream](const boost::filesystem::path& p) {
+		stream << "<file>" << p.filename().string() << "</file>";
 	});
 
-	return executionContext.getXObjectFactory().createString(
-		xalan::XalanDOMString(files.data())
+	stream << "</content>";
+
+	return executionContext.getXObjectFactory().createNodeSet(
+		this->parser_.parseXMLStream(
+			xalan::XSLTInputSource(stream)
+		)
 	);
 }
 
