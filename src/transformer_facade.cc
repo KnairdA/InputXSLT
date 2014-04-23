@@ -59,6 +59,8 @@ int TransformerFacade::execute(
 		domSupport
 	);
 
+	inputDom->release();
+
 	xalan::XSLTInputSource transform(transformation.data());
 	xalan::XSLTResultTarget output(target.data());
 

@@ -18,6 +18,7 @@ add_executable(
 	src/function/read_xml_file.cc
 	src/function/read_directory.cc
 	src/support/filesystem_context.cc
+	src/support/dom_document_guard.cc
 )
 
 target_link_libraries(

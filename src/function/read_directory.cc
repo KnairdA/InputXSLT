@@ -1,25 +1,16 @@
 #include "read_directory.h"
 
-#include <xalanc/XercesParserLiaison/XercesDOMSupport.hpp>
-#include <xalanc/XalanTransformer/XercesDOMWrapperParsedSource.hpp>
-
 #include <xercesc/dom/DOMDocument.hpp>
 #include <xercesc/dom/DOMImplementation.hpp>
 #include <xercesc/dom/DOMElement.hpp>
 #include <xercesc/dom/DOMText.hpp>
 #include <xercesc/util/XMLString.hpp>
 
-#include <sstream>
-
 namespace InputXSLT {
 
 FunctionReadDirectory::FunctionReadDirectory(const FilesystemContext& context):
 	fs_context_(context),
-	parser_() { }
-
-FunctionReadDirectory::FunctionReadDirectory(const FunctionReadDirectory& src):
-	fs_context_(src.fs_context_),
-	parser_() { }
+	documents_(new std::stack<DomDocumentGuard>()) { }
 
 xalan::XObjectPtr FunctionReadDirectory::execute(
 	xalan::XPathExecutionContext&                executionContext,
@@ -35,44 +26,29 @@ xalan::XObjectPtr FunctionReadDirectory::execute(
 		this->generalError(executionContext, context, locator);
 	}
 
-	xercesc::DOMDocument* const inputDom(
-		xercesc::DOMImplementation::getImplementation()->createDocument(
-			nullptr, xercesc::XMLString::transcode("content"), nullptr
-		)
-	);
+	this->documents_->emplace("content");
+	DomDocumentGuard& domDocument = this->documents_->top();
 
-	xercesc::DOMNode* const rootNode = inputDom->getDocumentElement();
+	xercesc::DOMNode* const rootNode = domDocument->getDocumentElement();
 
 	this->fs_context_.iterate(
 		arguments[0]->str(),
-		[&inputDom, &rootNode](const boost::filesystem::path& p) {
-		xercesc::DOMNode* const fileNode = inputDom->createElement(
-			xercesc::XMLString::transcode("file")
-		);
+		[&domDocument, &rootNode](const boost::filesystem::path& p) {
+		XMLCh* buffer = xercesc::XMLString::transcode("file");
+		xercesc::DOMNode* const fileNode = domDocument->createElement(buffer);
+		xercesc::XMLString::release(&buffer);
 
-		xercesc::DOMText* const textNode = inputDom->createTextNode(
-			xercesc::XMLString::transcode(p.filename().string().data())
-		);
+		buffer = xercesc::XMLString::transcode(p.filename().string().data());
+		xercesc::DOMText* const textNode = domDocument->createTextNode(buffer);
+		xercesc::XMLString::release(&buffer);
 
 		fileNode->appendChild(textNode);
 		rootNode->appendChild(fileNode);
 	});
 
-
-	xalan::XercesDOMSupport domSupport(this->parser_);
-
-	xalan::XercesDOMWrapperParsedSource* const parsedSource(
-		new xalan::XercesDOMWrapperParsedSource(
-			inputDom,
-			this->parser_,
-			domSupport
-		)
-	);
-
 	return executionContext.getXObjectFactory().createNodeSet(
-		parsedSource->getDocument()
+		domDocument.finalize()
 	);
-
 }
 
 FunctionReadDirectory* FunctionReadDirectory::clone(
