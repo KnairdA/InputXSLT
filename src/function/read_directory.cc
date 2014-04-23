@@ -1,5 +1,14 @@
 #include "read_directory.h"
 
+#include <xalanc/XercesParserLiaison/XercesDOMSupport.hpp>
+#include <xalanc/XalanTransformer/XercesDOMWrapperParsedSource.hpp>
+
+#include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/dom/DOMImplementation.hpp>
+#include <xercesc/dom/DOMElement.hpp>
+#include <xercesc/dom/DOMText.hpp>
+#include <xercesc/util/XMLString.hpp>
+
 #include <sstream>
 
 namespace InputXSLT {
@@ -26,22 +35,44 @@ xalan::XObjectPtr FunctionReadDirectory::execute(
 		this->generalError(executionContext, context, locator);
 	}
 
-	std::stringstream stream;
-	stream << "<content>";
+	xercesc::DOMDocument* const inputDom(
+		xercesc::DOMImplementation::getImplementation()->createDocument(
+			nullptr, xercesc::XMLString::transcode("content"), nullptr
+		)
+	);
+
+	xercesc::DOMNode* const rootNode = inputDom->getDocumentElement();
 
 	this->fs_context_.iterate(
 		arguments[0]->str(),
-		[&stream](const boost::filesystem::path& p) {
-		stream << "<file>" << p.filename().string() << "</file>";
+		[&inputDom, &rootNode](const boost::filesystem::path& p) {
+		xercesc::DOMNode* const fileNode = inputDom->createElement(
+			xercesc::XMLString::transcode("file")
+		);
+
+		xercesc::DOMText* const textNode = inputDom->createTextNode(
+			xercesc::XMLString::transcode(p.filename().string().data())
+		);
+
+		fileNode->appendChild(textNode);
+		rootNode->appendChild(fileNode);
 	});
 
-	stream << "</content>";
 
-	return executionContext.getXObjectFactory().createNodeSet(
-		this->parser_.parseXMLStream(
-			xalan::XSLTInputSource(stream)
+	xalan::XercesDOMSupport domSupport(this->parser_);
+
+	xalan::XercesDOMWrapperParsedSource* const parsedSource(
+		new xalan::XercesDOMWrapperParsedSource(
+			inputDom,
+			this->parser_,
+			domSupport
 		)
 	);
+
+	return executionContext.getXObjectFactory().createNodeSet(
+		parsedSource->getDocument()
+	);
+
 }
 
 FunctionReadDirectory* FunctionReadDirectory::clone(
