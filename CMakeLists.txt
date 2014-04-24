@@ -13,7 +13,7 @@ include_directories(
 add_executable(
 	test
 	test.cc
-	src/transformer_facade.cc
+	src/transformation_facade.cc
 	src/function/read_file.cc
 	src/function/read_xml_file.cc
 	src/function/read_directory.cc

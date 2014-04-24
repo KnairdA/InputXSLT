@@ -1,12 +1,9 @@
 #include "plattform_guard.h"
-#include "transformer_facade.h"
+#include "transformation_facade.h"
 
 int main() {
 	InputXSLT::PlattformGuard plattform;
-	InputXSLT::TransformerFacade transformer("../dummy/");
+	InputXSLT::TransformationFacade transformation("../dummy/transform.xsl");
 
-	return transformer.execute(
-		"../dummy/transform.xsl",
-		"out.xml"
-	);
+	return transformation.generate("out.xml");
 }

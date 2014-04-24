@@ -10,7 +10,7 @@ namespace InputXSLT {
 
 FunctionReadDirectory::FunctionReadDirectory(const FilesystemContext& context):
 	fs_context_(context),
-	documents_(new std::stack<DomDocumentGuard>()) { }
+	documents_(std::make_shared<std::stack<DomDocumentGuard>>()) { }
 
 xalan::XObjectPtr FunctionReadDirectory::execute(
 	xalan::XPathExecutionContext&                executionContext,
