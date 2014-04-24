@@ -40,7 +40,8 @@ void FilesystemContext::iterate(
 		for ( boost::filesystem::directory_iterator iter(directory);
 		      iter != boost::filesystem::directory_iterator();
 		      ++iter ) {
-			if ( boost::filesystem::is_regular_file(iter->status()) ) {
+			if ( boost::filesystem::is_regular_file(iter->status()) ||
+			     boost::filesystem::is_directory(iter->status()) ) {
 				func(*iter);
 			}
 		}

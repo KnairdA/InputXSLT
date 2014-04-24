@@ -34,16 +34,34 @@ xalan::XObjectPtr FunctionReadDirectory::execute(
 	this->fs_context_.iterate(
 		arguments[0]->str(),
 		[&domDocument, &rootNode](const boost::filesystem::path& p) {
-		XMLCh* buffer = xercesc::XMLString::transcode("file");
-		xercesc::DOMNode* const fileNode = domDocument->createElement(buffer);
+		XMLCh* buffer = xercesc::XMLString::transcode("item");
+		xercesc::DOMElement* const itemNode = domDocument->createElement(buffer);
+		xercesc::XMLString::release(&buffer);
+
+		buffer = xercesc::XMLString::transcode("type");
+
+		if ( boost::filesystem::is_regular_file(p) ) {
+			XMLCh* valueBuffer = xercesc::XMLString::transcode("file");
+
+			itemNode->setAttribute(buffer, valueBuffer);
+
+			xercesc::XMLString::release(&valueBuffer);
+		} else if ( boost::filesystem::is_directory(p) ) {
+			XMLCh* valueBuffer = xercesc::XMLString::transcode("directory");
+
+			itemNode->setAttribute(buffer, valueBuffer);
+
+			xercesc::XMLString::release(&valueBuffer);
+		}
+
 		xercesc::XMLString::release(&buffer);
 
 		buffer = xercesc::XMLString::transcode(p.filename().string().data());
 		xercesc::DOMText* const textNode = domDocument->createTextNode(buffer);
 		xercesc::XMLString::release(&buffer);
 
-		fileNode->appendChild(textNode);
-		rootNode->appendChild(fileNode);
+		itemNode->appendChild(textNode);
+		rootNode->appendChild(itemNode);
 	});
 
 	return executionContext.getXObjectFactory().createNodeSet(

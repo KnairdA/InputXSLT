@@ -1,10 +1,9 @@
 #ifndef INPUTXSLT_SRC_TRANSFORMATION_FACADE_H_
 #define INPUTXSLT_SRC_TRANSFORMATION_FACADE_H_
 
-#include <string>
-
 #include <xalanc/XalanTransformer/XalanTransformer.hpp>
-#include <xalanc/XercesParserLiaison/XercesParserLiaison.hpp>
+
+#include <string>
 
 #include "common.h"
 #include "support/filesystem_context.h"

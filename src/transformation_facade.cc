@@ -9,7 +9,6 @@
 #include "function/read_xml_file.h"
 #include "function/read_directory.h"
 
-
 namespace InputXSLT {
 
 TransformationFacade::TransformationFacade(const std::string& transformation):
