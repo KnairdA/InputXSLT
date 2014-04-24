@@ -19,6 +19,7 @@ add_executable(
 	src/function/read_directory.cc
 	src/support/filesystem_context.cc
 	src/support/dom_document_guard.cc
+	src/support/xerces_string_guard.cc
 )
 
 target_link_libraries(

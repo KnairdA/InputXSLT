@@ -6,6 +6,8 @@
 #include <xercesc/dom/DOMText.hpp>
 #include <xercesc/util/XMLString.hpp>
 
+#include "support/xerces_string_guard.h"
+
 namespace InputXSLT {
 
 FunctionReadDirectory::FunctionReadDirectory(const FilesystemContext& context):
@@ -34,31 +36,27 @@ xalan::XObjectPtr FunctionReadDirectory::execute(
 	this->fs_context_.iterate(
 		arguments[0]->str(),
 		[&domDocument, &rootNode](const boost::filesystem::path& p) {
-		XMLCh* buffer = xercesc::XMLString::transcode("item");
-		xercesc::DOMElement* const itemNode = domDocument->createElement(buffer);
-		xercesc::XMLString::release(&buffer);
-
-		buffer = xercesc::XMLString::transcode("type");
+		xercesc::DOMElement* const itemNode(
+			domDocument->createElement(*XercesStringGuard("item"))
+		);
 
 		if ( boost::filesystem::is_regular_file(p) ) {
-			XMLCh* valueBuffer = xercesc::XMLString::transcode("file");
-
-			itemNode->setAttribute(buffer, valueBuffer);
-
-			xercesc::XMLString::release(&valueBuffer);
+			itemNode->setAttribute(
+				*XercesStringGuard("type"),
+				*XercesStringGuard("file")
+			);
 		} else if ( boost::filesystem::is_directory(p) ) {
-			XMLCh* valueBuffer = xercesc::XMLString::transcode("directory");
-
-			itemNode->setAttribute(buffer, valueBuffer);
-
-			xercesc::XMLString::release(&valueBuffer);
+			itemNode->setAttribute(
+				*XercesStringGuard("type"),
+				*XercesStringGuard("directory")
+			);
 		}
 
-		xercesc::XMLString::release(&buffer);
-
-		buffer = xercesc::XMLString::transcode(p.filename().string().data());
-		xercesc::DOMText* const textNode = domDocument->createTextNode(buffer);
-		xercesc::XMLString::release(&buffer);
+		xercesc::DOMText* const textNode(
+			domDocument->createTextNode(
+				*XercesStringGuard(p.filename().string())
+			)
+		);
 
 		itemNode->appendChild(textNode);
 		rootNode->appendChild(itemNode);
