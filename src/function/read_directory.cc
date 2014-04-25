@@ -15,41 +15,43 @@ FunctionReadDirectory::FunctionReadDirectory(const FilesystemContext& context):
 	documents_(std::make_shared<std::stack<DomDocumentGuard>>()) { }
 
 xalan::XObjectPtr FunctionReadDirectory::execute(
-	xalan::XPathExecutionContext&                executionContext,
-	xalan::XalanNode*                            context,
-	const xalan::Function::XObjectArgVectorType& arguments,
-	const xalan::Locator*                        locator
+	xalan::XPathExecutionContext& executionContext,
+	xalan::XalanNode*,
+	const xalan::XObjectPtr argument,
+	const xalan::Locator*
 ) const {
-	if ( arguments.size() != 1 ) {
-		xalan::XPathExecutionContext::GetAndReleaseCachedString guard(
-			executionContext
-		);
-
-		this->generalError(executionContext, context, locator);
-	}
-
 	this->documents_->emplace("content");
 	DomDocumentGuard& domDocument = this->documents_->top();
 
 	xercesc::DOMNode* const rootNode = domDocument->getDocumentElement();
 
 	this->fs_context_.iterate(
-		arguments[0]->str(),
+		argument->str(),
 		[&domDocument, &rootNode](const boost::filesystem::path& p) {
 		xercesc::DOMElement* const itemNode(
 			domDocument->createElement(*XercesStringGuard("item"))
 		);
 
-		if ( boost::filesystem::is_regular_file(p) ) {
-			itemNode->setAttribute(
-				*XercesStringGuard("type"),
-				*XercesStringGuard("file")
-			);
-		} else if ( boost::filesystem::is_directory(p) ) {
-			itemNode->setAttribute(
-				*XercesStringGuard("type"),
-				*XercesStringGuard("directory")
-			);
+		switch ( boost::filesystem::status(p).type() ) {
+			case boost::filesystem::regular_file: {
+				itemNode->setAttribute(
+					*XercesStringGuard("type"),
+					*XercesStringGuard("file")
+				);
+
+				break;
+			};
+			case boost::filesystem::directory_file: {
+				itemNode->setAttribute(
+					*XercesStringGuard("type"),
+					*XercesStringGuard("directory")
+				);
+
+				break;
+			};
+			default: {
+				break;
+			};
 		}
 
 		xercesc::DOMText* const textNode(

@@ -4,6 +4,7 @@
 #include <xalanc/XalanTransformer/XalanCompiledStylesheet.hpp>
 
 #include <sstream>
+#include <iostream>
 
 #include "function/read_file.h"
 #include "function/read_xml_file.h"
@@ -54,11 +55,17 @@ int TransformationFacade::generate(const std::string& target) {
 	xalan::XSLTInputSource  inputSource(emptyStream);
 	xalan::XSLTResultTarget outputTarget(target.data());
 
-	return this->transformer_.transform(
+	const int resultCode = this->transformer_.transform(
 		inputSource,
 		this->transformation_,
 		outputTarget
 	);
+
+	if ( resultCode != 0 ) {
+		std::cerr << this->transformer_.getLastError() << std::endl;
+	}
+
+	return resultCode;
 }
 
 }

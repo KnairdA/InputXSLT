@@ -20,10 +20,10 @@ class FunctionReadXmlFile : public xalan::Function {
 		FunctionReadXmlFile(const FunctionReadXmlFile&);
 
 		virtual xalan::XObjectPtr execute(
-			xalan::XPathExecutionContext&                executionContext,
-			xalan::XalanNode*                            context,
-			const xalan::Function::XObjectArgVectorType& arguments,
-			const xalan::Locator*                        locator
+			xalan::XPathExecutionContext&,
+			xalan::XalanNode*,
+			const xalan::XObjectPtr,
+			const xalan::Locator*
 		) const;
 
 		virtual FunctionReadXmlFile* clone(xalan::MemoryManager&) const;

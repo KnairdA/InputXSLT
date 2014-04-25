@@ -20,7 +20,7 @@ class FunctionReadFile : public xalan::Function {
 		virtual xalan::XObjectPtr execute(
 			xalan::XPathExecutionContext&,
 			xalan::XalanNode*,
-			const xalan::Function::XObjectArgVectorType&,
+			const xalan::XObjectPtr,
 			const xalan::Locator*
 		) const;
 

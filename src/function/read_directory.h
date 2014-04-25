@@ -22,7 +22,7 @@ class FunctionReadDirectory : public xalan::Function {
 		virtual xalan::XObjectPtr execute(
 			xalan::XPathExecutionContext&,
 			xalan::XalanNode*,
-			const xalan::Function::XObjectArgVectorType&,
+			const xalan::XObjectPtr,
 			const xalan::Locator*
 		) const;
 
@@ -34,7 +34,9 @@ class FunctionReadDirectory : public xalan::Function {
 	private:
 		const FilesystemContext& fs_context_;
 
-		std::shared_ptr<std::stack<DomDocumentGuard>> documents_;
+		std::shared_ptr<
+			std::stack<DomDocumentGuard>
+		> documents_;
 
 		const xalan::XalanDOMString& getError(xalan::XalanDOMString&) const;
 

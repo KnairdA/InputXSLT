@@ -13,28 +13,28 @@ FunctionReadXmlFile::FunctionReadXmlFile(const FunctionReadXmlFile& src):
 	parser_() { }
 
 xalan::XObjectPtr FunctionReadXmlFile::execute(
-	xalan::XPathExecutionContext&                executionContext,
-	xalan::XalanNode*                            context,
-	const xalan::Function::XObjectArgVectorType& arguments,
-	const xalan::Locator*                        locator
+	xalan::XPathExecutionContext& executionContext,
+	xalan::XalanNode*,
+	const xalan::XObjectPtr argument,
+	const xalan::Locator*
 ) const {
-	if ( arguments.size() != 1 ) {
-		xalan::XPathExecutionContext::GetAndReleaseCachedString guard(
-			executionContext
+	const boost::filesystem::path filePath(
+		this->fs_context_.resolve(argument->str())
+	);
+
+	if ( boost::filesystem::is_regular_file(filePath) ) {
+		boost::filesystem::ifstream file(filePath);
+
+		return executionContext.getXObjectFactory().createNodeSet(
+			this->parser_.parseXMLStream(
+				xalan::XSLTInputSource(file)
+			)
 		);
-
-		this->generalError(executionContext, context, locator);
+	} else {
+		return executionContext.getXObjectFactory().createString(
+			xalan::XalanDOMString("io error")
+		);
 	}
-
-	boost::filesystem::ifstream file(
-		this->fs_context_.resolve(arguments[0]->str())
-	);
-
-	return executionContext.getXObjectFactory().createNodeSet(
-		this->parser_.parseXMLStream(
-			xalan::XSLTInputSource(file)
-		)
-	);
 }
 
 FunctionReadXmlFile* FunctionReadXmlFile::clone(
@@ -44,7 +44,7 @@ FunctionReadXmlFile* FunctionReadXmlFile::clone(
 
 const xalan::XalanDOMString& FunctionReadXmlFile::getError(
 	xalan::XalanDOMString& result) const {
-	result.assign("The read-xml-file() function expects one argument.");
+	result.assign("The read-xml-file() function expects one argument of type string.");
 
 	return result;
 }
