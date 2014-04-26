@@ -34,44 +34,80 @@ xalan::XObjectPtr FunctionReadDirectory::execute(
 			domDocument->getDocumentElement()
 		);
 
-		this->fs_context_.iterate(
-			argument->str(),
-			[&domDocument, &rootNode](const boost::filesystem::path& p) {
-			xercesc::DOMElement* const itemNode(
-				domDocument->createElement(*XercesStringGuard("item"))
+		if (boost::filesystem::is_directory(
+			this->fs_context_.resolve(argument->str())
+		)) {
+			xercesc::DOMElement* const contentNode(
+				domDocument->createElement(*XercesStringGuard("content"))
 			);
 
-			switch ( boost::filesystem::status(p).type() ) {
-				case boost::filesystem::regular_file: {
-					itemNode->setAttribute(
-						*XercesStringGuard("type"),
-						*XercesStringGuard("file")
-					);
+			this->fs_context_.iterate(
+				argument->str(),
+				[&domDocument, &contentNode](const boost::filesystem::path& p) {
+				xercesc::DOMElement* const itemNode(
+					domDocument->createElement(*XercesStringGuard("item"))
+				);
 
-					break;
-				};
-				case boost::filesystem::directory_file: {
-					itemNode->setAttribute(
-						*XercesStringGuard("type"),
-						*XercesStringGuard("directory")
-					);
+				switch ( boost::filesystem::status(p).type() ) {
+					case boost::filesystem::regular_file: {
+						itemNode->setAttribute(
+							*XercesStringGuard("type"),
+							*XercesStringGuard("file")
+						);
 
-					break;
-				};
-				default: {
-					break;
-				};
-			}
+						break;
+					};
+					case boost::filesystem::directory_file: {
+						itemNode->setAttribute(
+							*XercesStringGuard("type"),
+							*XercesStringGuard("directory")
+						);
 
-			xercesc::DOMText* const textNode(
+						break;
+					};
+					default: {
+						break;
+					};
+				}
+
+				xercesc::DOMText* const textNode(
+					domDocument->createTextNode(
+						*XercesStringGuard(p.filename().string())
+					)
+				);
+
+				itemNode->appendChild(textNode);
+				contentNode->appendChild(itemNode);
+			});
+
+			xercesc::DOMElement* const resultNode(
+				domDocument->createElement(*XercesStringGuard("status"))
+			);
+
+			xercesc::DOMText* const resultTextNode(
 				domDocument->createTextNode(
-					*XercesStringGuard(p.filename().string())
+					*XercesStringGuard("successful")
 				)
 			);
 
-			itemNode->appendChild(textNode);
-			rootNode->appendChild(itemNode);
-		});
+			resultNode->appendChild(resultTextNode);
+
+			rootNode->appendChild(contentNode);
+			rootNode->appendChild(resultNode);
+		} else {
+			xercesc::DOMElement* const resultNode(
+				domDocument->createElement(*XercesStringGuard("status"))
+			);
+
+			xercesc::DOMText* const resultTextNode(
+				domDocument->createTextNode(
+					*XercesStringGuard("error")
+				)
+			);
+
+			resultNode->appendChild(resultTextNode);
+			rootNode->appendChild(resultNode);
+		}
 	}
 
 	xalan::XPathExecutionContext::BorrowReturnMutableNodeRefList nodeList(
