@@ -11,10 +11,9 @@
 
 namespace InputXSLT {
 
-FunctionReadDirectory::FunctionReadDirectory(const FilesystemContext& context,
-                                             DomDocumentCache& cache):
+FunctionReadDirectory::FunctionReadDirectory(const FilesystemContext& context):
 	fs_context_(context),
-	document_cache_(cache) { }
+	document_cache_(std::make_shared<DomDocumentCache>()) { }
 
 xalan::XObjectPtr FunctionReadDirectory::execute(
 	xalan::XPathExecutionContext& executionContext,
@@ -23,7 +22,7 @@ xalan::XObjectPtr FunctionReadDirectory::execute(
 	const xalan::Locator*
 ) const {
 	DomDocumentCache::item* const cachedDocument(
-		this->document_cache_.get(xalanToString(argument->str()))
+		this->document_cache_->get(xalanToString(argument->str()))
 	);
 
 	if ( !cachedDocument->isFinalized() ) {

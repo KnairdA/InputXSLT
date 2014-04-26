@@ -1,7 +1,7 @@
 #ifndef INPUTXSLT_SRC_SUPPORT_DOM_DOCUMENT_CACHE_H_
 #define INPUTXSLT_SRC_SUPPORT_DOM_DOCUMENT_CACHE_H_
 
-#include <map>
+#include <unordered_map>
 #include <string>
 #include <memory>
 
@@ -16,7 +16,7 @@ class DomDocumentCache {
 		item* get(const std::string&);
 
 	private:
-		std::map<std::string, std::unique_ptr<item>> map_;
+		std::unordered_map<std::string, std::unique_ptr<item>> map_;
 
 };
 
