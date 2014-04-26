@@ -9,7 +9,7 @@ FilesystemContext::FilesystemContext(const std::string& path):
 
 boost::filesystem::path FilesystemContext::resolve(
 	const std::string& path) const {
-	return canonical(this->path_ / path);
+	return absolute(this->path_ / path);
 }
 
 boost::filesystem::path FilesystemContext::resolve(

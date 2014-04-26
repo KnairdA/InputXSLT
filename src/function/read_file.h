@@ -10,6 +10,7 @@
 
 #include "common.h"
 #include "support/filesystem_context.h"
+#include "support/dom/document_cache.h"
 
 namespace InputXSLT {
 
@@ -31,6 +32,7 @@ class FunctionReadFile : public xalan::Function {
 
 	private:
 		const FilesystemContext& fs_context_;
+		std::shared_ptr<DomDocumentCache> document_cache_;
 
 		const xalan::XalanDOMString& getError(xalan::XalanDOMString&) const;
 
