@@ -24,7 +24,17 @@
 		</xsl:for-each>
 		</ul>
 		<ul id="filelist">
-		<xsl:for-each select="external:read-directory('.')/content/item[@type='file']">
+		<xsl:for-each select="external:read-directory('.')[@type='file']">
+			<li><xsl:value-of select="."/></li>
+		</xsl:for-each>
+		</ul>
+		<ul id="filelist2">
+		<xsl:for-each select="external:read-directory('../')[@type='file']">
+			<li><xsl:value-of select="."/></li>
+		</xsl:for-each>
+		</ul>
+		<ul id="filelist3">
+		<xsl:for-each select="external:read-directory('../')[@type='directory']">
 			<li><xsl:value-of select="."/></li>
 		</xsl:for-each>
 		</ul>

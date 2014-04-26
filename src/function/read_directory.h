@@ -6,18 +6,15 @@
 #include <xalanc/XPath/Function.hpp>
 #include <xalanc/XPath/XObject.hpp>
 
-#include <memory>
-#include <stack>
-
 #include "common.h"
 #include "support/filesystem_context.h"
-#include "support/dom_document_guard.h"
+#include "support/dom/document_cache.h"
 
 namespace InputXSLT {
 
 class FunctionReadDirectory : public xalan::Function {
 	public:
-		FunctionReadDirectory(const FilesystemContext&);
+		FunctionReadDirectory(const FilesystemContext&, DomDocumentCache&);
 
 		virtual xalan::XObjectPtr execute(
 			xalan::XPathExecutionContext&,
@@ -33,10 +30,7 @@ class FunctionReadDirectory : public xalan::Function {
 
 	private:
 		const FilesystemContext& fs_context_;
-
-		std::shared_ptr<
-			std::stack<DomDocumentGuard>
-		> documents_;
+		DomDocumentCache& document_cache_;
 
 		const xalan::XalanDOMString& getError(xalan::XalanDOMString&) const;
 

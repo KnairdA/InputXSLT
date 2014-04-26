@@ -18,7 +18,8 @@ add_executable(
 	src/function/read_xml_file.cc
 	src/function/read_directory.cc
 	src/support/filesystem_context.cc
-	src/support/dom_document_guard.cc
+	src/support/dom/document_cache.cc
+	src/support/dom/document_cache_item.cc
 	src/support/xerces_string_guard.cc
 )
 

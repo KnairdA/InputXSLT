@@ -7,6 +7,7 @@
 
 #include "common.h"
 #include "support/filesystem_context.h"
+#include "support/dom/document_cache.h"
 
 namespace InputXSLT {
 
@@ -22,6 +23,7 @@ class TransformationFacade {
 		const xalan::XalanCompiledStylesheet* transformation_;
 
 		xalan::XalanTransformer transformer_;
+		DomDocumentCache document_cache_;
 
 };
 

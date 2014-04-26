@@ -15,7 +15,8 @@ namespace InputXSLT {
 TransformationFacade::TransformationFacade(const std::string& transformation):
 	fs_context_(boost::filesystem::path(transformation).parent_path().string()),
 	transformation_{},
-	transformer_() {
+	transformer_(),
+	document_cache_() {
 	const xalan::XalanDOMString customNamespace(
 		"http://ExternalFunction.xalan-c++.xml.apache.org"
 	);
@@ -35,7 +36,7 @@ TransformationFacade::TransformationFacade(const std::string& transformation):
 	this->transformer_.installExternalFunction(
 		customNamespace,
 		xalan::XalanDOMString("read-directory"),
-		InputXSLT::FunctionReadDirectory(this->fs_context_)
+		InputXSLT::FunctionReadDirectory(this->fs_context_, this->document_cache_)
 	);
 
 	this->transformer_.compileStylesheet(

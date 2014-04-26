@@ -1,5 +1,5 @@
-#ifndef INPUTXSLT_SRC_SUPPORT_DOM_DOCUMENT_GUARD_H_
-#define INPUTXSLT_SRC_SUPPORT_DOM_DOCUMENT_GUARD_H_
+#ifndef INPUTXSLT_SRC_SUPPORT_DOM_DOCUMENT_CACHE_ITEM_H_
+#define INPUTXSLT_SRC_SUPPORT_DOM_DOCUMENT_CACHE_ITEM_H_
 
 #include <xalanc/XercesParserLiaison/XercesParserLiaison.hpp>
 #include <xalanc/XercesParserLiaison/XercesDOMSupport.hpp>
@@ -11,21 +11,27 @@
 #include <memory>
 
 #include "common.h"
+#include "document_cache.h"
 
 namespace InputXSLT {
 
-class DomDocumentGuard {
+class DomDocumentCache::item {
 	public:
-		DomDocumentGuard(const std::string&);
-		~DomDocumentGuard();
+		~item();
 
-		xercesc::DOMDocument* operator->();
-		xalan::XalanDocument* finalize();
+		bool isFinalized() const;
+
+		xercesc::DOMDocument* getXercesDocument() const;
+		xalan::XalanDocument* getXalanDocument();
+
+	protected:
+		friend DomDocumentCache;
+
+		item(const std::string&);
 
 	private:
 		xalan::XercesParserLiaison parser_;
 		xalan::XercesDOMSupport dom_support_;
-		XMLCh* root_node_name_;
 		xercesc::DOMDocument* const document_;
 		std::unique_ptr<xalan::XercesDOMWrapperParsedSource> parsed_source_;
 
@@ -33,4 +39,4 @@ class DomDocumentGuard {
 
 }
 
-#endif  // INPUTXSLT_SRC_SUPPORT_DOM_DOCUMENT_GUARD_H_
+#endif  // INPUTXSLT_SRC_SUPPORT_DOM_DOCUMENT_CACHE_ITEM_H_
