@@ -5,19 +5,19 @@
 #include <xalanc/XPath/XObjectFactory.hpp>
 #include <xalanc/XPath/Function.hpp>
 #include <xalanc/XPath/XObject.hpp>
-#include <xalanc/XercesParserLiaison/XercesParserLiaison.hpp>
 
 #include <string>
+#include <memory>
 
 #include "common.h"
 #include "support/filesystem_context.h"
+#include "support/dom/document_cache.h"
 
 namespace InputXSLT {
 
 class FunctionReadXmlFile : public xalan::Function {
 	public:
 		FunctionReadXmlFile(const FilesystemContext&);
-		FunctionReadXmlFile(const FunctionReadXmlFile&);
 
 		virtual xalan::XObjectPtr execute(
 			xalan::XPathExecutionContext&,
@@ -33,7 +33,7 @@ class FunctionReadXmlFile : public xalan::Function {
 
 	private:
 		const FilesystemContext& fs_context_;
-		mutable xalan::XercesParserLiaison parser_;
+		std::shared_ptr<DomDocumentCache> document_cache_;
 
 		const xalan::XalanDOMString& getError(xalan::XalanDOMString& result) const;
 

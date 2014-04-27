@@ -4,14 +4,12 @@
 #include <xercesc/dom/DOMImplementation.hpp>
 #include <xercesc/dom/DOMElement.hpp>
 #include <xercesc/dom/DOMText.hpp>
-#include <xercesc/util/XMLString.hpp>
 
 #include "boost/filesystem/fstream.hpp"
 
 #include <fstream>
 
 #include "support/xerces_string_guard.h"
-#include "support/utility.h"
 
 namespace InputXSLT {
 
@@ -30,7 +28,7 @@ xalan::XObjectPtr FunctionReadFile::execute(
 	);
 
 	DomDocumentCache::item* const cachedDocument(
-		this->document_cache_->get(xalanToString(argument->str()))
+		this->document_cache_->get(filePath.string())
 	);
 
 	if ( !cachedDocument->isFinalized() ) {

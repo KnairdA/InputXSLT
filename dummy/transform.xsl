@@ -24,16 +24,26 @@
 					<xsl:value-of select="$testFile/self::content"/>
 				</xsl:when>
 				<xsl:otherwise>
-					Could not read file.
+					Could not read text file.
 				</xsl:otherwise>
 			</xsl:choose>
 		</div>
 
-		<ul id="xml">
-		<xsl:for-each select="external:read-xml-file('test.txt')/tester/eintrag">
-			<li><xsl:value-of select="."/></li>
-		</xsl:for-each>
-		</ul>
+		<div id="xml">
+			<xsl:variable name="testXml" select="external:read-xml-file('test.txt')"/>
+			<xsl:choose>
+				<xsl:when test="$testXml/self::status = 'successful'">
+					<ul id="xml">
+					<xsl:for-each select="$testXml/self::content/tester/eintrag">
+						<li><xsl:value-of select="."/></li>
+					</xsl:for-each>
+					</ul>
+				</xsl:when>
+				<xsl:otherwise>
+					Could not read XML file.
+				</xsl:otherwise>
+			</xsl:choose>
+		</div>
 
 		<div id="filelists">
 			<xsl:variable name="fileList" select="external:read-directory('../')"/>

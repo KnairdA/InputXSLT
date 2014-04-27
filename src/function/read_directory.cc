@@ -4,7 +4,6 @@
 #include <xercesc/dom/DOMImplementation.hpp>
 #include <xercesc/dom/DOMElement.hpp>
 #include <xercesc/dom/DOMText.hpp>
-#include <xercesc/util/XMLString.hpp>
 
 #include "support/utility.h"
 #include "support/xerces_string_guard.h"

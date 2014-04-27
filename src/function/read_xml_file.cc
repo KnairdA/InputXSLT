@@ -1,16 +1,20 @@
 #include "read_xml_file.h"
 
+#include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/dom/DOMImplementation.hpp>
+#include <xercesc/dom/DOMElement.hpp>
+#include <xercesc/dom/DOMText.hpp>
+#include <xercesc/parsers/XercesDOMParser.hpp>
+
 #include "boost/filesystem/fstream.hpp"
+
+#include "support/xerces_string_guard.h"
 
 namespace InputXSLT {
 
 FunctionReadXmlFile::FunctionReadXmlFile(const FilesystemContext& context):
 	fs_context_(context),
-	parser_() { }
-
-FunctionReadXmlFile::FunctionReadXmlFile(const FunctionReadXmlFile& src):
-	fs_context_(src.fs_context_),
-	parser_() { }
+	document_cache_(std::make_shared<DomDocumentCache>()) { }
 
 xalan::XObjectPtr FunctionReadXmlFile::execute(
 	xalan::XPathExecutionContext& executionContext,
@@ -22,19 +26,75 @@ xalan::XObjectPtr FunctionReadXmlFile::execute(
 		this->fs_context_.resolve(argument->str())
 	);
 
-	if ( boost::filesystem::is_regular_file(filePath) ) {
-		boost::filesystem::ifstream file(filePath);
+	DomDocumentCache::item* const cachedDocument(
+		this->document_cache_->get(filePath.string())
+	);
 
-		return executionContext.getXObjectFactory().createNodeSet(
-			this->parser_.parseXMLStream(
-				xalan::XSLTInputSource(file)
-			)
+	if ( !cachedDocument->isFinalized() ) {
+		xercesc::DOMDocument* const domDocument(
+			cachedDocument->getXercesDocument()
 		);
-	} else {
-		return executionContext.getXObjectFactory().createString(
-			xalan::XalanDOMString("io error")
+
+		xercesc::DOMNode* const rootNode(
+			domDocument->getDocumentElement()
 		);
+
+		if ( boost::filesystem::is_regular_file(filePath) ) {
+			xercesc::DOMElement* const contentNode(
+				domDocument->createElement(*XercesStringGuard("content"))
+			);
+
+			xercesc::XercesDOMParser parser;
+			boost::filesystem::ifstream file(filePath);
+			parser.parse(xalan::XSLTInputSource(file));
+
+			xercesc::DOMNode* const contentTreeNode(
+				domDocument->importNode(
+					parser.getDocument()->getDocumentElement(),
+					true
+				)
+			);
+
+			xercesc::DOMElement* const resultNode(
+				domDocument->createElement(*XercesStringGuard("status"))
+			);
+
+			xercesc::DOMText* const resultTextNode(
+				domDocument->createTextNode(
+					*XercesStringGuard("successful")
+				)
+			);
+
+			contentNode->appendChild(contentTreeNode);
+			resultNode->appendChild(resultTextNode);
+
+			rootNode->appendChild(contentNode);
+			rootNode->appendChild(resultNode);
+		} else {
+			xercesc::DOMElement* const resultNode(
+				domDocument->createElement(*XercesStringGuard("status"))
+			);
+
+			xercesc::DOMText* const resultTextNode(
+				domDocument->createTextNode(
+					*XercesStringGuard("error")
+				)
+			);
+
+			resultNode->appendChild(resultTextNode);
+			rootNode->appendChild(resultNode);
+		}
 	}
+
+	xalan::XPathExecutionContext::BorrowReturnMutableNodeRefList nodeList(
+		executionContext
+	);
+
+	nodeList->addNodes(
+		*cachedDocument->getXalanDocument()->getDocumentElement()->getChildNodes()
+	);
+
+	return executionContext.getXObjectFactory().createNodeSet(nodeList);
 }
 
 FunctionReadXmlFile* FunctionReadXmlFile::clone(
