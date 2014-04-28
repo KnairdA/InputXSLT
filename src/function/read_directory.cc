@@ -5,7 +5,6 @@
 #include <xercesc/dom/DOMElement.hpp>
 #include <xercesc/dom/DOMText.hpp>
 
-#include "support/utility.h"
 #include "support/xerces_string_guard.h"
 
 namespace InputXSLT {
@@ -20,8 +19,12 @@ xalan::XObjectPtr FunctionReadDirectory::execute(
 	const xalan::XObjectPtr argument,
 	const xalan::Locator*
 ) const {
+	const boost::filesystem::path directoryPath(
+		this->fs_context_.resolve(argument->str())
+	);
+
 	DomDocumentCache::item* const cachedDocument(
-		this->document_cache_->get(xalanToString(argument->str()))
+		this->document_cache_->get(directoryPath.string())
 	);
 
 	if ( !cachedDocument->isFinalized() ) {
@@ -33,9 +36,7 @@ xalan::XObjectPtr FunctionReadDirectory::execute(
 			domDocument->getDocumentElement()
 		);
 
-		if (boost::filesystem::is_directory(
-			this->fs_context_.resolve(argument->str())
-		)) {
+		if ( boost::filesystem::is_directory(directoryPath) ) {
 			xercesc::DOMElement* const contentNode(
 				domDocument->createElement(*XercesStringGuard("content"))
 			);

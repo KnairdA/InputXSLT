@@ -1,5 +1,7 @@
 #include "document_cache.h"
 
+#include <stdexcept>
+
 namespace InputXSLT {
 
 DomDocumentCache::DomDocumentCache():
@@ -16,7 +18,7 @@ DomDocumentCache::item* DomDocumentCache::get(const std::string& key) {
 		if ( result.second ) {
 			return (*(result.first)).second.get();
 		} else {
-			return nullptr;
+			throw std::out_of_range("failed to instantiate DomDocumentCache");
 		}
 	} else {
 		return (*itemIter).second.get();

@@ -1,6 +1,18 @@
 #include "filesystem_context.h"
 
-#include "support/utility.h"
+namespace {
+
+inline std::string xalanToString(const xalan::XalanDOMString& text) {
+	xalan::CharVectorType castHelper;
+	text.transcode(castHelper);
+
+	return std::string(
+		castHelper.begin(),
+		castHelper.end() - 1
+	);
+}
+
+}
 
 namespace InputXSLT {
 
