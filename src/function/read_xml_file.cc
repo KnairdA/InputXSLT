@@ -40,48 +40,33 @@ xalan::XObjectPtr FunctionReadXmlFile::execute(
 		);
 
 		if ( boost::filesystem::is_regular_file(filePath) ) {
-			xercesc::DOMElement* const contentNode(
-				domDocument->createElement(*XercesStringGuard("content"))
+			xercesc::DOMElement* const resultNode(
+				domDocument->createElement(*XercesStringGuard("result"))
+			);
+
+			resultNode->setAttribute(
+				*XercesStringGuard("name"),
+				*XercesStringGuard(filePath.filename().string())
 			);
 
 			xercesc::XercesDOMParser parser;
 			boost::filesystem::ifstream file(filePath);
 			parser.parse(xalan::XSLTInputSource(file));
 
-			xercesc::DOMNode* const contentTreeNode(
+			xercesc::DOMNode* const resultTreeNode(
 				domDocument->importNode(
 					parser.getDocument()->getDocumentElement(),
 					true
 				)
 			);
 
-			xercesc::DOMElement* const resultNode(
-				domDocument->createElement(*XercesStringGuard("status"))
-			);
-
-			xercesc::DOMText* const resultTextNode(
-				domDocument->createTextNode(
-					*XercesStringGuard("successful")
-				)
-			);
-
-			contentNode->appendChild(contentTreeNode);
-			resultNode->appendChild(resultTextNode);
-
-			rootNode->appendChild(contentNode);
+			resultNode->appendChild(resultTreeNode);
 			rootNode->appendChild(resultNode);
 		} else {
 			xercesc::DOMElement* const resultNode(
-				domDocument->createElement(*XercesStringGuard("status"))
+				domDocument->createElement(*XercesStringGuard("error"))
 			);
 
-			xercesc::DOMText* const resultTextNode(
-				domDocument->createTextNode(
-					*XercesStringGuard("error")
-				)
-			);
-
-			resultNode->appendChild(resultTextNode);
 			rootNode->appendChild(resultNode);
 		}
 	}

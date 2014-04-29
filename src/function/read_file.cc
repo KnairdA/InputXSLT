@@ -48,43 +48,28 @@ xalan::XObjectPtr FunctionReadFile::execute(
 				(std::istreambuf_iterator<char>())
 			);
 
-			xercesc::DOMElement* const contentNode(
-				domDocument->createElement(*XercesStringGuard("content"))
+			xercesc::DOMElement* const resultNode(
+				domDocument->createElement(*XercesStringGuard("result"))
 			);
 
-			xercesc::DOMText* const contentTextNode(
+			resultNode->setAttribute(
+				*XercesStringGuard("name"),
+				*XercesStringGuard(filePath.filename().string())
+			);
+
+			xercesc::DOMText* const resultTextNode(
 				domDocument->createTextNode(
 					*XercesStringGuard(fileContent)
 				)
 			);
 
-			xercesc::DOMElement* const resultNode(
-				domDocument->createElement(*XercesStringGuard("status"))
-			);
-
-			xercesc::DOMText* const resultTextNode(
-				domDocument->createTextNode(
-					*XercesStringGuard("successful")
-				)
-			);
-
-			contentNode->appendChild(contentTextNode);
 			resultNode->appendChild(resultTextNode);
-
-			rootNode->appendChild(contentNode);
 			rootNode->appendChild(resultNode);
 		} else {
 			xercesc::DOMElement* const resultNode(
-				domDocument->createElement(*XercesStringGuard("status"))
+				domDocument->createElement(*XercesStringGuard("error"))
 			);
 
-			xercesc::DOMText* const resultTextNode(
-				domDocument->createTextNode(
-					*XercesStringGuard("error")
-				)
-			);
-
-			resultNode->appendChild(resultTextNode);
 			rootNode->appendChild(resultNode);
 		}
 	}

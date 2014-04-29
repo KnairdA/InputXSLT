@@ -37,15 +37,11 @@ xalan::XObjectPtr FunctionReadDirectory::execute(
 		);
 
 		if ( boost::filesystem::is_directory(directoryPath) ) {
-			xercesc::DOMElement* const contentNode(
-				domDocument->createElement(*XercesStringGuard("content"))
-			);
-
 			this->fs_context_.iterate(
 				argument->str(),
-				[&domDocument, &contentNode](const boost::filesystem::path& p) {
+				[&domDocument, &rootNode](const boost::filesystem::path& p) {
 				xercesc::DOMElement* const itemNode(
-					domDocument->createElement(*XercesStringGuard("item"))
+					domDocument->createElement(*XercesStringGuard("result"))
 				);
 
 				switch ( boost::filesystem::status(p).type() ) {
@@ -77,35 +73,13 @@ xalan::XObjectPtr FunctionReadDirectory::execute(
 				);
 
 				itemNode->appendChild(textNode);
-				contentNode->appendChild(itemNode);
+				rootNode->appendChild(itemNode);
 			});
-
-			xercesc::DOMElement* const resultNode(
-				domDocument->createElement(*XercesStringGuard("status"))
-			);
-
-			xercesc::DOMText* const resultTextNode(
-				domDocument->createTextNode(
-					*XercesStringGuard("successful")
-				)
-			);
-
-			resultNode->appendChild(resultTextNode);
-
-			rootNode->appendChild(contentNode);
-			rootNode->appendChild(resultNode);
 		} else {
 			xercesc::DOMElement* const resultNode(
-				domDocument->createElement(*XercesStringGuard("status"))
+				domDocument->createElement(*XercesStringGuard("error"))
 			);
 
-			xercesc::DOMText* const resultTextNode(
-				domDocument->createTextNode(
-					*XercesStringGuard("error")
-				)
-			);
-
-			resultNode->appendChild(resultTextNode);
 			rootNode->appendChild(resultNode);
 		}
 	}
