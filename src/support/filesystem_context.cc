@@ -35,8 +35,7 @@ void FilesystemContext::iterate(
 ) const {
 	const boost::filesystem::path directory(this->resolve(path));
 
-	if ( boost::filesystem::exists(directory) &&
-	     boost::filesystem::is_directory(directory) ) {
+	if ( boost::filesystem::is_directory(directory) ) {
 		for ( boost::filesystem::directory_iterator iter(directory);
 		      iter != boost::filesystem::directory_iterator();
 		      ++iter ) {

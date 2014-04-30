@@ -10,6 +10,24 @@
 
 #include "support/xerces_string_guard.h"
 
+namespace {
+
+inline xercesc::DOMNode* importDocumentElement(
+	const boost::filesystem::path& filePath,
+	xercesc::DOMDocument* const domDocument
+) {
+	xercesc::XercesDOMParser parser;
+	boost::filesystem::ifstream file(filePath);
+	parser.parse(xalan::XSLTInputSource(file));
+
+	return domDocument->importNode(
+		parser.getDocument()->getDocumentElement(),
+		true
+	);
+}
+
+}
+
 namespace InputXSLT {
 
 FunctionReadXmlFile::FunctionReadXmlFile(const FilesystemContext& context):
@@ -49,15 +67,8 @@ xalan::XObjectPtr FunctionReadXmlFile::execute(
 				*XercesStringGuard(filePath.filename().string())
 			);
 
-			xercesc::XercesDOMParser parser;
-			boost::filesystem::ifstream file(filePath);
-			parser.parse(xalan::XSLTInputSource(file));
-
 			xercesc::DOMNode* const resultTreeNode(
-				domDocument->importNode(
-					parser.getDocument()->getDocumentElement(),
-					true
-				)
+				importDocumentElement(filePath, domDocument)
 			);
 
 			resultNode->appendChild(resultTreeNode);

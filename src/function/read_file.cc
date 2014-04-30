@@ -7,9 +7,20 @@
 
 #include "boost/filesystem/fstream.hpp"
 
-#include <fstream>
-
 #include "support/xerces_string_guard.h"
+
+namespace {
+
+inline std::string readFile(const boost::filesystem::path& filePath) {
+	boost::filesystem::ifstream file(filePath);
+
+	return std::string(
+		(std::istreambuf_iterator<char>(file)),
+		(std::istreambuf_iterator<char>())
+	);
+}
+
+}
 
 namespace InputXSLT {
 
@@ -41,13 +52,6 @@ xalan::XObjectPtr FunctionReadFile::execute(
 		);
 
 		if ( boost::filesystem::is_regular_file(filePath) ) {
-			boost::filesystem::ifstream file(filePath);
-
-			const std::string fileContent(
-				(std::istreambuf_iterator<char>(file)),
-				(std::istreambuf_iterator<char>())
-			);
-
 			xercesc::DOMElement* const resultNode(
 				domDocument->createElement(*XercesStringGuard("result"))
 			);
@@ -59,7 +63,7 @@ xalan::XObjectPtr FunctionReadFile::execute(
 
 			xercesc::DOMText* const resultTextNode(
 				domDocument->createTextNode(
-					*XercesStringGuard(fileContent)
+					*XercesStringGuard(readFile(filePath))
 				)
 			);
 

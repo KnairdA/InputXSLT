@@ -62,6 +62,11 @@ xalan::XObjectPtr FunctionReadDirectory::execute(
 						break;
 					};
 					default: {
+						itemNode->setAttribute(
+							*XercesStringGuard("type"),
+							*XercesStringGuard("misc")
+						);
+
 						break;
 					};
 				}
