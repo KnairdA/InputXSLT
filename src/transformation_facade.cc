@@ -55,6 +55,7 @@ int TransformationFacade::generate(const std::string& target) {
 	xalan::XSLTInputSource  inputSource(emptyStream);
 	xalan::XSLTResultTarget outputTarget(target.data());
 
+
 	const int resultCode = this->transformer_.transform(
 		inputSource,
 		this->transformation_,
@@ -64,6 +65,24 @@ int TransformationFacade::generate(const std::string& target) {
 	if ( resultCode != 0 ) {
 		std::cerr << this->transformer_.getLastError() << std::endl;
 	}
+
+	return resultCode;
+}
+
+int TransformationFacade::generate(
+	const std::string& target,
+	const parameter_map& parameters
+) {
+	for ( auto&& parameter : parameters ) {
+		this->transformer_.setStylesheetParam(
+			parameter.first.data(),
+			parameter.second.data()
+		);
+	}
+
+	const int resultCode = this->generate(target);
+
+	this->transformer_.clearStylesheetParams();
 
 	return resultCode;
 }

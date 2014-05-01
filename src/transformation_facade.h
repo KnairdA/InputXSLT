@@ -4,6 +4,7 @@
 #include <xalanc/XalanTransformer/XalanTransformer.hpp>
 
 #include <string>
+#include <unordered_map>
 
 #include "common.h"
 #include "support/filesystem_context.h"
@@ -12,10 +13,13 @@ namespace InputXSLT {
 
 class TransformationFacade {
 	public:
+		typedef std::unordered_map<std::string, std::string> parameter_map;
+
 		TransformationFacade(const std::string&);
 		~TransformationFacade();
 
 		int generate(const std::string&);
+		int generate(const std::string&, const parameter_map&);
 
 	private:
 		const FilesystemContext fs_context_;

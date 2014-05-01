@@ -15,11 +15,17 @@
 	indent="yes"
 />
 
+<xsl:param name="test"/>
+
 <xsl:template match="/">
 <html>
 	<head>
 	</head>
 	<body>
+		<div id="parameter">
+			Parameter "test" contains value "<xsl:value-of select="$test"/>"
+		</div>
+
 		<div id="raw">
 			<xsl:variable name="testFile" select="InputXSLT:read-file('test.txt')"/>
 			<xsl:choose>

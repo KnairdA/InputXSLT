@@ -5,5 +5,7 @@ int main() {
 	InputXSLT::PlattformGuard plattform;
 	InputXSLT::TransformationFacade transformation("../dummy/transform.xsl");
 
-	return transformation.generate("out.xml");
+	return transformation.generate("out.xml", {
+		{"test", "42"}
+	});
 }
