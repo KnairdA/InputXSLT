@@ -17,7 +17,7 @@ TransformationFacade::TransformationFacade(const std::string& transformation):
 	transformation_{},
 	transformer_() {
 	const xalan::XalanDOMString customNamespace(
-		"http://ExternalFunction.xalan-c++.xml.apache.org"
+		"function.inputxslt.application"
 	);
 
 	this->transformer_.installExternalFunction(
