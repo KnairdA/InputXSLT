@@ -10,14 +10,13 @@
 #include <memory>
 
 #include "common.h"
-#include "support/filesystem_context.h"
 #include "support/dom/document_cache.h"
 
 namespace InputXSLT {
 
 class FunctionReadXmlFile : public xalan::Function {
 	public:
-		FunctionReadXmlFile(const FilesystemContext&);
+		FunctionReadXmlFile();
 
 		virtual xalan::XObjectPtr execute(
 			xalan::XPathExecutionContext&,
@@ -32,7 +31,6 @@ class FunctionReadXmlFile : public xalan::Function {
 		bool operator==(const FunctionReadXmlFile&) const          = delete;
 
 	private:
-		const FilesystemContext& fs_context_;
 		std::shared_ptr<DomDocumentCache> document_cache_;
 
 		const xalan::XalanDOMString& getError(xalan::XalanDOMString& result) const;

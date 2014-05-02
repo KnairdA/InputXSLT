@@ -6,38 +6,11 @@
 #include <sstream>
 #include <iostream>
 
-#include "function/read_file.h"
-#include "function/read_xml_file.h"
-#include "function/read_directory.h"
-
 namespace InputXSLT {
 
 TransformationFacade::TransformationFacade(const std::string& transformation):
-	fs_context_(boost::filesystem::path(transformation).parent_path().string()),
 	transformation_{},
 	transformer_() {
-	const xalan::XalanDOMString customNamespace(
-		"function.inputxslt.application"
-	);
-
-	this->transformer_.installExternalFunction(
-		customNamespace,
-		xalan::XalanDOMString("read-file"),
-		InputXSLT::FunctionReadFile(this->fs_context_)
-	);
-
-	this->transformer_.installExternalFunction(
-		customNamespace,
-		xalan::XalanDOMString("read-xml-file"),
-		InputXSLT::FunctionReadXmlFile(this->fs_context_)
-	);
-
-	this->transformer_.installExternalFunction(
-		customNamespace,
-		xalan::XalanDOMString("read-directory"),
-		InputXSLT::FunctionReadDirectory(this->fs_context_)
-	);
-
 	this->transformer_.compileStylesheet(
 		xalan::XSLTInputSource(transformation.data()),
 		this->transformation_

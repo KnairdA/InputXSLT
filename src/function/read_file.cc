@@ -8,6 +8,7 @@
 #include "boost/filesystem/fstream.hpp"
 
 #include "support/xerces_string_guard.h"
+#include "support/filesystem_context.h"
 
 namespace {
 
@@ -24,18 +25,23 @@ inline std::string readFile(const boost::filesystem::path& filePath) {
 
 namespace InputXSLT {
 
-FunctionReadFile::FunctionReadFile(const FilesystemContext& context):
-	fs_context_(context),
+FunctionReadFile::FunctionReadFile():
 	document_cache_(std::make_shared<DomDocumentCache>()) { }
 
 xalan::XObjectPtr FunctionReadFile::execute(
 	xalan::XPathExecutionContext& executionContext,
 	xalan::XalanNode*,
 	const xalan::XObjectPtr argument,
-	const xalan::Locator*
+	const xalan::Locator* locator
 ) const {
+	const FilesystemContext fs_context(
+		boost::filesystem::path(
+			xercesc::XMLString::transcode(locator->getSystemId() + 7)
+		).parent_path().string()
+	);
+
 	const boost::filesystem::path filePath(
-		this->fs_context_.resolve(argument->str())
+		fs_context.resolve(argument->str())
 	);
 
 	DomDocumentCache::item* const cachedDocument(

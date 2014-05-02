@@ -9,14 +9,13 @@
 #include <memory>
 
 #include "common.h"
-#include "support/filesystem_context.h"
 #include "support/dom/document_cache.h"
 
 namespace InputXSLT {
 
 class FunctionReadDirectory : public xalan::Function {
 	public:
-		FunctionReadDirectory(const FilesystemContext&);
+		FunctionReadDirectory();
 
 		virtual xalan::XObjectPtr execute(
 			xalan::XPathExecutionContext&,
@@ -31,7 +30,6 @@ class FunctionReadDirectory : public xalan::Function {
 		bool operator==(const FunctionReadDirectory&) const            = delete;
 
 	private:
-		const FilesystemContext& fs_context_;
 		std::shared_ptr<DomDocumentCache> document_cache_;
 
 		const xalan::XalanDOMString& getError(xalan::XalanDOMString&) const;

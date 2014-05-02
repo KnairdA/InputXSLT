@@ -6,21 +6,27 @@
 #include <xercesc/dom/DOMText.hpp>
 
 #include "support/xerces_string_guard.h"
+#include "support/filesystem_context.h"
 
 namespace InputXSLT {
 
-FunctionReadDirectory::FunctionReadDirectory(const FilesystemContext& context):
-	fs_context_(context),
+FunctionReadDirectory::FunctionReadDirectory():
 	document_cache_(std::make_shared<DomDocumentCache>()) { }
 
 xalan::XObjectPtr FunctionReadDirectory::execute(
 	xalan::XPathExecutionContext& executionContext,
 	xalan::XalanNode*,
 	const xalan::XObjectPtr argument,
-	const xalan::Locator*
+	const xalan::Locator* locator
 ) const {
+	const FilesystemContext fs_context(
+		boost::filesystem::path(
+			xercesc::XMLString::transcode(locator->getSystemId() + 7)
+		).parent_path().string()
+	);
+
 	const boost::filesystem::path directoryPath(
-		this->fs_context_.resolve(argument->str())
+		fs_context.resolve(argument->str())
 	);
 
 	DomDocumentCache::item* const cachedDocument(
@@ -37,7 +43,7 @@ xalan::XObjectPtr FunctionReadDirectory::execute(
 		);
 
 		if ( boost::filesystem::is_directory(directoryPath) ) {
-			this->fs_context_.iterate(
+			fs_context.iterate(
 				argument->str(),
 				[&domDocument, &rootNode](const boost::filesystem::path& p) {
 				xercesc::DOMElement* const itemNode(

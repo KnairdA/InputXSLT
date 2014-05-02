@@ -7,7 +7,6 @@
 #include <unordered_map>
 
 #include "common.h"
-#include "support/filesystem_context.h"
 
 namespace InputXSLT {
 
@@ -22,7 +21,6 @@ class TransformationFacade {
 		int generate(const std::string&, const parameter_map&);
 
 	private:
-		const FilesystemContext fs_context_;
 		const xalan::XalanCompiledStylesheet* transformation_;
 
 		xalan::XalanTransformer transformer_;
