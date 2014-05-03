@@ -7,15 +7,33 @@
 
 namespace InputXSLT {
 
+template <typename Type>
 class XercesStringGuard {
 	public:
-		XercesStringGuard(const std::string&);
-		~XercesStringGuard();
+		XercesStringGuard(const Type* src):
+			string_(src) { }
 
-		XMLCh* operator*();
+		XercesStringGuard(
+			const std::basic_string<
+				typename std::remove_pointer<decltype(
+					xercesc::XMLString::transcode(new Type[1])
+				)>::type
+			>& src
+		):
+			string_(xercesc::XMLString::transcode(src.data())) { }
+
+		~XercesStringGuard() {
+			xercesc::XMLString::release(
+				const_cast<Type**>(&this->string_)
+			);
+		}
+
+		inline const Type* operator*() const {
+			return this->string_;
+		}
 
 	private:
-		XMLCh* const string_;
+		const Type* const string_;
 
 };
 

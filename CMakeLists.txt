@@ -21,7 +21,6 @@ add_executable(
 	src/support/filesystem_context.cc
 	src/support/dom/document_cache.cc
 	src/support/dom/document_cache_item.cc
-	src/support/xerces_string_guard.cc
 )
 
 target_link_libraries(

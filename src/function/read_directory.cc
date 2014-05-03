@@ -21,7 +21,11 @@ xalan::XObjectPtr FunctionReadDirectory::execute(
 ) const {
 	const FilesystemContext fs_context(
 		boost::filesystem::path(
-			xercesc::XMLString::transcode(locator->getSystemId() + 7)
+			*XercesStringGuard<char>(
+				xercesc::XMLString::transcode(
+					locator->getSystemId() + 7
+				)
+			)
 		).parent_path().string()
 	);
 
@@ -29,13 +33,17 @@ xalan::XObjectPtr FunctionReadDirectory::execute(
 		fs_context.resolve(argument->str())
 	);
 
-	DomDocumentCache::item* const cachedDocument(
+	DomDocumentCache::optional_item optionalCachedDocument(
 		this->document_cache_->get(directoryPath.string())
 	);
 
-	if ( !cachedDocument->isFinalized() ) {
+	if ( !optionalCachedDocument.first ) {
 		xercesc::DOMDocument* const domDocument(
-			cachedDocument->getXercesDocument()
+			xercesc::DOMImplementation::getImplementation()->createDocument(
+				nullptr,
+				*XercesStringGuard<XMLCh>("content"),
+				nullptr
+			)
 		);
 
 		xercesc::DOMNode* const rootNode(
@@ -47,30 +55,30 @@ xalan::XObjectPtr FunctionReadDirectory::execute(
 				argument->str(),
 				[&domDocument, &rootNode](const boost::filesystem::path& p) {
 				xercesc::DOMElement* const itemNode(
-					domDocument->createElement(*XercesStringGuard("result"))
+					domDocument->createElement(*XercesStringGuard<XMLCh>("result"))
 				);
 
 				switch ( boost::filesystem::status(p).type() ) {
 					case boost::filesystem::regular_file: {
 						itemNode->setAttribute(
-							*XercesStringGuard("type"),
-							*XercesStringGuard("file")
+							*XercesStringGuard<XMLCh>("type"),
+							*XercesStringGuard<XMLCh>("file")
 						);
 
 						break;
 					};
 					case boost::filesystem::directory_file: {
 						itemNode->setAttribute(
-							*XercesStringGuard("type"),
-							*XercesStringGuard("directory")
+							*XercesStringGuard<XMLCh>("type"),
+							*XercesStringGuard<XMLCh>("directory")
 						);
 
 						break;
 					};
 					default: {
 						itemNode->setAttribute(
-							*XercesStringGuard("type"),
-							*XercesStringGuard("misc")
+							*XercesStringGuard<XMLCh>("type"),
+							*XercesStringGuard<XMLCh>("misc")
 						);
 
 						break;
@@ -79,7 +87,7 @@ xalan::XObjectPtr FunctionReadDirectory::execute(
 
 				xercesc::DOMText* const textNode(
 					domDocument->createTextNode(
-						*XercesStringGuard(p.filename().string())
+						*XercesStringGuard<XMLCh>(p.filename().string())
 					)
 				);
 
@@ -88,11 +96,16 @@ xalan::XObjectPtr FunctionReadDirectory::execute(
 			});
 		} else {
 			xercesc::DOMElement* const resultNode(
-				domDocument->createElement(*XercesStringGuard("error"))
+				domDocument->createElement(*XercesStringGuard<XMLCh>("error"))
 			);
 
 			rootNode->appendChild(resultNode);
 		}
+
+		optionalCachedDocument = this->document_cache_->create(
+			directoryPath.string(),
+			domDocument
+		);
 	}
 
 	xalan::XPathExecutionContext::BorrowReturnMutableNodeRefList nodeList(
@@ -100,7 +113,9 @@ xalan::XObjectPtr FunctionReadDirectory::execute(
 	);
 
 	nodeList->addNodes(
-		*cachedDocument->getXalanDocument()->getDocumentElement()->getChildNodes()
+		*optionalCachedDocument.second->getXalanDocument()
+		                              ->getDocumentElement()
+		                              ->getChildNodes()
 	);
 
 	return executionContext.getXObjectFactory().createNodeSet(nodeList);

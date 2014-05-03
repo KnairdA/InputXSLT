@@ -42,7 +42,11 @@ xalan::XObjectPtr FunctionReadXmlFile::execute(
 ) const {
 	const FilesystemContext fs_context(
 		boost::filesystem::path(
-			xercesc::XMLString::transcode(locator->getSystemId() + 7)
+			*XercesStringGuard<char>(
+				xercesc::XMLString::transcode(
+					locator->getSystemId() + 7
+				)
+			)
 		).parent_path().string()
 	);
 
@@ -50,13 +54,17 @@ xalan::XObjectPtr FunctionReadXmlFile::execute(
 		fs_context.resolve(argument->str())
 	);
 
-	DomDocumentCache::item* const cachedDocument(
+	DomDocumentCache::optional_item optionalCachedDocument(
 		this->document_cache_->get(filePath.string())
 	);
 
-	if ( !cachedDocument->isFinalized() ) {
+	if ( !optionalCachedDocument.first ) {
 		xercesc::DOMDocument* const domDocument(
-			cachedDocument->getXercesDocument()
+			xercesc::DOMImplementation::getImplementation()->createDocument(
+				nullptr,
+				*XercesStringGuard<XMLCh>("content"),
+				nullptr
+			)
 		);
 
 		xercesc::DOMNode* const rootNode(
@@ -65,12 +73,12 @@ xalan::XObjectPtr FunctionReadXmlFile::execute(
 
 		if ( boost::filesystem::is_regular_file(filePath) ) {
 			xercesc::DOMElement* const resultNode(
-				domDocument->createElement(*XercesStringGuard("result"))
+				domDocument->createElement(*XercesStringGuard<XMLCh>("result"))
 			);
 
 			resultNode->setAttribute(
-				*XercesStringGuard("name"),
-				*XercesStringGuard(filePath.filename().string())
+				*XercesStringGuard<XMLCh>("name"),
+				*XercesStringGuard<XMLCh>(filePath.filename().string())
 			);
 
 			xercesc::DOMNode* const resultTreeNode(
@@ -81,11 +89,16 @@ xalan::XObjectPtr FunctionReadXmlFile::execute(
 			rootNode->appendChild(resultNode);
 		} else {
 			xercesc::DOMElement* const resultNode(
-				domDocument->createElement(*XercesStringGuard("error"))
+				domDocument->createElement(*XercesStringGuard<XMLCh>("error"))
 			);
 
 			rootNode->appendChild(resultNode);
 		}
+
+		optionalCachedDocument = this->document_cache_->create(
+			filePath.string(),
+			domDocument
+		);
 	}
 
 	xalan::XPathExecutionContext::BorrowReturnMutableNodeRefList nodeList(
@@ -93,7 +106,9 @@ xalan::XObjectPtr FunctionReadXmlFile::execute(
 	);
 
 	nodeList->addNodes(
-		*cachedDocument->getXalanDocument()->getDocumentElement()->getChildNodes()
+		*optionalCachedDocument.second->getXalanDocument()
+		                              ->getDocumentElement()
+		                              ->getChildNodes()
 	);
 
 	return executionContext.getXObjectFactory().createNodeSet(nodeList);

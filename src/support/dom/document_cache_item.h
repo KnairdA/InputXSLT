@@ -7,9 +7,6 @@
 
 #include <xercesc/dom/DOMDocument.hpp>
 
-#include <string>
-#include <memory>
-
 #include "common.h"
 #include "document_cache.h"
 
@@ -19,21 +16,18 @@ class DomDocumentCache::item {
 	public:
 		~item();
 
-		bool isFinalized() const;
-
-		xercesc::DOMDocument* getXercesDocument() const;
 		xalan::XalanDocument* getXalanDocument();
 
 	protected:
 		friend DomDocumentCache;
 
-		item(const std::string&);
+		item(xercesc::DOMDocument*);
 
 	private:
 		xalan::XercesParserLiaison parser_;
 		xalan::XercesDOMSupport dom_support_;
 		xercesc::DOMDocument* const document_;
-		std::unique_ptr<xalan::XercesDOMWrapperParsedSource> parsed_source_;
+		xalan::XercesDOMWrapperParsedSource parsed_source_;
 
 };
 
