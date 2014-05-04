@@ -1,5 +1,7 @@
 #include "filesystem_context.h"
 
+#include "support/xerces_string_guard.h"
+
 namespace {
 
 inline std::string xalanToString(const xalan::XalanDOMString& text) {
@@ -16,8 +18,12 @@ inline std::string xalanToString(const xalan::XalanDOMString& text) {
 
 namespace InputXSLT {
 
-FilesystemContext::FilesystemContext(const std::string& path):
-	path_(canonical(boost::filesystem::path(path))) { }
+FilesystemContext::FilesystemContext(const xalan::Locator* locator):
+	path_(boost::filesystem::canonical(
+		boost::filesystem::path(
+			*XercesStringGuard<char>(locator->getSystemId()) + 7
+		).parent_path().string()
+	)) { }
 
 boost::filesystem::path FilesystemContext::resolve(
 	const std::string& path) const {

@@ -40,15 +40,7 @@ xalan::XObjectPtr FunctionReadXmlFile::execute(
 	const xalan::XObjectPtr argument,
 	const xalan::Locator* locator
 ) const {
-	const FilesystemContext fs_context(
-		boost::filesystem::path(
-			*XercesStringGuard<char>(
-				xercesc::XMLString::transcode(
-					locator->getSystemId() + 7
-				)
-			)
-		).parent_path().string()
-	);
+	const FilesystemContext fs_context(locator);
 
 	const boost::filesystem::path filePath(
 		fs_context.resolve(argument->str())

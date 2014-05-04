@@ -2,6 +2,7 @@
 #define INPUTXSLT_SRC_SUPPORT_FILESYSTEM_CONTEXT_H_
 
 #include <xalanc/XalanDOM/XalanDOMString.hpp>
+#include <xalanc/XPath/Function.hpp>
 
 #include "boost/filesystem.hpp"
 
@@ -14,7 +15,7 @@ namespace InputXSLT {
 
 class FilesystemContext {
 	public:
-		explicit FilesystemContext(const std::string&);
+		explicit FilesystemContext(const xalan::Locator*);
 
 		boost::filesystem::path resolve(const std::string&) const;
 		boost::filesystem::path resolve(const xalan::XalanDOMString&) const;
