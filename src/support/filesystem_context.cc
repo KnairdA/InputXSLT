@@ -36,11 +36,9 @@ boost::filesystem::path FilesystemContext::resolve(
 }
 
 void FilesystemContext::iterate(
-	const std::string& path,
+	const boost::filesystem::path& directory,
 	std::function<void(const boost::filesystem::path&)> func
 ) const {
-	const boost::filesystem::path directory(this->resolve(path));
-
 	if ( boost::filesystem::is_directory(directory) ) {
 		for ( boost::filesystem::directory_iterator iter(directory);
 		      iter != boost::filesystem::directory_iterator();
@@ -51,6 +49,13 @@ void FilesystemContext::iterate(
 			}
 		}
 	}
+}
+
+void FilesystemContext::iterate(
+	const std::string& path,
+	std::function<void(const boost::filesystem::path&)> func
+) const {
+	this->iterate(this->resolve(path), func);
 }
 
 void FilesystemContext::iterate(

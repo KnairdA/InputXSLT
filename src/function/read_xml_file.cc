@@ -13,6 +13,8 @@
 
 namespace {
 
+using InputXSLT::XercesStringGuard;
+
 inline xercesc::DOMNode* importDocumentElement(
 	const boost::filesystem::path& filePath,
 	xercesc::DOMDocument* const domDocument
@@ -25,6 +27,48 @@ inline xercesc::DOMNode* importDocumentElement(
 		parser.getDocument()->getDocumentElement(),
 		true
 	);
+}
+
+xercesc::DOMDocument* constructDocument(
+	const boost::filesystem::path& filePath
+) {
+	xercesc::DOMDocument* const domDocument(
+		xercesc::DOMImplementation::getImplementation()->createDocument(
+			nullptr,
+			*XercesStringGuard<XMLCh>("content"),
+			nullptr
+		)
+	);
+
+	xercesc::DOMNode* const rootNode(
+		domDocument->getDocumentElement()
+	);
+
+	if ( boost::filesystem::is_regular_file(filePath) ) {
+		xercesc::DOMElement* const resultNode(
+			domDocument->createElement(*XercesStringGuard<XMLCh>("result"))
+		);
+
+		resultNode->setAttribute(
+			*XercesStringGuard<XMLCh>("name"),
+			*XercesStringGuard<XMLCh>(filePath.filename().string())
+		);
+
+		xercesc::DOMNode* const resultTreeNode(
+			importDocumentElement(filePath, domDocument)
+		);
+
+		resultNode->appendChild(resultTreeNode);
+		rootNode->appendChild(resultNode);
+	} else {
+		xercesc::DOMElement* const resultNode(
+			domDocument->createElement(*XercesStringGuard<XMLCh>("error"))
+		);
+
+		rootNode->appendChild(resultNode);
+	}
+
+	return domDocument;
 }
 
 }
@@ -40,10 +84,10 @@ xalan::XObjectPtr FunctionReadXmlFile::execute(
 	const xalan::XObjectPtr argument,
 	const xalan::Locator* locator
 ) const {
-	const FilesystemContext fs_context(locator);
+	const FilesystemContext fsContext(locator);
 
 	const boost::filesystem::path filePath(
-		fs_context.resolve(argument->str())
+		fsContext.resolve(argument->str())
 	);
 
 	DomDocumentCache::optional_item optionalCachedDocument(
@@ -51,45 +95,9 @@ xalan::XObjectPtr FunctionReadXmlFile::execute(
 	);
 
 	if ( !optionalCachedDocument.first ) {
-		xercesc::DOMDocument* const domDocument(
-			xercesc::DOMImplementation::getImplementation()->createDocument(
-				nullptr,
-				*XercesStringGuard<XMLCh>("content"),
-				nullptr
-			)
-		);
-
-		xercesc::DOMNode* const rootNode(
-			domDocument->getDocumentElement()
-		);
-
-		if ( boost::filesystem::is_regular_file(filePath) ) {
-			xercesc::DOMElement* const resultNode(
-				domDocument->createElement(*XercesStringGuard<XMLCh>("result"))
-			);
-
-			resultNode->setAttribute(
-				*XercesStringGuard<XMLCh>("name"),
-				*XercesStringGuard<XMLCh>(filePath.filename().string())
-			);
-
-			xercesc::DOMNode* const resultTreeNode(
-				importDocumentElement(filePath, domDocument)
-			);
-
-			resultNode->appendChild(resultTreeNode);
-			rootNode->appendChild(resultNode);
-		} else {
-			xercesc::DOMElement* const resultNode(
-				domDocument->createElement(*XercesStringGuard<XMLCh>("error"))
-			);
-
-			rootNode->appendChild(resultNode);
-		}
-
 		optionalCachedDocument = this->document_cache_->create(
 			filePath.string(),
-			domDocument
+			constructDocument(filePath)
 		);
 	}
 

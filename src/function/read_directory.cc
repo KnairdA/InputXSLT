@@ -8,6 +8,83 @@
 #include "support/xerces_string_guard.h"
 #include "support/filesystem_context.h"
 
+namespace {
+
+using InputXSLT::XercesStringGuard;
+
+xercesc::DOMDocument* constructDocument(
+	const InputXSLT::FilesystemContext& fsContext,
+	const boost::filesystem::path& directoryPath
+) {
+	xercesc::DOMDocument* const domDocument(
+		xercesc::DOMImplementation::getImplementation()->createDocument(
+			nullptr,
+			*XercesStringGuard<XMLCh>("content"),
+			nullptr
+		)
+	);
+
+	xercesc::DOMNode* const rootNode(
+		domDocument->getDocumentElement()
+	);
+
+	if ( boost::filesystem::is_directory(directoryPath) ) {
+		fsContext.iterate(
+			directoryPath,
+			[&domDocument, &rootNode](const boost::filesystem::path& p) {
+			xercesc::DOMElement* const itemNode(
+				domDocument->createElement(*XercesStringGuard<XMLCh>("result"))
+			);
+
+			switch ( boost::filesystem::status(p).type() ) {
+				case boost::filesystem::regular_file: {
+					itemNode->setAttribute(
+						*XercesStringGuard<XMLCh>("type"),
+						*XercesStringGuard<XMLCh>("file")
+					);
+
+					break;
+				};
+				case boost::filesystem::directory_file: {
+					itemNode->setAttribute(
+						*XercesStringGuard<XMLCh>("type"),
+						*XercesStringGuard<XMLCh>("directory")
+					);
+
+					break;
+				};
+				default: {
+					itemNode->setAttribute(
+						*XercesStringGuard<XMLCh>("type"),
+						*XercesStringGuard<XMLCh>("misc")
+					);
+
+					break;
+				};
+			}
+
+			xercesc::DOMText* const textNode(
+				domDocument->createTextNode(
+					*XercesStringGuard<XMLCh>(p.filename().string())
+				)
+			);
+
+			itemNode->appendChild(textNode);
+			rootNode->appendChild(itemNode);
+		});
+	} else {
+		xercesc::DOMElement* const resultNode(
+			domDocument->createElement(*XercesStringGuard<XMLCh>("error"))
+		);
+
+		rootNode->appendChild(resultNode);
+	}
+
+	return domDocument;
+}
+
+}
+
 namespace InputXSLT {
 
 FunctionReadDirectory::FunctionReadDirectory():
@@ -19,10 +96,10 @@ xalan::XObjectPtr FunctionReadDirectory::execute(
 	const xalan::XObjectPtr argument,
 	const xalan::Locator* locator
 ) const {
-	const FilesystemContext fs_context(locator);
+	const FilesystemContext fsContext(locator);
 
 	const boost::filesystem::path directoryPath(
-		fs_context.resolve(argument->str())
+		fsContext.resolve(argument->str())
 	);
 
 	DomDocumentCache::optional_item optionalCachedDocument(
@@ -30,73 +107,9 @@ xalan::XObjectPtr FunctionReadDirectory::execute(
 	);
 
 	if ( !optionalCachedDocument.first ) {
-		xercesc::DOMDocument* const domDocument(
-			xercesc::DOMImplementation::getImplementation()->createDocument(
-				nullptr,
-				*XercesStringGuard<XMLCh>("content"),
-				nullptr
-			)
-		);
-
-		xercesc::DOMNode* const rootNode(
-			domDocument->getDocumentElement()
-		);
-
-		if ( boost::filesystem::is_directory(directoryPath) ) {
-			fs_context.iterate(
-				argument->str(),
-				[&domDocument, &rootNode](const boost::filesystem::path& p) {
-				xercesc::DOMElement* const itemNode(
-					domDocument->createElement(*XercesStringGuard<XMLCh>("result"))
-				);
-
-				switch ( boost::filesystem::status(p).type() ) {
-					case boost::filesystem::regular_file: {
-						itemNode->setAttribute(
-							*XercesStringGuard<XMLCh>("type"),
-							*XercesStringGuard<XMLCh>("file")
-						);
-
-						break;
-					};
-					case boost::filesystem::directory_file: {
-						itemNode->setAttribute(
-							*XercesStringGuard<XMLCh>("type"),
-							*XercesStringGuard<XMLCh>("directory")
-						);
-
-						break;
-					};
-					default: {
-						itemNode->setAttribute(
-							*XercesStringGuard<XMLCh>("type"),
-							*XercesStringGuard<XMLCh>("misc")
-						);
-
-						break;
-					};
-				}
-
-				xercesc::DOMText* const textNode(
-					domDocument->createTextNode(
-						*XercesStringGuard<XMLCh>(p.filename().string())
-					)
-				);
-
-				itemNode->appendChild(textNode);
-				rootNode->appendChild(itemNode);
-			});
-		} else {
-			xercesc::DOMElement* const resultNode(
-				domDocument->createElement(*XercesStringGuard<XMLCh>("error"))
-			);
-
-			rootNode->appendChild(resultNode);
-		}
-
 		optionalCachedDocument = this->document_cache_->create(
 			directoryPath.string(),
-			domDocument
+			constructDocument(fsContext, directoryPath)
 		);
 	}
 
