@@ -1,38 +1,21 @@
 #ifndef INPUTXSLT_SRC_FUNCTION_READ_FILE_H_
 #define INPUTXSLT_SRC_FUNCTION_READ_FILE_H_
 
-#include <xalanc/XalanTransformer/XalanTransformer.hpp>
-#include <xalanc/XPath/XObjectFactory.hpp>
-#include <xalanc/XPath/Function.hpp>
-#include <xalanc/XPath/XObject.hpp>
-
-#include <string>
-
-#include "common.h"
-#include "support/dom/document_cache.h"
+#include "base.h"
 
 namespace InputXSLT {
 
-class FunctionReadFile : public xalan::Function {
+class FunctionReadFile : public FunctionBase<FunctionReadFile> {
 	public:
-		FunctionReadFile();
+		using FunctionBase<FunctionReadFile>::FunctionBase;
 
-		virtual xalan::XObjectPtr execute(
-			xalan::XPathExecutionContext&,
-			xalan::XalanNode*,
-			const xalan::XObjectPtr,
-			const xalan::Locator*
-		) const;
+	protected:
+		friend FunctionBase<FunctionReadFile>;
 
-		virtual FunctionReadFile* clone(xalan::MemoryManager&) const;
-
-		FunctionReadFile& operator=(const FunctionReadFile&) = delete;
-		bool operator==(const FunctionReadFile&) const       = delete;
-
-	private:
-		std::shared_ptr<DomDocumentCache> document_cache_;
-
-		const xalan::XalanDOMString& getError(xalan::XalanDOMString&) const;
+		xercesc::DOMDocument* constructDocument(
+			const FilesystemContext&,
+			const boost::filesystem::path&
+		);
 
 };
 

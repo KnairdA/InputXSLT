@@ -6,13 +6,10 @@
 #include <xercesc/dom/DOMText.hpp>
 
 #include "support/xerces_string_guard.h"
-#include "support/filesystem_context.h"
 
-namespace {
+namespace InputXSLT {
 
-using InputXSLT::XercesStringGuard;
-
-xercesc::DOMDocument* constructDocument(
+xercesc::DOMDocument* FunctionReadDirectory::constructDocument(
 	const InputXSLT::FilesystemContext& fsContext,
 	const boost::filesystem::path& directoryPath
 ) {
@@ -81,61 +78,6 @@ xercesc::DOMDocument* constructDocument(
 	}
 
 	return domDocument;
-}
-
-}
-
-namespace InputXSLT {
-
-FunctionReadDirectory::FunctionReadDirectory():
-	document_cache_(std::make_shared<DomDocumentCache>()) { }
-
-xalan::XObjectPtr FunctionReadDirectory::execute(
-	xalan::XPathExecutionContext& executionContext,
-	xalan::XalanNode*,
-	const xalan::XObjectPtr argument,
-	const xalan::Locator* locator
-) const {
-	const FilesystemContext fsContext(locator);
-
-	const boost::filesystem::path directoryPath(
-		fsContext.resolve(argument->str())
-	);
-
-	DomDocumentCache::optional_item optionalCachedDocument(
-		this->document_cache_->get(directoryPath.string())
-	);
-
-	if ( !optionalCachedDocument.first ) {
-		optionalCachedDocument = this->document_cache_->create(
-			directoryPath.string(),
-			constructDocument(fsContext, directoryPath)
-		);
-	}
-
-	xalan::XPathExecutionContext::BorrowReturnMutableNodeRefList nodeList(
-		executionContext
-	);
-
-	nodeList->addNodes(
-		*optionalCachedDocument.second->getXalanDocument()
-		                              ->getDocumentElement()
-		                              ->getChildNodes()
-	);
-
-	return executionContext.getXObjectFactory().createNodeSet(nodeList);
-}
-
-FunctionReadDirectory* FunctionReadDirectory::clone(
-	xalan::MemoryManager& manager) const {
-	return xalan::XalanCopyConstruct(manager, *this);
-}
-
-const xalan::XalanDOMString& FunctionReadDirectory::getError(
-	xalan::XalanDOMString& result) const {
-	result.assign("The read-directory() function expects one argument of type string.");
-
-	return result;
 }
 
 }
