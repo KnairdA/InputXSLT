@@ -21,6 +21,7 @@ add_executable(
 	src/support/filesystem_context.cc
 	src/support/dom/document_cache.cc
 	src/support/dom/document_cache_item.cc
+	tests/function_read_file.cc
 )
 
 target_link_libraries(
@@ -29,4 +30,5 @@ target_link_libraries(
 	xerces-c
 	boost_system
 	boost_filesystem
+	gtest
 )

@@ -16,6 +16,7 @@ namespace InputXSLT {
 class FilesystemContext {
 	public:
 		explicit FilesystemContext(const xalan::Locator*);
+		explicit FilesystemContext(const std::string&);
 
 		boost::filesystem::path resolve(const std::string&) const;
 		boost::filesystem::path resolve(const xalan::XalanDOMString&) const;

@@ -9,9 +9,6 @@ class FunctionReadFile : public FunctionBase<FunctionReadFile> {
 	public:
 		using FunctionBase<FunctionReadFile>::FunctionBase;
 
-	protected:
-		friend FunctionBase<FunctionReadFile>;
-
 		xercesc::DOMDocument* constructDocument(
 			const FilesystemContext&,
 			const boost::filesystem::path&

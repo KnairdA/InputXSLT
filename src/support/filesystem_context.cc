@@ -25,6 +25,9 @@ FilesystemContext::FilesystemContext(const xalan::Locator* locator):
 		).parent_path().string()
 	)) { }
 
+FilesystemContext::FilesystemContext(const std::string& path):
+	path_(boost::filesystem::canonical(path)) { }
+
 boost::filesystem::path FilesystemContext::resolve(
 	const std::string& path) const {
 	return absolute(this->path_ / path);
