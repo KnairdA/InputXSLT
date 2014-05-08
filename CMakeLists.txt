@@ -10,9 +10,18 @@ include_directories(
 	src/
 )
 
-add_library(
+set(
+	Libraries
 	InputXSLT
-	STATIC
+	xalan-c
+	xerces-c
+	boost_system
+	boost_filesystem
+	boost_program_options
+)
+
+set(
+	Sources
 	src/plattform_guard.cc
 	src/transformation_facade.cc
 	src/function/read_file.cc
@@ -24,32 +33,17 @@ add_library(
 )
 
 add_executable(
-	example
-	example.cc
-)
-
-add_executable(
 	test
 	test.cc
-	tests/function_read_file.cc
 )
 
-set(
-	Libraries
+add_library(
 	InputXSLT
-	xalan-c
-	xerces-c
-	boost_system
-	boost_filesystem
-)
-
-target_link_libraries(
-	example
-	${Libraries}
+	STATIC
+	${Sources}
 )
 
 target_link_libraries(
 	test
-	gtest
 	${Libraries}
 )
