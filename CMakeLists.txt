@@ -47,3 +47,10 @@ target_link_libraries(
 	test
 	${Libraries}
 )
+
+add_custom_command(
+	TARGET
+	test
+	POST_BUILD COMMAND
+	cd ../test && ./check.sh
+)

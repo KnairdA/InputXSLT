@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test_case>
+<function_read_xml_file>
+<item>Hello 1</item>
+<item>Hello 2</item>
+<item>Hello 3</item>
+<item>Hello 4</item>
+</function_read_xml_file>
+</test_case>

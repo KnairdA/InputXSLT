@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test_case>
+<function_read_file>&lt;?xml version="1.0"?&gt;
+&lt;tester&gt;
+	&lt;eintrag&gt;Hello 1&lt;/eintrag&gt;
+	&lt;eintrag&gt;Hello 2&lt;/eintrag&gt;
+	&lt;eintrag&gt;Hello 3&lt;/eintrag&gt;
+	&lt;eintrag&gt;Hello 4&lt;/eintrag&gt;
+&lt;/tester&gt;
+</function_read_file>
+</test_case>
