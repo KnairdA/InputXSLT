@@ -25,6 +25,8 @@ class TransformationFacade {
 
 		xalan::XalanTransformer transformer_;
 
+		void setParameters(const parameter_map&);
+
 };
 
 }

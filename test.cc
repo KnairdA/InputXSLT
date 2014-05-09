@@ -40,10 +40,7 @@ int main(int ac, char** av) {
 		);
 
 		return transformation.generate(
-			variables["target"].as<std::string>(),
-			{
-				{"test", "42"}
-			}
+			variables["target"].as<std::string>()
 		);
 	} else {
 		std::cout << optionDescription << std::endl;
