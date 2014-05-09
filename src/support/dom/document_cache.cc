@@ -14,7 +14,7 @@ DomDocumentCache::optional_item DomDocumentCache::get(const std::string& key) {
 	if ( itemIter == this->map_.end() ) {
 		return optional_item(false, nullptr);
 	} else {
-		return optional_item(true, (*itemIter).second.get());
+		return optional_item(true, (*itemIter).second->getXalanDocument());
 	}
 }
 
@@ -29,7 +29,7 @@ DomDocumentCache::optional_item DomDocumentCache::create(
 	);
 
 	if ( result.second ) {
-		return optional_item(true, (*(result.first)).second.get());
+		return optional_item(true, (*(result.first)).second->getXalanDocument());
 	} else {
 		return optional_item(false, nullptr);
 	}

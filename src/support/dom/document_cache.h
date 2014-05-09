@@ -1,6 +1,8 @@
 #ifndef INPUTXSLT_SRC_SUPPORT_DOM_DOCUMENT_CACHE_H_
 #define INPUTXSLT_SRC_SUPPORT_DOM_DOCUMENT_CACHE_H_
 
+#include <xalanc/XalanDOM/XalanDocument.hpp>
+
 #include <xercesc/dom/DOMDocument.hpp>
 
 #include <string>
@@ -8,12 +10,13 @@
 #include <unordered_map>
 #include <memory>
 
+#include "common.h"
+
 namespace InputXSLT {
 
 class DomDocumentCache {
 	public:
-		class item;
-		typedef std::pair<bool, item*> optional_item;
+		typedef std::pair<bool, xalan::XalanDocument*> optional_item;
 
 		DomDocumentCache();
 
@@ -21,6 +24,8 @@ class DomDocumentCache {
 		optional_item create(const std::string&, xercesc::DOMDocument*);
 
 	private:
+		class item;
+
 		std::mutex write_mutex_;
 		std::unordered_map<std::string, std::unique_ptr<item>> map_;
 

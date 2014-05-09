@@ -7,7 +7,7 @@ namespace InputXSLT {
 
 class FunctionReadXmlFile : public FunctionBase<FunctionReadXmlFile> {
 	public:
-		using FunctionBase<FunctionReadXmlFile>::FunctionBase;
+		using FunctionBase::FunctionBase;
 
 	protected:
 		friend FunctionBase;

@@ -53,8 +53,7 @@ class FunctionBase : public xalan::Function {
 			);
 
 			nodeList->addNodes(
-				*optionalCachedDocument.second->getXalanDocument()
-				                              ->getDocumentElement()
+				*optionalCachedDocument.second->getDocumentElement()
 				                              ->getChildNodes()
 			);
 
