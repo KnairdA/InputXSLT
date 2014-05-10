@@ -3,7 +3,7 @@ project(InputXSLT)
 
 set(
 	CMAKE_CXX_FLAGS
-	"-std=c++11 -W -Wall -Wextra -Winline -pedantic -g"
+	"${CMAKE_CXX_FLAGS} -std=c++11 -W -Wall -Wextra -Winline -pedantic"
 )
 
 include_directories(
@@ -49,9 +49,13 @@ target_link_libraries(
 	${Libraries}
 )
 
-add_custom_command(
-	TARGET
+add_custom_target(
+	testcase
+	ALL
+	WORKING_DIRECTORY
+	${CMAKE_CURRENT_SOURCE_DIR}/test/
+	COMMAND
+	sh check.sh
+	DEPENDS
 	test
-	POST_BUILD COMMAND
-	cd ../test && ./check.sh
 )
