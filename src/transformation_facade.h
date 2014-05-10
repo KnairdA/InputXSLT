@@ -4,28 +4,29 @@
 #include <xalanc/XalanTransformer/XalanTransformer.hpp>
 
 #include <string>
-#include <unordered_map>
 
 #include "common.h"
+#include "support/stylesheet_parameter_guard.h"
 
 namespace InputXSLT {
 
 class TransformationFacade {
 	public:
-		typedef std::unordered_map<std::string, std::string> parameter_map;
-
-		TransformationFacade(const std::string&);
+		explicit TransformationFacade(const std::string&);
 		~TransformationFacade();
 
 		int generate(const std::string&);
-		int generate(const std::string&, const parameter_map&);
+		int generate(
+			const std::string&,
+			const StylesheetParameterGuard::map&
+		);
 
 	private:
 		const xalan::XalanCompiledStylesheet* transformation_;
 
 		xalan::XalanTransformer transformer_;
 
-		void setParameters(const parameter_map&);
+		int generate(const std::string&, StylesheetParameterGuard&);
 
 };
 

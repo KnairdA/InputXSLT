@@ -26,14 +26,34 @@ TransformationFacade::~TransformationFacade() {
 }
 
 int TransformationFacade::generate(const std::string& target) {
+	StylesheetParameterGuard guard(this->transformer_);
+
+	return this->generate(target, guard);
+}
+
+int TransformationFacade::generate(
+	const std::string& target,
+	const StylesheetParameterGuard::map& parameters
+) {
+	StylesheetParameterGuard guard(this->transformer_, parameters);
+
+	return this->generate(target, guard);
+}
+
+int TransformationFacade::generate(
+	const std::string& target,
+	StylesheetParameterGuard& parameters
+) {
 	const boost::filesystem::path targetFilePath(
 		boost::filesystem::absolute(target)
 	);
 
-	this->setParameters({
-		{ "target-file",      targetFilePath.filename().string()               },
-		{ "parent-directory", targetFilePath.parent_path().filename().string() }
-	});
+	parameters.set(
+		"target-file",      targetFilePath.filename().string()
+	);
+	parameters.set(
+		"parent-directory", targetFilePath.parent_path().filename().string()
+	);
 
 	std::stringstream       emptyStream("<dummy/>");
 	xalan::XSLTInputSource  inputSource(emptyStream);
@@ -49,27 +69,7 @@ int TransformationFacade::generate(const std::string& target) {
 		std::cerr << this->transformer_.getLastError() << std::endl;
 	}
 
-	this->transformer_.clearStylesheetParams();
-
 	return resultCode;
-}
-
-int TransformationFacade::generate(
-	const std::string& target,
-	const parameter_map& parameters
-) {
-	this->setParameters(parameters);
-
-	return this->generate(target);
-}
-
-void TransformationFacade::setParameters(const parameter_map& parameters) {
-	for ( auto&& parameter : parameters ) {
-		this->transformer_.setStylesheetParam(
-			parameter.first.data(),
-			std::string("'" + parameter.second + "'").data()
-		);
-	}
 }
 
 }
