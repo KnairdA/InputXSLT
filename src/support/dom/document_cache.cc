@@ -6,33 +6,14 @@ namespace InputXSLT {
 
 DomDocumentCache::DomDocumentCache():
 	write_mutex_(),
-	map_() { }
+	cache_() { }
 
-DomDocumentCache::optional_item DomDocumentCache::get(const std::string& key) {
-	auto itemIter = this->map_.find(key);
-
-	if ( itemIter == this->map_.end() ) {
-		return optional_item(false, nullptr);
-	} else {
-		return optional_item(true, (*itemIter).second->getXalanDocument());
-	}
-}
-
-DomDocumentCache::optional_item DomDocumentCache::create(
-	const std::string&    key,
-	xercesc::DOMDocument* document
-) {
+xalan::XalanDocument* DomDocumentCache::create(xercesc::DOMDocument* document) {
 	std::lock_guard<std::mutex> guard(this->write_mutex_);
 
-	auto result = this->map_.emplace(
-		std::make_pair(key, std::unique_ptr<item>(new item(document)))
-	);
+	this->cache_.emplace(new item(document));
 
-	if ( result.second ) {
-		return optional_item(true, (*(result.first)).second->getXalanDocument());
-	} else {
-		return optional_item(false, nullptr);
-	}
+	return this->cache_.top()->getXalanDocument();
 }
 
 }

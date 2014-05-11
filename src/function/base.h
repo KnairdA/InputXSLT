@@ -28,33 +28,23 @@ class FunctionBase : public xalan::Function {
 		) const {
 			const FilesystemContext fsContext(locator);
 
-			const boost::filesystem::path argumentPath(
-				fsContext.resolve(argument->str())
-			);
-
-			DomDocumentCache::optional_item optionalCachedDocument(
-				this->document_cache_->get(argumentPath.string())
-			);
-
-			if ( !optionalCachedDocument.first ) {
-				optionalCachedDocument = this->document_cache_->create(
-					argumentPath.string(),
+			xalan::XalanDocument* const domDocument(
+				this->document_cache_->create(
 					static_cast<Implementation*>(
 						const_cast<FunctionBase*>(this)
 					)->constructDocument(
 						fsContext,
-						argumentPath
+						fsContext.resolve(argument->str())
 					)
-				);
-			}
+				)
+			);
 
 			xalan::XPathExecutionContext::BorrowReturnMutableNodeRefList nodeList(
 				executionContext
 			);
 
 			nodeList->addNodes(
-				*optionalCachedDocument.second->getDocumentElement()
-				                              ->getChildNodes()
+				*domDocument->getDocumentElement()->getChildNodes()
 			);
 
 			return executionContext.getXObjectFactory().createNodeSet(nodeList);
