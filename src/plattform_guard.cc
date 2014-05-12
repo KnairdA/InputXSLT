@@ -9,6 +9,7 @@
 #include "function/read_file.h"
 #include "function/read_xml_file.h"
 #include "function/read_directory.h"
+#include "function/transform.h"
 
 namespace InputXSLT {
 
@@ -36,6 +37,12 @@ PlattformGuard::PlattformGuard() {
 		customNamespace,
 		xalan::XalanDOMString("read-directory"),
 		InputXSLT::FunctionReadDirectory()
+	);
+
+	xalan::XalanTransformer::installExternalFunctionGlobal(
+		customNamespace,
+		xalan::XalanDOMString("transform"),
+		InputXSLT::FunctionTransform()
 	);
 }
 

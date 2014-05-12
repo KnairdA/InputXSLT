@@ -5,6 +5,7 @@
 <item>read_xml_file</item>
 <item>common</item>
 <item>read_file</item>
+<item>transform</item>
 <item>default_params</item>
 </function_read_directory>
 </test_case>
