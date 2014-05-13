@@ -1,5 +1,8 @@
 #include "filesystem_context.h"
 
+#include <algorithm>
+#include <iterator>
+
 #include "support/xerces_string_guard.h"
 
 namespace {
@@ -42,15 +45,25 @@ void FilesystemContext::iterate(
 	const boost::filesystem::path& directory,
 	std::function<void(const boost::filesystem::path&)> func
 ) const {
-	if ( boost::filesystem::is_directory(directory) ) {
-		for ( boost::filesystem::directory_iterator iter(directory);
-		      iter != boost::filesystem::directory_iterator();
-		      ++iter ) {
-			if ( boost::filesystem::is_regular_file(iter->status()) ||
-			     boost::filesystem::is_directory(iter->status()) ) {
-				func(*iter);
-			}
+	std::vector<boost::filesystem::path> directoryItems;
+
+	std::copy_if(
+		boost::filesystem::directory_iterator(directory),
+		boost::filesystem::directory_iterator(),
+		std::back_inserter(directoryItems),
+		[](const boost::filesystem::path& p) -> bool {
+			return boost::filesystem::is_regular_file(p) ||
+			       boost::filesystem::is_directory(p);
 		}
+	);
+
+	std::sort(
+		directoryItems.begin(),
+		directoryItems.end()
+	);
+
+	for ( auto&& item : directoryItems ) {
+		func(item);
 	}
 }
 
