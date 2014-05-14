@@ -25,10 +25,12 @@ inline std::string readFile(const boost::filesystem::path& filePath) {
 namespace InputXSLT {
 
 xercesc::DOMDocument* FunctionReadFile::constructDocument(
-	const FilesystemContext&,
+	const FilesystemContext& fsContext,
 	const FunctionBase::argument_array& arguments
 ) {
-	const boost::filesystem::path& filePath = arguments[0];
+	const boost::filesystem::path filePath(
+		fsContext.resolve(arguments[0])
+	);
 
 	xercesc::DOMDocument* const domDocument(
 		xercesc::DOMImplementation::getImplementation()->createDocument(

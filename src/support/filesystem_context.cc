@@ -3,21 +3,8 @@
 #include <algorithm>
 #include <iterator>
 
+#include "support/xalan_string.h"
 #include "support/xerces_string_guard.h"
-
-namespace {
-
-inline std::string xalanToString(const xalan::XalanDOMString& text) {
-	xalan::CharVectorType castHelper;
-	text.transcode(castHelper);
-
-	return std::string(
-		castHelper.begin(),
-		castHelper.end() - 1
-	);
-}
-
-}
 
 namespace InputXSLT {
 
@@ -38,7 +25,7 @@ boost::filesystem::path FilesystemContext::resolve(
 
 boost::filesystem::path FilesystemContext::resolve(
 	const xalan::XalanDOMString& path) const {
-	return this->resolve(xalanToString(path));
+	return this->resolve(toString(path));
 }
 
 void FilesystemContext::iterate(
@@ -78,7 +65,7 @@ void FilesystemContext::iterate(
 	const xalan::XalanDOMString& path,
 	std::function<void(const boost::filesystem::path&)> func
 ) const {
-	this->iterate(xalanToString(path), func);
+	this->iterate(toString(path), func);
 }
 
 }

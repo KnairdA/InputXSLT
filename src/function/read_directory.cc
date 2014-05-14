@@ -13,7 +13,9 @@ xercesc::DOMDocument* FunctionReadDirectory::constructDocument(
 	const InputXSLT::FilesystemContext& fsContext,
 	const FunctionBase::argument_array& arguments
 ) {
-	const boost::filesystem::path& directoryPath = arguments[0];
+	const boost::filesystem::path directoryPath(
+		fsContext.resolve(arguments[0])
+	);
 
 	xercesc::DOMDocument* const domDocument(
 		xercesc::DOMImplementation::getImplementation()->createDocument(

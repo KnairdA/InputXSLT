@@ -11,6 +11,7 @@
 #include <array>
 
 #include "common.h"
+#include "support/xalan_string.h"
 #include "support/dom/document_cache.h"
 #include "support/filesystem_context.h"
 
@@ -22,10 +23,7 @@ template <
 >
 class FunctionBase : public xalan::Function {
 	public:
-		typedef std::array<
-			boost::filesystem::path,
-			ArgumentCount
-		> argument_array;
+		typedef std::array<std::string, ArgumentCount> argument_array;
 
 		FunctionBase():
 			document_cache_(std::make_shared<DomDocumentCache>()) { }
@@ -43,15 +41,14 @@ class FunctionBase : public xalan::Function {
 				locator
 			);
 
-			const FilesystemContext fsContext(locator);
 			argument_array pathArguments;
 
 			std::transform(
 				rawArguments.begin(),
 				rawArguments.end(),
 				pathArguments.begin(),
-				[&fsContext](const xalan::XObjectPtr& ptr) -> boost::filesystem::path {
-					return fsContext.resolve(ptr->str());
+				[](const xalan::XObjectPtr& ptr) -> std::string {
+					return toString(ptr->str());
 				}
 			);
 
@@ -60,7 +57,7 @@ class FunctionBase : public xalan::Function {
 					static_cast<Implementation*>(
 						const_cast<FunctionBase*>(this)
 					)->constructDocument(
-						fsContext,
+						FilesystemContext(locator),
 						pathArguments
 					)
 				)
@@ -108,7 +105,7 @@ class FunctionBase : public xalan::Function {
 			xalan::XalanNode* context,
 			const xalan::Locator* locator
 		) const {
-			const bool notNull = std::none_of(
+			const bool anyNull = std::any_of(
 				rawArguments.begin(),
 				rawArguments.end(),
 				[](const xalan::XObjectPtr& ptr) -> bool {
@@ -116,7 +113,7 @@ class FunctionBase : public xalan::Function {
 				}
 			);
 
-			if ( rawArguments.size() != ArgumentCount && notNull ) {
+			if ( rawArguments.size() != ArgumentCount || anyNull ) {
 				xalan::XPathExecutionContext::GetAndReleaseCachedString guard(
 					executionContext
 				);
