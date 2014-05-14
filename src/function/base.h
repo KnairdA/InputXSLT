@@ -7,6 +7,8 @@
 #include <xalanc/XPath/XObject.hpp>
 
 #include <memory>
+#include <algorithm>
+#include <array>
 
 #include "common.h"
 #include "support/dom/document_cache.h"
@@ -14,19 +16,44 @@
 
 namespace InputXSLT {
 
-template <class Implementation>
+template <
+	class Implementation,
+	std::size_t ArgumentCount
+>
 class FunctionBase : public xalan::Function {
 	public:
+		typedef std::array<
+			boost::filesystem::path,
+			ArgumentCount
+		> argument_array;
+
 		FunctionBase():
 			document_cache_(std::make_shared<DomDocumentCache>()) { }
 
 		virtual xalan::XObjectPtr execute(
 			xalan::XPathExecutionContext& executionContext,
-			xalan::XalanNode*,
-			const xalan::XObjectPtr argument,
+			xalan::XalanNode* context,
+			const XObjectArgVectorType& rawArguments,
 			const xalan::Locator* locator
 		) const {
+			this->validateArguments(
+				rawArguments,
+				executionContext,
+				context,
+				locator
+			);
+
 			const FilesystemContext fsContext(locator);
+			argument_array pathArguments;
+
+			std::transform(
+				rawArguments.begin(),
+				rawArguments.end(),
+				pathArguments.begin(),
+				[&fsContext](const xalan::XObjectPtr& ptr) -> boost::filesystem::path {
+					return fsContext.resolve(ptr->str());
+				}
+			);
 
 			xalan::XalanDocument* const domDocument(
 				this->document_cache_->create(
@@ -34,7 +61,7 @@ class FunctionBase : public xalan::Function {
 						const_cast<FunctionBase*>(this)
 					)->constructDocument(
 						fsContext,
-						fsContext.resolve(argument->str())
+						pathArguments
 					)
 				)
 			);
@@ -61,14 +88,41 @@ class FunctionBase : public xalan::Function {
 		FunctionBase& operator=(const FunctionBase&) = delete;
 		bool operator==(const FunctionBase&) const   = delete;
 
-	protected:
+	private:
 		std::shared_ptr<DomDocumentCache> document_cache_;
 
 		const xalan::XalanDOMString& getError(
 			xalan::XalanDOMString& result) const {
-			result.assign("The function expects one argument of type string.");
+			result.assign(std::string(
+				"The function expects "        +
+				std::to_string(ArgumentCount)  +
+				" argument(s) of type string."
+			).data());
 
 			return result;
+		}
+
+		inline void validateArguments(
+			const XObjectArgVectorType& rawArguments,
+			xalan::XPathExecutionContext& executionContext,
+			xalan::XalanNode* context,
+			const xalan::Locator* locator
+		) const {
+			const bool notNull = std::none_of(
+				rawArguments.begin(),
+				rawArguments.end(),
+				[](const xalan::XObjectPtr& ptr) -> bool {
+					return ptr.null();
+				}
+			);
+
+			if ( rawArguments.size() != ArgumentCount && notNull ) {
+				xalan::XPathExecutionContext::GetAndReleaseCachedString guard(
+					executionContext
+				);
+
+				this->generalError(executionContext, context, locator);
+			}
 		}
 
 };
