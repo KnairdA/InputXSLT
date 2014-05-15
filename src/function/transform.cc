@@ -11,14 +11,14 @@ namespace InputXSLT {
 
 xercesc::DOMDocument* FunctionTransform::constructDocument(
 	const InputXSLT::FilesystemContext& fsContext,
-	const FunctionBase::argument_array& arguments
+	const FunctionBase::argument_tuple& arguments
 ) {
 	const boost::filesystem::path transformationPath(
-		fsContext.resolve(arguments[0])
+		fsContext.resolve(std::get<0>(arguments))
 	);
 
 	const boost::filesystem::path targetPath(
-		fsContext.resolve(arguments[1])
+		fsContext.resolve(std::get<1>(arguments))
 	);
 
 	xercesc::DOMDocument* const domDocument(

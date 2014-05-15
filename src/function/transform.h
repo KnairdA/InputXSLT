@@ -5,7 +5,11 @@
 
 namespace InputXSLT {
 
-class FunctionTransform : public FunctionBase<FunctionTransform, 2> {
+class FunctionTransform : public FunctionBase<
+	FunctionTransform,
+	std::string,
+	std::string
+> {
 	public:
 		using FunctionBase::FunctionBase;
 
@@ -14,7 +18,7 @@ class FunctionTransform : public FunctionBase<FunctionTransform, 2> {
 
 		xercesc::DOMDocument* constructDocument(
 			const FilesystemContext&,
-			const FunctionBase::argument_array&
+			const FunctionBase::argument_tuple&
 		);
 
 };

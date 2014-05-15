@@ -1,29 +1,28 @@
 #ifndef INPUTXSLT_SRC_FUNCTION_BASE_H_
 #define INPUTXSLT_SRC_FUNCTION_BASE_H_
 
-#include <xalanc/XalanTransformer/XalanTransformer.hpp>
 #include <xalanc/XPath/XObjectFactory.hpp>
 #include <xalanc/XPath/Function.hpp>
 #include <xalanc/XPath/XObject.hpp>
 
 #include <memory>
-#include <algorithm>
-#include <array>
+#include <tuple>
 
 #include "common.h"
 #include "support/xalan_string.h"
+#include "support/tuple/mapper.h"
 #include "support/dom/document_cache.h"
 #include "support/filesystem_context.h"
 
 namespace InputXSLT {
 
 template <
-	class Implementation,
-	std::size_t ArgumentCount
+	typename Implementation,
+	typename... Types
 >
 class FunctionBase : public xalan::Function {
 	public:
-		typedef std::array<std::string, ArgumentCount> argument_array;
+		typedef std::tuple<Types...> argument_tuple;
 
 		FunctionBase():
 			document_cache_(std::make_shared<DomDocumentCache>()) { }
@@ -31,25 +30,14 @@ class FunctionBase : public xalan::Function {
 		virtual xalan::XObjectPtr execute(
 			xalan::XPathExecutionContext& executionContext,
 			xalan::XalanNode* context,
-			const XObjectArgVectorType& rawArguments,
+			const XObjectArgVectorType& arguments,
 			const xalan::Locator* locator
 		) const {
 			this->validateArguments(
-				rawArguments,
+				arguments,
 				executionContext,
 				context,
 				locator
-			);
-
-			argument_array pathArguments;
-
-			std::transform(
-				rawArguments.begin(),
-				rawArguments.end(),
-				pathArguments.begin(),
-				[](const xalan::XObjectPtr& ptr) -> std::string {
-					return toString(ptr->str());
-				}
 			);
 
 			xalan::XalanDocument* const domDocument(
@@ -58,7 +46,7 @@ class FunctionBase : public xalan::Function {
 						const_cast<FunctionBase*>(this)
 					)->constructDocument(
 						FilesystemContext(locator),
-						pathArguments
+						Mapper::template construct<argument_tuple>(arguments)
 					)
 				)
 			);
@@ -91,8 +79,8 @@ class FunctionBase : public xalan::Function {
 		const xalan::XalanDOMString& getError(
 			xalan::XalanDOMString& result) const {
 			result.assign(std::string(
-				"The function expects "        +
-				std::to_string(ArgumentCount)  +
+				"The function expects "                                +
+				std::to_string(std::tuple_size<argument_tuple>::value) +
 				" argument(s) of type string."
 			).data());
 
@@ -100,20 +88,20 @@ class FunctionBase : public xalan::Function {
 		}
 
 		inline void validateArguments(
-			const XObjectArgVectorType& rawArguments,
+			const XObjectArgVectorType& arguments,
 			xalan::XPathExecutionContext& executionContext,
 			xalan::XalanNode* context,
 			const xalan::Locator* locator
 		) const {
 			const bool anyNull = std::any_of(
-				rawArguments.begin(),
-				rawArguments.end(),
+				arguments.begin(),
+				arguments.end(),
 				[](const xalan::XObjectPtr& ptr) -> bool {
 					return ptr.null();
 				}
 			);
 
-			if ( rawArguments.size() != ArgumentCount || anyNull ) {
+			if ( arguments.size() != std::tuple_size<argument_tuple>::value || anyNull ) {
 				xalan::XPathExecutionContext::GetAndReleaseCachedString guard(
 					executionContext
 				);

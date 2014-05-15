@@ -5,7 +5,10 @@
 
 namespace InputXSLT {
 
-class FunctionReadXmlFile : public FunctionBase<FunctionReadXmlFile, 1> {
+class FunctionReadXmlFile : public FunctionBase<
+	FunctionReadXmlFile,
+	std::string
+> {
 	public:
 		using FunctionBase::FunctionBase;
 
@@ -14,7 +17,7 @@ class FunctionReadXmlFile : public FunctionBase<FunctionReadXmlFile, 1> {
 
 		xercesc::DOMDocument* constructDocument(
 			const FilesystemContext&,
-			const FunctionBase::argument_array&
+			const FunctionBase::argument_tuple&
 		);
 
 };
