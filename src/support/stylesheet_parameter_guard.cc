@@ -33,4 +33,14 @@ void StylesheetParameterGuard::set(
 	);
 }
 
+void StylesheetParameterGuard::set(
+	const std::string& key,
+	const xalan::XObjectPtr& value
+) {
+	this->transformer_.setStylesheetParam(
+		key.data(),
+		value
+	);
+}
+
 }

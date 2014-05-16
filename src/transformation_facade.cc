@@ -42,6 +42,16 @@ int TransformationFacade::generate(
 
 int TransformationFacade::generate(
 	const std::string& target,
+	const xalan::XObjectPtr& argument
+) {
+	StylesheetParameterGuard guard(this->transformer_);
+	guard.set("arguments", argument);
+
+	return this->generate(target, guard);
+}
+
+int TransformationFacade::generate(
+	const std::string& target,
 	StylesheetParameterGuard& parameters
 ) {
 	const boost::filesystem::path targetFilePath(

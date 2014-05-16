@@ -8,7 +8,8 @@ namespace InputXSLT {
 class FunctionTransform : public FunctionBase<
 	FunctionTransform,
 	std::string,
-	std::string
+	std::string,
+	xalan::XObjectPtr
 > {
 	public:
 		using FunctionBase::FunctionBase;

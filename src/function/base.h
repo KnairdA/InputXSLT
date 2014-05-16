@@ -81,7 +81,7 @@ class FunctionBase : public xalan::Function {
 			result.assign(std::string(
 				"The function expects "                                +
 				std::to_string(std::tuple_size<argument_tuple>::value) +
-				" argument(s) of type string."
+				" argument(s)"
 			).data());
 
 			return result;

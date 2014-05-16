@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <test_case>
-<transform>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+<transform>
+<transform_test>
+<argument_value>42</argument_value>
+<transformation_content>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;xsl:stylesheet
 	version="1.0"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+	xmlns:xalan="http://xml.apache.org/xalan"
 	xmlns:InputXSLT="function.inputxslt.application"
-	exclude-result-prefixes="InputXSLT"
+	exclude-result-prefixes="InputXSLT xalan"
 &gt;
 
 &lt;xsl:output
@@ -18,12 +22,17 @@
 &lt;xsl:template match="/"&gt;
 &lt;test_case&gt;
 	&lt;transform&gt;
+		&lt;xsl:variable name="argument"&gt;
+			&lt;key&gt;test&lt;/key&gt;
+			&lt;value&gt;42&lt;/value&gt;
+		&lt;/xsl:variable&gt;
+
 		&lt;xsl:variable
 			name   = "result"
-			select = "InputXSLT:transform('test.xsl', 'test_actual.xml')"
+			select = "InputXSLT:transform('test.xsl', 'test_actual.xml', $argument)"
 		/&gt;
 
-		&lt;xsl:value-of select="
+		&lt;xsl:copy-of select="
 			InputXSLT:read-xml-file('test_actual.xml')/test_case/transform_test
 		"/&gt;
 	&lt;/transform&gt;
@@ -31,5 +40,7 @@
 &lt;/xsl:template&gt;
 
 &lt;/xsl:stylesheet&gt;
+</transformation_content>
+</transform_test>
 </transform>
 </test_case>

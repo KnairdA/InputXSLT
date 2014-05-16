@@ -16,10 +16,8 @@ class TransformationFacade {
 		~TransformationFacade();
 
 		int generate(const std::string&);
-		int generate(
-			const std::string&,
-			const StylesheetParameterGuard::map&
-		);
+		int generate(const std::string&, const StylesheetParameterGuard::map&);
+		int generate(const std::string&, const xalan::XObjectPtr&);
 
 	private:
 		const xalan::XalanCompiledStylesheet* transformation_;

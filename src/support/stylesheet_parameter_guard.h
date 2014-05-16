@@ -2,6 +2,7 @@
 #define INPUTXSLT_SRC_SUPPORT_STYLESHEET_PARAMETER_GUARD_H_
 
 #include <xalanc/XalanTransformer/XalanTransformer.hpp>
+#include <xalanc/XPath/XObject.hpp>
 
 #include <string>
 #include <unordered_map>
@@ -24,6 +25,7 @@ class StylesheetParameterGuard {
 
 		void set(const map&);
 		void set(const std::string&, const std::string&);
+		void set(const std::string&, const xalan::XObjectPtr&);
 
 	private:
 		xalan::XalanTransformer& transformer_;

@@ -38,7 +38,8 @@ xercesc::DOMDocument* FunctionTransform::constructDocument(
 	);
 
 	const int result = transformation.generate(
-		targetPath.string()
+		targetPath.string(),
+		std::get<2>(arguments)
 	);
 
 	if ( result == 0 ) {
