@@ -14,18 +14,26 @@
 	indent="yes"
 />
 
+<xsl:template name="transformer">
+	<xsl:param name="transformation"/>
+	<xsl:param name="target"/>
+	<xsl:param name="parameters"/>
+
+	<xsl:variable name="result" select="
+		InputXSLT:transform($transformation, $target, xalan:nodeset($parameters))
+	"/>
+</xsl:template>
+
 <xsl:template match="/">
 <test_case>
 	<transform>
-		<xsl:variable name="argument">
-			<key>test</key>
-			<value>42</value>
-		</xsl:variable>
-
-		<xsl:variable
-			name   = "result"
-			select = "InputXSLT:transform('test.xsl', 'test_actual.xml', $argument)"
-		/>
+		<xsl:call-template name="transformer">
+			<xsl:with-param name="transformation">test.xsl</xsl:with-param>
+			<xsl:with-param name="target">test_actual.xml</xsl:with-param>
+			<xsl:with-param name="parameters">
+				<test>21</test>
+			</xsl:with-param>
+		</xsl:call-template>
 
 		<xsl:copy-of select="
 			InputXSLT:read-xml-file('test_actual.xml')/test_case/transform_test

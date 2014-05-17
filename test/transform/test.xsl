@@ -14,17 +14,14 @@
 	indent="yes"
 />
 
-<xsl:param name="arguments"/>
+<xsl:param name="parameters"/>
 
 <xsl:template match="/">
 <test_case>
 	<transform_test>
-		<argument_value>
-			<xsl:value-of select="xalan:nodeset($arguments)/value"/>
-		</argument_value>
-		<transformation_content>
-			<xsl:value-of select="InputXSLT:read-file('transformation.xsl')"/>
-		</transformation_content>
+		<parameter_value>
+			<xsl:value-of select="$parameters/test * 2"/>
+		</parameter_value>
 	</transform_test>
 </test_case>
 </xsl:template>
