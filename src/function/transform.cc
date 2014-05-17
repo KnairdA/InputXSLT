@@ -11,14 +11,18 @@ namespace InputXSLT {
 
 xercesc::DOMDocument* FunctionTransform::constructDocument(
 	const InputXSLT::FilesystemContext& fsContext,
-	const FunctionBase::argument_tuple& arguments
+	const FunctionBase::parameter_tuple& parameters
 ) {
-	const boost::filesystem::path transformationPath(
-		fsContext.resolve(std::get<0>(arguments))
+	const std::string transformationPath(
+		fsContext.resolve(std::get<0>(parameters)).string()
 	);
 
-	const boost::filesystem::path targetPath(
-		fsContext.resolve(std::get<1>(arguments))
+	const std::string targetPath(
+		fsContext.resolve(std::get<1>(parameters)).string()
+	);
+
+	const xalan::XObjectPtr& parameterObject(
+		std::get<2>(parameters)
 	);
 
 	xercesc::DOMDocument* const domDocument(
@@ -33,23 +37,16 @@ xercesc::DOMDocument* FunctionTransform::constructDocument(
 		domDocument->getDocumentElement()
 	);
 
-	InputXSLT::TransformationFacade transformation(
-		transformationPath.string()
-	);
+	InputXSLT::TransformationFacade transformation(transformationPath);
 
-	const int result = transformation.generate(
-		targetPath.string(),
-		std::get<2>(arguments)
-	);
-
-	if ( result == 0 ) {
+	if ( transformation.generate(targetPath, parameterObject) == 0 ) {
 		xercesc::DOMElement* const resultNode(
 			domDocument->createElement(*XercesStringGuard<XMLCh>("result"))
 		);
 
 		resultNode->setAttribute(
 			*XercesStringGuard<XMLCh>("name"),
-			*XercesStringGuard<XMLCh>(targetPath.string())
+			*XercesStringGuard<XMLCh>(targetPath)
 		);
 
 		rootNode->appendChild(resultNode);

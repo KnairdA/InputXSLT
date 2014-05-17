@@ -26,10 +26,10 @@ namespace InputXSLT {
 
 xercesc::DOMDocument* FunctionReadFile::constructDocument(
 	const FilesystemContext& fsContext,
-	const FunctionBase::argument_tuple& arguments
+	const FunctionBase::parameter_tuple& parameters
 ) {
 	const boost::filesystem::path filePath(
-		fsContext.resolve(std::get<0>(arguments))
+		fsContext.resolve(std::get<0>(parameters))
 	);
 
 	xercesc::DOMDocument* const domDocument(

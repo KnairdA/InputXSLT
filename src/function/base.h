@@ -22,7 +22,7 @@ template <
 >
 class FunctionBase : public xalan::Function {
 	public:
-		typedef std::tuple<Types...> argument_tuple;
+		typedef std::tuple<Types...> parameter_tuple;
 
 		FunctionBase():
 			document_cache_(std::make_shared<DomDocumentCache>()) { }
@@ -30,11 +30,11 @@ class FunctionBase : public xalan::Function {
 		virtual xalan::XObjectPtr execute(
 			xalan::XPathExecutionContext& executionContext,
 			xalan::XalanNode* context,
-			const XObjectArgVectorType& arguments,
+			const XObjectArgVectorType& parameters,
 			const xalan::Locator* locator
 		) const {
-			this->validateArguments(
-				arguments,
+			this->validateParameters(
+				parameters,
 				executionContext,
 				context,
 				locator
@@ -46,7 +46,7 @@ class FunctionBase : public xalan::Function {
 						const_cast<FunctionBase*>(this)
 					)->constructDocument(
 						FilesystemContext(locator),
-						Mapper::template construct<argument_tuple>(arguments)
+						Mapper::template construct<parameter_tuple>(parameters)
 					)
 				)
 			);
@@ -79,29 +79,29 @@ class FunctionBase : public xalan::Function {
 		const xalan::XalanDOMString& getError(
 			xalan::XalanDOMString& result) const {
 			result.assign(std::string(
-				"The function expects "                                +
-				std::to_string(std::tuple_size<argument_tuple>::value) +
-				" argument(s)"
+				"The function expects "                                 +
+				std::to_string(std::tuple_size<parameter_tuple>::value) +
+				" parameter(s)"
 			).data());
 
 			return result;
 		}
 
-		inline void validateArguments(
-			const XObjectArgVectorType& arguments,
+		inline void validateParameters(
+			const XObjectArgVectorType& parameters,
 			xalan::XPathExecutionContext& executionContext,
 			xalan::XalanNode* context,
 			const xalan::Locator* locator
 		) const {
 			const bool anyNull = std::any_of(
-				arguments.begin(),
-				arguments.end(),
+				parameters.begin(),
+				parameters.end(),
 				[](const xalan::XObjectPtr& ptr) -> bool {
 					return ptr.null();
 				}
 			);
 
-			if ( arguments.size() != std::tuple_size<argument_tuple>::value || anyNull ) {
+			if ( parameters.size() != std::tuple_size<parameter_tuple>::value || anyNull ) {
 				xalan::XPathExecutionContext::GetAndReleaseCachedString guard(
 					executionContext
 				);

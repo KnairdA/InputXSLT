@@ -42,10 +42,10 @@ int TransformationFacade::generate(
 
 int TransformationFacade::generate(
 	const std::string& target,
-	const xalan::XObjectPtr& argument
+	const xalan::XObjectPtr& parameter
 ) {
 	StylesheetParameterGuard guard(this->transformer_);
-	guard.set("arguments", argument);
+	guard.set("parameters", parameter);
 
 	return this->generate(target, guard);
 }

@@ -17,7 +17,7 @@ class FunctionReadXmlFile : public FunctionBase<
 
 		xercesc::DOMDocument* constructDocument(
 			const FilesystemContext&,
-			const FunctionBase::argument_tuple&
+			const FunctionBase::parameter_tuple&
 		);
 
 };
