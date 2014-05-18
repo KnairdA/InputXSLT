@@ -25,49 +25,43 @@ TransformationFacade::~TransformationFacade() {
 	);
 }
 
-int TransformationFacade::generate(const std::string& target) {
-	StylesheetParameterGuard guard(this->transformer_);
-
-	return this->generate(target, guard);
-}
-
 int TransformationFacade::generate(
-	const std::string& target,
-	const StylesheetParameterGuard::map& parameters
-) {
-	StylesheetParameterGuard guard(this->transformer_, parameters);
-
-	return this->generate(target, guard);
-}
-
-int TransformationFacade::generate(
-	const std::string& target,
-	const xalan::XObjectPtr& parameter
-) {
-	StylesheetParameterGuard guard(this->transformer_);
-	guard.set("parameters", parameter);
-
-	return this->generate(target, guard);
-}
-
-int TransformationFacade::generate(
-	const std::string& target,
+	const std::string& targetPath,
 	StylesheetParameterGuard& parameters
 ) {
-	const boost::filesystem::path targetFilePath(
-		boost::filesystem::absolute(target)
+	const boost::filesystem::path targetPathHelper(
+		boost::filesystem::absolute(targetPath)
 	);
 
 	parameters.set(
-		"target-file",      targetFilePath.filename().string()
+		"target-file",      targetPathHelper.filename().string()
 	);
 	parameters.set(
-		"parent-directory", targetFilePath.parent_path().filename().string()
+		"parent-directory", targetPathHelper.parent_path().filename().string()
 	);
 
+	return this->generate(
+		xalan::XSLTResultTarget(targetPath.data()),
+		parameters
+	);
+}
+
+int TransformationFacade::generate(
+	std::basic_ostream<char>& targetStream,
+	StylesheetParameterGuard& parameters
+) {
+	return this->generate(
+		xalan::XSLTResultTarget(targetStream),
+		parameters
+	);
+}
+
+int TransformationFacade::generate(
+	xalan::XSLTResultTarget&& outputTarget,
+	StylesheetParameterGuard&
+) {
 	std::stringstream       emptyStream("<dummy/>");
 	xalan::XSLTInputSource  inputSource(emptyStream);
-	xalan::XSLTResultTarget outputTarget(target.data());
 
 	const int resultCode = this->transformer_.transform(
 		inputSource,

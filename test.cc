@@ -12,7 +12,7 @@ int main(int ac, char** av) {
 
 	optionDescription.add_options()
 		("transformation", boost::program_options::value<std::string>()->required(), "transformation file")
-		("target",         boost::program_options::value<std::string>()->required(), "target file")
+		("target",         boost::program_options::value<std::string>(),             "target file")
 	;
 
 	boost::program_options::variables_map variables;
@@ -31,17 +31,20 @@ int main(int ac, char** av) {
 		std::cerr << exception.what() << std::endl;
 	}
 
-	if ( variables.count("transformation") &&
-	     variables.count("target") ) {
+	if ( variables.count("transformation") ) {
 		InputXSLT::PlattformGuard plattform;
 
 		InputXSLT::TransformationFacade transformation(
 			variables["transformation"].as<std::string>()
 		);
 
-		return transformation.generate(
-			variables["target"].as<std::string>()
-		);
+		if ( variables.count("target") ) {
+			return transformation.generate(
+				variables["target"].as<std::string>()
+			);
+		} else {
+			return transformation.generate(std::cout);
+		}
 	} else {
 		std::cout << optionDescription << std::endl;
 

@@ -15,9 +15,14 @@ class TransformationFacade {
 		explicit TransformationFacade(const std::string&);
 		~TransformationFacade();
 
-		int generate(const std::string&);
-		int generate(const std::string&, const StylesheetParameterGuard::map&);
-		int generate(const std::string&, const xalan::XObjectPtr&);
+		template <typename Target>
+		int generate(Target&);
+
+		template <typename Target>
+		int generate(Target&, const StylesheetParameterGuard::map&);
+
+		template <typename Target>
+		int generate(Target&, const xalan::XObjectPtr&);
 
 	private:
 		const xalan::XalanCompiledStylesheet* transformation_;
@@ -25,8 +30,38 @@ class TransformationFacade {
 		xalan::XalanTransformer transformer_;
 
 		int generate(const std::string&, StylesheetParameterGuard&);
+		int generate(std::basic_ostream<char>&, StylesheetParameterGuard&);
+		int generate(xalan::XSLTResultTarget&&, StylesheetParameterGuard&);
 
 };
+
+template <typename Target>
+int TransformationFacade::generate(Target& target) {
+	StylesheetParameterGuard guard(this->transformer_);
+
+	return this->generate(target, guard);
+}
+
+template <typename Target>
+int TransformationFacade::generate(
+	Target& target,
+	const StylesheetParameterGuard::map& parameters
+) {
+	StylesheetParameterGuard guard(this->transformer_, parameters);
+
+	return this->generate(target, guard);
+}
+
+template <typename Target>
+int TransformationFacade::generate(
+	Target& target,
+	const xalan::XObjectPtr& parameter
+) {
+	StylesheetParameterGuard guard(this->transformer_);
+	guard.set("parameters", parameter);
+
+	return this->generate(target, guard);
+}
 
 }
 
