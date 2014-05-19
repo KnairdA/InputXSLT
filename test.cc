@@ -3,6 +3,8 @@
 
 #include "boost/program_options.hpp"
 
+#include <string>
+#include <vector>
 #include <iostream>
 
 int main(int ac, char** av) {
@@ -11,8 +13,9 @@ int main(int ac, char** av) {
 	);
 
 	optionDescription.add_options()
-		("transformation", boost::program_options::value<std::string>()->required(), "transformation file")
-		("target",         boost::program_options::value<std::string>(),             "target file")
+		("transformation", boost::program_options::value<std::string>()->required(),  "transformation file")
+		("target",         boost::program_options::value<std::string>(),              "target file")
+		("include",        boost::program_options::value<std::vector<std::string>>(), "include paths")
 	;
 
 	boost::program_options::variables_map variables;
@@ -32,7 +35,13 @@ int main(int ac, char** av) {
 	}
 
 	if ( variables.count("transformation") ) {
-		InputXSLT::PlattformGuard plattform;
+		std::vector<std::string> includePath;
+
+		if ( variables.count("include") ) {
+			includePath = variables["include"].as<std::vector<std::string>>();
+		};
+
+		InputXSLT::PlattformGuard plattform(includePath);
 
 		InputXSLT::TransformationFacade transformation(
 			variables["transformation"].as<std::string>()
