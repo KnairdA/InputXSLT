@@ -6,13 +6,14 @@
 #include <string>
 
 #include "common.h"
+#include "support/include_entity_resolver.h"
 #include "support/stylesheet_parameter_guard.h"
 
 namespace InputXSLT {
 
 class TransformationFacade {
 	public:
-		explicit TransformationFacade(const std::string&);
+		TransformationFacade(const std::string&, IncludeEntityResolver*);
 		~TransformationFacade();
 
 		template <typename Target>

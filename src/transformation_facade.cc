@@ -10,9 +10,14 @@
 
 namespace InputXSLT {
 
-TransformationFacade::TransformationFacade(const std::string& transformation):
+TransformationFacade::TransformationFacade(
+	const std::string& transformation,
+	IncludeEntityResolver* resolver
+):
 	transformation_{},
 	transformer_() {
+	this->transformer_.setEntityResolver(resolver);
+
 	this->transformer_.compileStylesheet(
 		xalan::XSLTInputSource(transformation.data()),
 		this->transformation_

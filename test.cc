@@ -44,7 +44,8 @@ int main(int ac, char** av) {
 		InputXSLT::PlattformGuard plattform(includePath);
 
 		InputXSLT::TransformationFacade transformation(
-			variables["transformation"].as<std::string>()
+			variables["transformation"].as<std::string>(),
+			plattform.getEntityResolver()
 		);
 
 		if ( variables.count("target") ) {

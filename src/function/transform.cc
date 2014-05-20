@@ -9,6 +9,10 @@
 
 namespace InputXSLT {
 
+FunctionTransform::FunctionTransform(IncludeEntityResolver* resolver):
+	FunctionBase::FunctionBase(),
+	include_resolver_(resolver) { }
+
 xercesc::DOMDocument* FunctionTransform::constructDocument(
 	const InputXSLT::FilesystemContext& fsContext,
 	const FunctionBase::parameter_tuple& parameters
@@ -37,7 +41,10 @@ xercesc::DOMDocument* FunctionTransform::constructDocument(
 		domDocument->getDocumentElement()
 	);
 
-	InputXSLT::TransformationFacade transformation(transformationPath);
+	InputXSLT::TransformationFacade transformation(
+		transformationPath,
+		this->include_resolver_
+	);
 
 	if ( transformation.generate(targetPath, parameterObject) == 0 ) {
 		xercesc::DOMElement* const resultNode(

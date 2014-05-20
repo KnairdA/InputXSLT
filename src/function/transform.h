@@ -3,6 +3,8 @@
 
 #include "base.h"
 
+#include "support/include_entity_resolver.h"
+
 namespace InputXSLT {
 
 class FunctionTransform : public FunctionBase<
@@ -12,7 +14,7 @@ class FunctionTransform : public FunctionBase<
 	xalan::XObjectPtr
 > {
 	public:
-		using FunctionBase::FunctionBase;
+		FunctionTransform(IncludeEntityResolver*);
 
 	protected:
 		friend FunctionBase;
@@ -21,6 +23,9 @@ class FunctionTransform : public FunctionBase<
 			const FilesystemContext&,
 			const FunctionBase::parameter_tuple&
 		);
+
+	private:
+		IncludeEntityResolver* const include_resolver_;
 
 };
 

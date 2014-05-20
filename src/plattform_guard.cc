@@ -10,11 +10,11 @@
 #include "function/read_xml_file.h"
 #include "function/read_directory.h"
 #include "function/transform.h"
-#include "function/resolve_include.h"
 
 namespace InputXSLT {
 
-PlattformGuard::PlattformGuard(const std::vector<std::string>& path) {
+PlattformGuard::PlattformGuard(const std::vector<std::string>& path):
+	include_resolver_(path) {
 	xercesc::XMLPlatformUtils::Initialize();
 	xalan::XalanTransformer::initialize();
 
@@ -43,18 +43,16 @@ PlattformGuard::PlattformGuard(const std::vector<std::string>& path) {
 	xalan::XalanTransformer::installExternalFunctionGlobal(
 		customNamespace,
 		xalan::XalanDOMString("transform"),
-		InputXSLT::FunctionTransform()
-	);
-
-	xalan::XalanTransformer::installExternalFunctionGlobal(
-		customNamespace,
-		xalan::XalanDOMString("resolve-include"),
-		InputXSLT::FunctionResolveInclude(path)
+		InputXSLT::FunctionTransform(&this->include_resolver_)
 	);
 }
 
 PlattformGuard::~PlattformGuard() {
 	xalan::XalanTransformer::terminate();
+}
+
+IncludeEntityResolver* PlattformGuard::getEntityResolver() {
+	return &this->include_resolver_;
 }
 
 }

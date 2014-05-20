@@ -4,11 +4,20 @@
 #include <string>
 #include <vector>
 
+#include "support/include_entity_resolver.h"
+
 namespace InputXSLT {
 
-struct PlattformGuard {
-	PlattformGuard(const std::vector<std::string>&);
-	~PlattformGuard();
+class PlattformGuard {
+	public:
+		PlattformGuard(const std::vector<std::string>&);
+		~PlattformGuard();
+
+		IncludeEntityResolver* getEntityResolver();
+
+	private:
+		IncludeEntityResolver include_resolver_;
+
 };
 
 }
