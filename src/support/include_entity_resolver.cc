@@ -6,6 +6,29 @@
 
 #include "support/xerces_string_guard.h"
 
+namespace {
+
+std::pair<bool, std::string> extractFilePath(const std::string& rawPath) {
+	const std::size_t leadingDelimiter = rawPath.find_first_of('[');
+	const std::size_t closingDelimiter = rawPath.find_last_of(']');
+
+	if ( leadingDelimiter != std::string::npos &&
+		 closingDelimiter != std::string::npos &&
+		 leadingDelimiter <  closingDelimiter ) {
+		return std::make_pair(
+			true,
+			rawPath.substr(
+				leadingDelimiter + 1,
+				closingDelimiter - leadingDelimiter - 1
+			)
+		);
+	} else {
+		return std::make_pair(false, std::string());
+	}
+}
+
+}
+
 namespace InputXSLT {
 
 IncludeEntityResolver::IncludeEntityResolver(
@@ -28,43 +51,40 @@ xercesc::InputSource* IncludeEntityResolver::resolveEntity(
 	const XMLCh* const systemId
 ) {
 	if ( systemId != nullptr ) {
-		const std::string rawPath(
-			*XercesStringGuard<char>(systemId)
-		);
+		auto filePath = extractFilePath(*XercesStringGuard<char>(systemId));
 
-		const std::size_t leadingDelimiter = rawPath.find_first_of('[');
-		const std::size_t closingDelimiter = rawPath.find_last_of(']');
+		if ( filePath.first ) {
+			auto resolvedPath = this->resolve(filePath.second);
 
-		if ( leadingDelimiter != std::string::npos &&
-		     closingDelimiter != std::string::npos &&
-		     leadingDelimiter <  closingDelimiter ) {
-			const std::string filePath(
-				rawPath.substr(
-					leadingDelimiter + 1,
-					closingDelimiter - leadingDelimiter - 1
-				)
-			);
-
-			for ( auto&& context : this->path_ ) {
-				const boost::filesystem::path resolvedPath(
-					context.resolve(filePath)
+			if ( resolvedPath.first ) {
+				return new xercesc::LocalFileInputSource(
+					*XercesStringGuard<XMLCh>(resolvedPath.second.string())
 				);
-
-				if ( boost::filesystem::exists(resolvedPath) &&
-					 boost::filesystem::is_regular_file(resolvedPath) ) {
-					return new xercesc::LocalFileInputSource(
-						*XercesStringGuard<XMLCh>(resolvedPath.string())
-					);
-				}
+			} else {
+				return nullptr;
 			}
-
-			return nullptr;
 		} else {
 			return nullptr;
 		}
 	} else {
 		return nullptr;
 	}
+}
+
+std::pair<bool, boost::filesystem::path> IncludeEntityResolver::resolve(
+	const std::string& filePath) {
+	for ( auto&& context : this->path_ ) {
+		const boost::filesystem::path resolvedPath(
+			context.resolve(filePath)
+		);
+
+		if ( boost::filesystem::exists(resolvedPath) &&
+			 boost::filesystem::is_regular_file(resolvedPath) ) {
+			return std::make_pair(true, resolvedPath);
+		}
+	}
+
+	return std::make_pair(false, boost::filesystem::path());
 }
 
 }
