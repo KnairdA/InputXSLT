@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <test_case>
-<function_read_directory>
 <item>common</item>
 <item>default_params</item>
 <item>read_directory</item>
 <item>read_file</item>
 <item>read_xml_file</item>
 <item>transform</item>
-</function_read_directory>
 </test_case>

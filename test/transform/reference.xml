@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <test_case>
-<transform>
 <transform_test>
 <parameter_value>42</parameter_value>
 </transform_test>
-</transform>
 </test_case>

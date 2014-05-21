@@ -6,27 +6,18 @@
 	exclude-result-prefixes="InputXSLT"
 >
 
-<xsl:output
-	method="xml"
-	omit-xml-declaration="no"
-	encoding="UTF-8"
-	indent="yes"
-/>
+<xsl:include href="[testcase.xsl]"/>
 
 <xsl:param name="target-file"/>
 <xsl:param name="parent-directory"/>
 
-<xsl:template match="/">
-<test_case>
-	<default_params>
-		<target_file>
-			<xsl:value-of select="$target-file"/>
-		</target_file>
-		<parent_directory>
-			<xsl:value-of select="$parent-directory"/>
-		</parent_directory>
-	</default_params>
-</test_case>
+<xsl:template name="implementation">
+	<target_file>
+		<xsl:value-of select="$target-file"/>
+	</target_file>
+	<parent_directory>
+		<xsl:value-of select="$parent-directory"/>
+	</parent_directory>
 </xsl:template>
 
 </xsl:stylesheet>

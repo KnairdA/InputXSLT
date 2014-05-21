@@ -6,12 +6,17 @@
 	exclude-result-prefixes="InputXSLT"
 >
 
-<xsl:include href="[testcase.xsl]"/>
+<xsl:output
+	method="xml"
+	omit-xml-declaration="no"
+	encoding="UTF-8"
+	indent="yes"
+/>
 
-<xsl:template name="implementation">
-	<xsl:for-each select="InputXSLT:read-directory('../')[@type='directory']">
-		<item><xsl:value-of select="."/></item>
-	</xsl:for-each>
+<xsl:template match="/">
+<test_case>
+	<xsl:call-template name="implementation"/>
+</test_case>
 </xsl:template>
 
 </xsl:stylesheet>

@@ -9,7 +9,7 @@ do
 		cd $testcase
 		rm -f actual.xml 
 
-		./../../build/test --transformation transformation.xsl --target actual.xml
+		./../../build/test --transformation transformation.xsl --target actual.xml --include ../common/
 		diff -u reference.xml actual.xml
 
 		if [ $? = 0 ]

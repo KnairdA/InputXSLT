@@ -6,19 +6,10 @@
 	exclude-result-prefixes="InputXSLT"
 >
 
-<xsl:output
-	method="xml"
-	omit-xml-declaration="no"
-	encoding="UTF-8"
-	indent="yes"
-/>
+<xsl:include href="[testcase.xsl]"/>
 
-<xsl:template match="/">
-<test_case>
-	<function_read_file>
-		<xsl:value-of select="InputXSLT:read-file('../common/test.txt')"/>
-	</function_read_file>
-</test_case>
+<xsl:template name="implementation">
+	<xsl:value-of select="InputXSLT:read-file('../common/test.txt')"/>
 </xsl:template>
 
 </xsl:stylesheet>
