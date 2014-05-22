@@ -4,6 +4,8 @@
 #include <xercesc/sax/EntityResolver.hpp>
 #include <xercesc/sax/InputSource.hpp>
 
+#include "boost/optional.hpp"
+
 #include <string>
 #include <vector>
 
@@ -20,7 +22,7 @@ class IncludeEntityResolver : public xercesc::EntityResolver {
 			const XMLCh* const
 		);
 
-		std::pair<bool, boost::filesystem::path> resolve(const std::string&);
+		boost::optional<boost::filesystem::path> resolve(const std::string&);
 
 	private:
 		std::vector<FilesystemContext> path_;

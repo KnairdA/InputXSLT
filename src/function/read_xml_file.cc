@@ -38,18 +38,13 @@ xercesc::DOMDocument* FunctionReadXmlFile::constructDocument(
 	const FilesystemContext& fsContext,
 	const FunctionBase::parameter_tuple& parameters
 ) {
-	boost::filesystem::path filePath(
-		fsContext.resolve(std::get<0>(parameters))
-	);
+	const std::string& rawPath = std::get<0>(parameters);
+	boost::filesystem::path filePath(fsContext.resolve(rawPath));
 
 	if ( !(boost::filesystem::exists(filePath) &&
 	       boost::filesystem::is_regular_file(filePath)) ) {
-		auto resolvedPath = this->include_resolver_->resolve(
-			std::get<0>(parameters)
-		);
-
-		if ( resolvedPath.first ) {
-			filePath = resolvedPath.second;
+		if ( auto resolvedPath = this->include_resolver_->resolve(rawPath) ) {
+			filePath = *resolvedPath;
 		}
 	}
 
