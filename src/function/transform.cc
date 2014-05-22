@@ -9,10 +9,6 @@
 
 namespace InputXSLT {
 
-FunctionTransform::FunctionTransform(IncludeEntityResolver* resolver):
-	FunctionBase::FunctionBase(),
-	include_resolver_(resolver) { }
-
 xercesc::DOMDocument* FunctionTransform::constructDocument(
 	const InputXSLT::FilesystemContext& fsContext,
 	const FunctionBase::parameter_tuple& parameters

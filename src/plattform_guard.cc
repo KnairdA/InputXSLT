@@ -25,19 +25,19 @@ PlattformGuard::PlattformGuard(const std::vector<std::string>& path):
 	xalan::XalanTransformer::installExternalFunctionGlobal(
 		customNamespace,
 		xalan::XalanDOMString("read-file"),
-		InputXSLT::FunctionReadFile()
+		InputXSLT::FunctionReadFile(&this->include_resolver_)
 	);
 
 	xalan::XalanTransformer::installExternalFunctionGlobal(
 		customNamespace,
 		xalan::XalanDOMString("read-xml-file"),
-		InputXSLT::FunctionReadXmlFile()
+		InputXSLT::FunctionReadXmlFile(&this->include_resolver_)
 	);
 
 	xalan::XalanTransformer::installExternalFunctionGlobal(
 		customNamespace,
 		xalan::XalanDOMString("read-directory"),
-		InputXSLT::FunctionReadDirectory()
+		InputXSLT::FunctionReadDirectory(&this->include_resolver_)
 	);
 
 	xalan::XalanTransformer::installExternalFunctionGlobal(

@@ -28,9 +28,20 @@ xercesc::DOMDocument* FunctionReadFile::constructDocument(
 	const FilesystemContext& fsContext,
 	const FunctionBase::parameter_tuple& parameters
 ) {
-	const boost::filesystem::path filePath(
+	boost::filesystem::path filePath(
 		fsContext.resolve(std::get<0>(parameters))
 	);
+
+	if ( !(boost::filesystem::exists(filePath) &&
+	       boost::filesystem::is_regular_file(filePath)) ) {
+		auto resolvedPath = this->include_resolver_->resolve(
+			std::get<0>(parameters)
+		);
+
+		if ( resolvedPath.first ) {
+			filePath = resolvedPath.second;
+		}
+	}
 
 	xercesc::DOMDocument* const domDocument(
 		xercesc::DOMImplementation::getImplementation()->createDocument(

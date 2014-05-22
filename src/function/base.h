@@ -10,9 +10,10 @@
 
 #include "common.h"
 #include "support/xalan_string.h"
+#include "support/filesystem_context.h"
+#include "support/include_entity_resolver.h"
 #include "support/tuple/mapper.h"
 #include "support/dom/document_cache.h"
-#include "support/filesystem_context.h"
 
 namespace InputXSLT {
 
@@ -24,7 +25,8 @@ class FunctionBase : public xalan::Function {
 	public:
 		typedef std::tuple<Types...> parameter_tuple;
 
-		FunctionBase():
+		FunctionBase(IncludeEntityResolver* resolver):
+			include_resolver_(resolver),
 			document_cache_(std::make_shared<DomDocumentCache>()) { }
 
 		virtual xalan::XObjectPtr execute(
@@ -72,6 +74,9 @@ class FunctionBase : public xalan::Function {
 
 		FunctionBase& operator=(const FunctionBase&) = delete;
 		bool operator==(const FunctionBase&) const   = delete;
+
+	protected:
+		IncludeEntityResolver* const include_resolver_;
 
 	private:
 		std::shared_ptr<DomDocumentCache> document_cache_;
