@@ -22,10 +22,11 @@ class IncludeEntityResolver : public xercesc::EntityResolver {
 			const XMLCh* const
 		);
 
-		boost::optional<boost::filesystem::path> resolve(const std::string&);
+		boost::optional<boost::filesystem::path> resolve(
+			const std::string&) const;
 
 	private:
-		std::vector<FilesystemContext> path_;
+		const std::vector<FilesystemContext> path_;
 
 };
 
