@@ -21,12 +21,20 @@ class FilesystemContext {
 		boost::filesystem::path resolve(const std::string&) const;
 		boost::filesystem::path resolve(const xalan::XalanDOMString&) const;
 
-		void iterate(const boost::filesystem::path&,
-		             std::function<void(const boost::filesystem::path&)>) const;
-		void iterate(const std::string&,
-		             std::function<void(const boost::filesystem::path&)>) const;
-		void iterate(const xalan::XalanDOMString&,
-		             std::function<void(const boost::filesystem::path&)>) const;
+		void iterate(
+			const std::string&,
+			const std::function<void(const boost::filesystem::path&)>&
+		) const;
+
+		void iterate(
+			const xalan::XalanDOMString&,
+			const std::function<void(const boost::filesystem::path&)>&
+		) const;
+
+		void iterate(
+			const boost::filesystem::path&,
+			const std::function<void(const boost::filesystem::path&)>&
+		) const;
 
 	private:
 		const boost::filesystem::path path_;

@@ -29,8 +29,22 @@ boost::filesystem::path FilesystemContext::resolve(
 }
 
 void FilesystemContext::iterate(
+	const std::string& path,
+	const std::function<void(const boost::filesystem::path&)>& func
+) const {
+	this->iterate(this->resolve(path), func);
+}
+
+void FilesystemContext::iterate(
+	const xalan::XalanDOMString& path,
+	const std::function<void(const boost::filesystem::path&)>& func
+) const {
+	this->iterate(toString(path), func);
+}
+
+void FilesystemContext::iterate(
 	const boost::filesystem::path& directory,
-	std::function<void(const boost::filesystem::path&)> func
+	const std::function<void(const boost::filesystem::path&)>& func
 ) const {
 	std::vector<boost::filesystem::path> directoryItems;
 
@@ -49,23 +63,11 @@ void FilesystemContext::iterate(
 		directoryItems.end()
 	);
 
-	for ( auto&& item : directoryItems ) {
-		func(item);
-	}
-}
-
-void FilesystemContext::iterate(
-	const std::string& path,
-	std::function<void(const boost::filesystem::path&)> func
-) const {
-	this->iterate(this->resolve(path), func);
-}
-
-void FilesystemContext::iterate(
-	const xalan::XalanDOMString& path,
-	std::function<void(const boost::filesystem::path&)> func
-) const {
-	this->iterate(toString(path), func);
+	std::for_each(
+		directoryItems.begin(),
+		directoryItems.end(),
+		func
+	);
 }
 
 }
