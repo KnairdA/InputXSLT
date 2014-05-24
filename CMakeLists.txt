@@ -35,6 +35,7 @@ set(
 	src/support/tuple/xobject_value.cc
 	src/support/dom/document_cache.cc
 	src/support/dom/document_cache_item.cc
+	src/support/dom/result_node_facade.cc
 )
 
 add_executable(

@@ -3,9 +3,9 @@
 #include <xercesc/dom/DOMDocument.hpp>
 #include <xercesc/dom/DOMImplementation.hpp>
 #include <xercesc/dom/DOMElement.hpp>
-#include <xercesc/dom/DOMText.hpp>
 
 #include "support/xerces_string_guard.h"
+#include "support/dom/result_node_facade.h"
 
 namespace InputXSLT {
 
@@ -33,52 +33,34 @@ xercesc::DOMDocument* FunctionReadDirectory::constructDocument(
 		fsContext.iterate(
 			directoryPath,
 			[&domDocument, &rootNode](const boost::filesystem::path& p) {
-			xercesc::DOMElement* const itemNode(
-				domDocument->createElement(*XercesStringGuard<XMLCh>("result"))
-			);
+			ResultNodeFacade result(domDocument, rootNode, "result");
 
 			switch ( boost::filesystem::status(p).type() ) {
 				case boost::filesystem::regular_file: {
-					itemNode->setAttribute(
-						*XercesStringGuard<XMLCh>("type"),
-						*XercesStringGuard<XMLCh>("file")
-					);
+					result.setAttribute("type", "file");
+					result.setValueNode("name", p.stem().string());
+					result.setValueNode("extension", p.extension().string());
 
 					break;
 				};
 				case boost::filesystem::directory_file: {
-					itemNode->setAttribute(
-						*XercesStringGuard<XMLCh>("type"),
-						*XercesStringGuard<XMLCh>("directory")
-					);
+					result.setAttribute("type", "directory");
+					result.setValueNode("name", p.filename().string());
 
 					break;
 				};
 				default: {
-					itemNode->setAttribute(
-						*XercesStringGuard<XMLCh>("type"),
-						*XercesStringGuard<XMLCh>("misc")
-					);
+					result.setAttribute("type", "misc");
+					result.setValueNode("name", p.filename().string());
 
 					break;
 				};
 			}
 
-			xercesc::DOMText* const textNode(
-				domDocument->createTextNode(
-					*XercesStringGuard<XMLCh>(p.filename().string())
-				)
-			);
-
-			itemNode->appendChild(textNode);
-			rootNode->appendChild(itemNode);
+			result.setValueNode("full", boost::filesystem::canonical(p).string());
 		});
 	} else {
-		xercesc::DOMElement* const resultNode(
-			domDocument->createElement(*XercesStringGuard<XMLCh>("error"))
-		);
-
-		rootNode->appendChild(resultNode);
+		ResultNodeFacade result(domDocument, rootNode, "error");
 	}
 
 	return domDocument;

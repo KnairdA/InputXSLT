@@ -6,6 +6,7 @@
 
 #include "transformation_facade.h"
 #include "support/xerces_string_guard.h"
+#include "support/dom/result_node_facade.h"
 
 namespace InputXSLT {
 
@@ -43,22 +44,11 @@ xercesc::DOMDocument* FunctionTransform::constructDocument(
 	);
 
 	if ( transformation.generate(targetPath, parameterObject) == 0 ) {
-		xercesc::DOMElement* const resultNode(
-			domDocument->createElement(*XercesStringGuard<XMLCh>("result"))
-		);
+		ResultNodeFacade result(domDocument, rootNode, "result");
 
-		resultNode->setAttribute(
-			*XercesStringGuard<XMLCh>("name"),
-			*XercesStringGuard<XMLCh>(targetPath)
-		);
-
-		rootNode->appendChild(resultNode);
+		result.setAttribute("name", targetPath);
 	} else {
-		xercesc::DOMElement* const resultNode(
-			domDocument->createElement(*XercesStringGuard<XMLCh>("error"))
-		);
-
-		rootNode->appendChild(resultNode);
+		ResultNodeFacade result(domDocument, rootNode, "error");
 	}
 
 	return domDocument;

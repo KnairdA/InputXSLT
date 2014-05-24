@@ -5,12 +5,12 @@
 #include <xercesc/dom/DOMDocument.hpp>
 #include <xercesc/dom/DOMImplementation.hpp>
 #include <xercesc/dom/DOMElement.hpp>
-#include <xercesc/dom/DOMText.hpp>
 #include <xercesc/parsers/XercesDOMParser.hpp>
 
 #include "boost/filesystem/fstream.hpp"
 
 #include "support/xerces_string_guard.h"
+#include "support/dom/result_node_facade.h"
 
 namespace {
 
@@ -61,27 +61,15 @@ xercesc::DOMDocument* FunctionReadXmlFile::constructDocument(
 	);
 
 	if ( boost::filesystem::is_regular_file(filePath) ) {
-		xercesc::DOMElement* const resultNode(
-			domDocument->createElement(*XercesStringGuard<XMLCh>("result"))
-		);
+		ResultNodeFacade result(domDocument, rootNode, "result");
 
-		resultNode->setAttribute(
-			*XercesStringGuard<XMLCh>("name"),
-			*XercesStringGuard<XMLCh>(filePath.filename().string())
-		);
+		result.setAttribute("name", filePath.filename().string());
 
-		xercesc::DOMNode* const resultTreeNode(
+		result.setContent(
 			importDocumentElement(filePath, domDocument)
 		);
-
-		resultNode->appendChild(resultTreeNode);
-		rootNode->appendChild(resultNode);
 	} else {
-		xercesc::DOMElement* const resultNode(
-			domDocument->createElement(*XercesStringGuard<XMLCh>("error"))
-		);
-
-		rootNode->appendChild(resultNode);
+		ResultNodeFacade result(domDocument, rootNode, "error");
 	}
 
 	return domDocument;

@@ -10,7 +10,7 @@
 
 <xsl:template name="implementation">
 	<xsl:for-each select="InputXSLT:read-directory('../')[@type='directory']">
-		<item><xsl:value-of select="."/></item>
+		<item><xsl:value-of select="name"/></item>
 	</xsl:for-each>
 </xsl:template>
 
