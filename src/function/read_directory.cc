@@ -37,8 +37,8 @@ xercesc::DOMDocument* FunctionReadDirectory::constructDocument(
 
 			switch ( boost::filesystem::status(p).type() ) {
 				case boost::filesystem::regular_file: {
-					result.setAttribute("type", "file");
-					result.setValueNode("name", p.stem().string());
+					result.setAttribute("type",      "file");
+					result.setValueNode("name",      p.stem().string());
 					result.setValueNode("extension", p.extension().string());
 
 					break;

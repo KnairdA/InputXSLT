@@ -20,7 +20,13 @@ FilesystemContext::FilesystemContext(const std::string& path):
 
 boost::filesystem::path FilesystemContext::resolve(
 	const std::string& path) const {
-	return absolute(this->path_ / path);
+	const boost::filesystem::path targetPath(path);
+
+	if ( targetPath.is_absolute() ) {
+		return targetPath;
+	} else {
+		return absolute(this->path_ / targetPath);
+	}
 }
 
 boost::filesystem::path FilesystemContext::resolve(
