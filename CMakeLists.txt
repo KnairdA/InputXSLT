@@ -28,6 +28,7 @@ set(
 	src/function/read_xml_file.cc
 	src/function/read_directory.cc
 	src/function/transform.cc
+	src/function/execute.cc
 	src/support/filesystem_context.cc
 	src/support/stylesheet_parameter_guard.cc
 	src/support/xalan_string.cc

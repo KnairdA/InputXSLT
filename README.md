@@ -12,6 +12,7 @@ Contrary to popular opinion I actually like XSLT as a content transformation lan
 - external `read-xml-file` function for read-only access to XML files
 - external `read-directory` function for read-only directory traversal
 - external `transform` function for executing transformations inside transformations
+- external `execute` function for executing external applications and capturing their output
 
 ## Requirements:
 
@@ -21,3 +22,4 @@ Contrary to popular opinion I actually like XSLT as a content transformation lan
 - Apache [Xerces](https://xerces.apache.org/) XML Library
 - Boost [Filesystem](http://www.boost.org/doc/libs/1_55_0/libs/filesystem/doc/index.htm)
 - Boost [Program Options](http://www.boost.org/doc/libs/1_55_0/doc/html/program_options.html)
+- Boost [Process](http://www.highscore.de/boost/process/index.html)
