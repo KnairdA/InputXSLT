@@ -1,12 +1,12 @@
-#ifndef INPUTXSLT_SRC_FUNCTION_EXECUTE_H_
-#define INPUTXSLT_SRC_FUNCTION_EXECUTE_H_
+#ifndef INPUTXSLT_SRC_FUNCTION_EXTERNAL_TEXT_FORMATTER_H_
+#define INPUTXSLT_SRC_FUNCTION_EXTERNAL_TEXT_FORMATTER_H_
 
 #include "base.h"
 
 namespace InputXSLT {
 
-class FunctionExecute : public FunctionBase<
-	FunctionExecute,
+class FunctionExternalTextFormatter : public FunctionBase<
+	FunctionExternalTextFormatter,
 	std::string,
 	std::string
 > {
@@ -25,4 +25,4 @@ class FunctionExecute : public FunctionBase<
 
 }
 
-#endif  // INPUTXSLT_SRC_FUNCTION_EXECUTE_H_
+#endif  // INPUTXSLT_SRC_FUNCTION_EXTERNAL_TEXT_FORMATTER_H_

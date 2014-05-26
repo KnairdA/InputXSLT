@@ -10,7 +10,7 @@
 #include "function/read_xml_file.h"
 #include "function/read_directory.h"
 #include "function/transform.h"
-#include "function/execute.h"
+#include "function/external_text_formatter.h"
 
 namespace InputXSLT {
 
@@ -49,8 +49,8 @@ PlattformGuard::PlattformGuard(const std::vector<std::string>& path):
 
 	xalan::XalanTransformer::installExternalFunctionGlobal(
 		customNamespace,
-		xalan::XalanDOMString("execute"),
-		InputXSLT::FunctionExecute(&this->include_resolver_)
+		xalan::XalanDOMString("external-text-formatter"),
+		InputXSLT::FunctionExternalTextFormatter(&this->include_resolver_)
 	);
 }
 
