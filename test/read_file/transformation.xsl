@@ -9,7 +9,7 @@
 <xsl:include href="[testcase.xsl]"/>
 
 <xsl:template name="implementation">
-	<xsl:value-of select="InputXSLT:read-file('../common/test.txt')"/>
+	<xsl:value-of select="InputXSLT:read-file('test.txt')"/>
 </xsl:template>
 
 </xsl:stylesheet>

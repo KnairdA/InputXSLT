@@ -2,6 +2,7 @@
 <test_case>
 <item>common</item>
 <item>default_params</item>
+<item>external_text_formatter</item>
 <item>read_directory</item>
 <item>read_file</item>
 <item>read_xml_file</item>
