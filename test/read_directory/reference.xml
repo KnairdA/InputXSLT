@@ -1,10 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <test_case>
-<item>common</item>
-<item>default_params</item>
-<item>external_text_formatter</item>
-<item>read_directory</item>
-<item>read_file</item>
-<item>read_xml_file</item>
-<item>transform</item>
+<item type="file">
+<name>Session</name>
+</item>
+<item type="file">
+<name>check</name>
+<extension>.sh</extension>
+</item>
+<item type="directory">
+<name>common</name>
+</item>
+<item type="directory">
+<name>default_params</name>
+</item>
+<item type="directory">
+<name>external_text_formatter</name>
+</item>
+<item type="directory">
+<name>read_directory</name>
+</item>
+<item type="directory">
+<name>read_file</name>
+</item>
+<item type="directory">
+<name>read_xml_file</name>
+</item>
+<item type="directory">
+<name>transform</name>
+</item>
 </test_case>

@@ -9,8 +9,14 @@
 <xsl:include href="[testcase.xsl]"/>
 
 <xsl:template name="implementation">
-	<xsl:for-each select="InputXSLT:read-directory('../')[@type='directory']">
-		<item><xsl:value-of select="name"/></item>
+	<xsl:for-each select="InputXSLT:read-directory('../')">
+		<item type="{@type}">
+			<name><xsl:value-of select="./name"/></name>
+
+			<xsl:if test="@type='file' and ./name='check'">
+				<extension><xsl:value-of select="./extension"/></extension>
+			</xsl:if>
+		</item>
 	</xsl:for-each>
 </xsl:template>
 
