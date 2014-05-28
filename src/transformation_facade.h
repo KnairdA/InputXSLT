@@ -6,6 +6,7 @@
 #include <string>
 
 #include "common.h"
+#include "support/error_handler.h"
 #include "support/include_entity_resolver.h"
 #include "support/stylesheet_parameter_guard.h"
 
@@ -29,6 +30,7 @@ class TransformationFacade {
 		const xalan::XalanCompiledStylesheet* transformation_;
 
 		xalan::XalanTransformer transformer_;
+		ErrorHandler error_handler_;
 
 		int generate(const std::string&, StylesheetParameterGuard&);
 		int generate(std::basic_ostream<char>&, StylesheetParameterGuard&);

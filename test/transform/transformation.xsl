@@ -36,7 +36,7 @@
 	</xsl:call-template>
 
 	<xsl:copy-of select="
-		InputXSLT:read-xml-file('test_actual.xml')/test_case/transform_test
+		InputXSLT:read-xml-file('test_actual.xml')/test_case/transform_test/*
 	"/>
 </xsl:template>
 

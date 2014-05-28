@@ -4,6 +4,8 @@
 #include <xercesc/dom/DOMImplementation.hpp>
 #include <xercesc/dom/DOMElement.hpp>
 
+#include <boost/algorithm/string.hpp>
+
 #include "transformation_facade.h"
 #include "support/xerces_string_guard.h"
 #include "support/dom/result_node_facade.h"
@@ -14,13 +16,13 @@ xercesc::DOMDocument* FunctionTransform::constructDocument(
 	const InputXSLT::FilesystemContext& fsContext,
 	const FunctionBase::parameter_tuple& parameters
 ) {
-	const std::string transformationPath(
+	const std::string transformationPath(boost::trim_copy(
 		fsContext.resolve(std::get<0>(parameters)).string()
-	);
+	));
 
-	const std::string targetPath(
+	const std::string targetPath(boost::trim_copy(
 		fsContext.resolve(std::get<1>(parameters)).string()
-	);
+	));
 
 	const xalan::XObjectPtr& parameterObject(
 		std::get<2>(parameters)

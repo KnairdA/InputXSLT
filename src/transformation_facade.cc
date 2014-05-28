@@ -15,8 +15,10 @@ TransformationFacade::TransformationFacade(
 	IncludeEntityResolver* resolver
 ):
 	transformation_{},
-	transformer_() {
+	transformer_(),
+	error_handler_(transformation) {
 	this->transformer_.setEntityResolver(resolver);
+	this->transformer_.setErrorHandler(&this->error_handler_);
 
 	this->transformer_.compileStylesheet(
 		xalan::XSLTInputSource(transformation.data()),
