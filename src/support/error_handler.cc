@@ -4,6 +4,7 @@
 
 #include <iostream>
 
+#include "support/xalan_string.h"
 #include "support/xerces_string_guard.h"
 
 namespace {
@@ -46,6 +47,52 @@ void ErrorHandler::fatalError(const xercesc::SAXParseException& exception) {
 }
 
 void ErrorHandler::resetErrors() { }
+
+void ErrorHandler::problem(
+	xalan::ProblemListenerBase::eSource,
+	xalan::ProblemListenerBase::eClassification,
+	const xalan::XalanDOMString& message,
+	const xalan::Locator*,
+	const xalan::XalanNode*
+) {
+	this->constructErrorCache();
+
+	this->error_cache_->emplace_back(
+		"XSLT problem: " + toString(message)
+	);
+}
+
+void ErrorHandler::problem(
+	xalan::ProblemListenerBase::eSource,
+	xalan::ProblemListenerBase::eClassification,
+	const xalan::XalanNode*,
+	const xalan::ElemTemplateElement*,
+	const xalan::XalanDOMString& message,
+	const xalan::XalanDOMChar*,
+	xalan::XalanFileLoc,
+	xalan::XalanFileLoc
+) {
+	this->constructErrorCache();
+
+	this->error_cache_->emplace_back(
+		"XSLT problem: " + toString(message)
+	);
+}
+
+void ErrorHandler::problem(
+	xalan::ProblemListenerBase::eSource,
+	xalan::ProblemListenerBase::eClassification,
+	const xalan::XalanDOMString& message,
+	const xalan::XalanNode*
+) {
+	this->constructErrorCache();
+
+	this->error_cache_->emplace_back(
+		"XSLT problem: " + toString(message)
+	);
+}
+
+void ErrorHandler::setPrintWriter(xalan::PrintWriter*) { }
 
 auto ErrorHandler::getCachedErrors() -> error_cache_ptr {
 	return error_cache_ptr(this->error_cache_.release());

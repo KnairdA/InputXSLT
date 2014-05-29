@@ -1,0 +1,15 @@
+--- xalan-c-1.11_original/c/src/xalanc/PlatformSupport/XSLException.cpp	2014-05-29 22:27:20.366792350 +0200
++++ xalan-c-1.11_patched/c/src/xalanc/PlatformSupport/XSLException.cpp	2014-05-29 22:56:01.136185453 +0200
+@@ -41,11 +41,7 @@
+             const Locator*          theLocator) :
+     m_memoryManager(theManager),
+     m_message(theMessage, theManager),
+-    m_uri(
+-        XalanLocator::getSystemId(
+-            theLocator,
+-            &s_dummy),
+-        theManager),
++    m_uri(theLocator == 0 ? s_dummy : theLocator->getSystemId()),
+     m_lineNumber(XalanLocator::getLineNumber(theLocator)),
+     m_columnNumber(XalanLocator::getColumnNumber(theLocator)),
+     m_formatted(false)

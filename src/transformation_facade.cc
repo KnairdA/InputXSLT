@@ -18,6 +18,7 @@ TransformationFacade::TransformationFacade(
 	error_handler_() {
 	this->transformer_.setEntityResolver(resolver);
 	this->transformer_.setErrorHandler(&this->error_handler_);
+	this->transformer_.setProblemListener(&this->error_handler_);
 
 	this->transformer_.compileStylesheet(
 		xalan::XSLTInputSource(transformation.data()),
@@ -66,27 +67,18 @@ auto TransformationFacade::generate(
 	xalan::XSLTResultTarget&& outputTarget,
 	StylesheetParameterGuard&
 ) -> return_type {
-	std::stringstream      emptyStream("<dummy/>");
-	xalan::XSLTInputSource inputSource(emptyStream);
+	if ( this->transformation_ != nullptr ) {
+		std::stringstream      emptyStream("<dummy/>");
+		xalan::XSLTInputSource inputSource(emptyStream);
 
-	const int resultCode = this->transformer_.transform(
-		inputSource,
-		this->transformation_,
-		outputTarget
-	);
-
-	return_type errors(this->error_handler_.getCachedErrors());
-
-	if ( errors && resultCode != 0 ) {
-		errors->emplace_back(
-			"Transformation error with code " +
-			std::to_string(resultCode)        +
-			": "                              +
-			this->transformer_.getLastError()
+		this->transformer_.transform(
+			inputSource,
+			this->transformation_,
+			outputTarget
 		);
 	}
 
-	return errors;
+	return this->error_handler_.getCachedErrors();
 }
 
 }
