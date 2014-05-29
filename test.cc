@@ -48,12 +48,20 @@ int main(int ac, char** av) {
 			plattform.getEntityResolver()
 		);
 
+		InputXSLT::TransformationFacade::return_type errors{};
+
 		if ( variables.count("target") ) {
-			return transformation.generate(
+			errors = transformation.generate(
 				variables["target"].as<std::string>()
 			);
 		} else {
-			return transformation.generate(std::cout);
+			errors = transformation.generate(std::cout);
+		}
+
+		if ( errors ) {
+			for ( auto&& error : *errors ) {
+				std::cerr << error << std::endl;
+			}
 		}
 	} else {
 		std::cout << optionDescription << std::endl;

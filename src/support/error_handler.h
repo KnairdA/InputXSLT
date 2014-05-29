@@ -3,21 +3,30 @@
 
 #include <xercesc/sax/ErrorHandler.hpp>
 
+#include <memory>
+#include <vector>
 #include <string>
 
 namespace InputXSLT {
 
 class ErrorHandler : public xercesc::ErrorHandler {
 	public:
-		ErrorHandler(const std::string&);
+		typedef std::vector<std::string> error_cache;
+		typedef std::unique_ptr<error_cache> error_cache_ptr;
+
+		ErrorHandler();
 
 		virtual void warning(const xercesc::SAXParseException&);
 		virtual void error(const xercesc::SAXParseException&);
 		virtual void fatalError(const xercesc::SAXParseException&);
 		virtual void resetErrors();
 
+		error_cache_ptr getCachedErrors();
+
 	private:
-		const std::string& transformation_path_;
+		error_cache_ptr error_cache_;
+
+		void constructErrorCache();
 
 };
 

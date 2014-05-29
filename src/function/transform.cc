@@ -38,17 +38,22 @@ xercesc::DOMDocument* FunctionTransform::constructDocument(
 		domDocument->getDocumentElement()
 	);
 
+	ResultNodeFacade result(domDocument, rootNode, "result");
+	result.setAttribute("name", targetPath);
+
 	InputXSLT::TransformationFacade transformation(
 		transformationPath,
 		this->include_resolver_
 	);
 
-	if ( transformation.generate(targetPath, parameterObject) == 0 ) {
-		ResultNodeFacade result(domDocument, rootNode, "result");
+	InputXSLT::TransformationFacade::return_type errors(
+		transformation.generate(targetPath, parameterObject)
+	);
 
-		result.setAttribute("name", targetPath);
-	} else {
-		ResultNodeFacade result(domDocument, rootNode, "error");
+	if ( errors ) {
+		for ( auto&& error : *errors ) {
+			result.setValueNode("error", error);
+		}
 	}
 
 	return domDocument;

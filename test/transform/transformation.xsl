@@ -23,21 +23,30 @@
 		)
 	</xsl:variable>
 
-	<xsl:variable name="result" select="dyn:evaluate($command)"/>
+	<xsl:copy-of select="dyn:evaluate($command)"/>
 </xsl:template>
 
 <xsl:template name="implementation">
-	<xsl:call-template name="transformer">
-		<xsl:with-param name="transformation">test.xsl</xsl:with-param>
-		<xsl:with-param name="target">test_actual.xml</xsl:with-param>
-		<xsl:with-param name="parameters">
-			<test>21</test>
-		</xsl:with-param>
-	</xsl:call-template>
+	<xsl:variable name="result">
+		<xsl:call-template name="transformer">
+			<xsl:with-param name="transformation">test.xsl</xsl:with-param>
+			<xsl:with-param name="target">test_actual.xml</xsl:with-param>
+			<xsl:with-param name="parameters">
+				<test>21</test>
+			</xsl:with-param>
+		</xsl:call-template>
+	</xsl:variable>
 
-	<xsl:copy-of select="
-		InputXSLT:read-xml-file('test_actual.xml')/test_case/transform_test/*
-	"/>
+	<xsl:choose>
+		<xsl:when test="xalan:nodeset($result)/result/error">
+			<xsl:copy-of select="xalan:nodeset($result)/result/error"/>
+		</xsl:when>
+		<xsl:otherwise>
+			<xsl:copy-of select="
+				InputXSLT:read-xml-file('test_actual.xml')/test_case/transform_test/*
+			"/>
+		</xsl:otherwise>
+	</xsl:choose>
 </xsl:template>
 
 </xsl:stylesheet>

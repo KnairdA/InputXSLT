@@ -48,7 +48,9 @@ xercesc::InputSource* IncludeEntityResolver::resolveEntity(
 					*XercesStringGuard<XMLCh>((*resolvedPath).string())
 				);
 			} else {
-				return nullptr;
+				return new xercesc::LocalFileInputSource(
+					*XercesStringGuard<XMLCh>(*filePath)
+				);
 			}
 		} else {
 			return nullptr;

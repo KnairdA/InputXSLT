@@ -6,7 +6,6 @@
 #include "boost/filesystem.hpp"
 
 #include <sstream>
-#include <iostream>
 
 namespace InputXSLT {
 
@@ -16,7 +15,7 @@ TransformationFacade::TransformationFacade(
 ):
 	transformation_{},
 	transformer_(),
-	error_handler_(transformation) {
+	error_handler_() {
 	this->transformer_.setEntityResolver(resolver);
 	this->transformer_.setErrorHandler(&this->error_handler_);
 
@@ -32,10 +31,10 @@ TransformationFacade::~TransformationFacade() {
 	);
 }
 
-int TransformationFacade::generate(
+auto TransformationFacade::generate(
 	const std::string& targetPath,
 	StylesheetParameterGuard& parameters
-) {
+) -> return_type {
 	const boost::filesystem::path targetPathHelper(
 		boost::filesystem::absolute(targetPath)
 	);
@@ -53,22 +52,22 @@ int TransformationFacade::generate(
 	);
 }
 
-int TransformationFacade::generate(
+auto TransformationFacade::generate(
 	std::basic_ostream<char>& targetStream,
 	StylesheetParameterGuard& parameters
-) {
+) -> return_type {
 	return this->generate(
 		xalan::XSLTResultTarget(targetStream),
 		parameters
 	);
 }
 
-int TransformationFacade::generate(
+auto TransformationFacade::generate(
 	xalan::XSLTResultTarget&& outputTarget,
 	StylesheetParameterGuard&
-) {
-	std::stringstream       emptyStream("<dummy/>");
-	xalan::XSLTInputSource  inputSource(emptyStream);
+) -> return_type {
+	std::stringstream      emptyStream("<dummy/>");
+	xalan::XSLTInputSource inputSource(emptyStream);
 
 	const int resultCode = this->transformer_.transform(
 		inputSource,
@@ -76,11 +75,18 @@ int TransformationFacade::generate(
 		outputTarget
 	);
 
-	if ( resultCode != 0 ) {
-		std::cerr << this->transformer_.getLastError() << std::endl;
+	return_type errors(this->error_handler_.getCachedErrors());
+
+	if ( errors && resultCode != 0 ) {
+		errors->emplace_back(
+			"Transformation error with code " +
+			std::to_string(resultCode)        +
+			": "                              +
+			this->transformer_.getLastError()
+		);
 	}
 
-	return resultCode;
+	return errors;
 }
 
 }
