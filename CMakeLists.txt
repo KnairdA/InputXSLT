@@ -33,7 +33,7 @@ set(
 	src/support/stylesheet_parameter_guard.cc
 	src/support/xalan_string.cc
 	src/support/include_entity_resolver.cc
-	src/support/error_handler.cc
+	src/support/error_capacitor.cc
 	src/support/tuple/xobject_value.cc
 	src/support/dom/document_cache.cc
 	src/support/dom/document_cache_item.cc

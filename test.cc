@@ -43,25 +43,28 @@ int main(int ac, char** av) {
 
 		InputXSLT::PlattformGuard plattform(includePath);
 
-		InputXSLT::TransformationFacade transformation(
-			variables["transformation"].as<std::string>(),
-			plattform.getEntityResolver()
-		);
-
-		InputXSLT::TransformationFacade::return_type errors{};
-
-		if ( variables.count("target") ) {
-			errors = transformation.generate(
-				variables["target"].as<std::string>()
+		try {
+			InputXSLT::TransformationFacade transformation(
+				variables["transformation"].as<std::string>(),
+				plattform.getEntityResolver()
 			);
-		} else {
-			errors = transformation.generate(std::cout);
-		}
 
-		if ( errors ) {
-			for ( auto&& error : *errors ) {
+			if ( variables.count("target") ) {
+				transformation.generate(
+					variables["target"].as<std::string>()
+				);
+			} else {
+				transformation.generate(std::cout);
+			}
+
+			return 0;
+		} 
+		catch (const InputXSLT::ErrorCapacitor::exception& exception) {
+			for ( auto&& error : *(exception.getCachedErrors()) ) {
 				std::cerr << error << std::endl;
 			}
+
+			return 1;
 		}
 	} else {
 		std::cout << optionDescription << std::endl;

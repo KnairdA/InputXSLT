@@ -14,16 +14,17 @@ TransformationFacade::TransformationFacade(
 	IncludeEntityResolver* resolver
 ):
 	transformation_{},
-	transformer_(),
-	error_handler_() {
+	transformer_() {
 	this->transformer_.setEntityResolver(resolver);
-	this->transformer_.setErrorHandler(&this->error_handler_);
-	this->transformer_.setProblemListener(&this->error_handler_);
+
+	ErrorCapacitor errorCapacitor(&this->transformer_);
 
 	this->transformer_.compileStylesheet(
 		xalan::XSLTInputSource(transformation.data()),
 		this->transformation_
 	);
+
+	errorCapacitor.discharge();
 }
 
 TransformationFacade::~TransformationFacade() {
@@ -32,10 +33,10 @@ TransformationFacade::~TransformationFacade() {
 	);
 }
 
-auto TransformationFacade::generate(
+void TransformationFacade::generate(
 	const std::string& targetPath,
 	StylesheetParameterGuard& parameters
-) -> return_type {
+) {
 	const boost::filesystem::path targetPathHelper(
 		boost::filesystem::absolute(targetPath)
 	);
@@ -47,38 +48,38 @@ auto TransformationFacade::generate(
 		"parent-directory", targetPathHelper.parent_path().filename().string()
 	);
 
-	return this->generate(
+	this->generate(
 		xalan::XSLTResultTarget(targetPath.data()),
 		parameters
 	);
 }
 
-auto TransformationFacade::generate(
+void TransformationFacade::generate(
 	std::basic_ostream<char>& targetStream,
 	StylesheetParameterGuard& parameters
-) -> return_type {
-	return this->generate(
+) {
+	this->generate(
 		xalan::XSLTResultTarget(targetStream),
 		parameters
 	);
 }
 
-auto TransformationFacade::generate(
+void TransformationFacade::generate(
 	xalan::XSLTResultTarget&& outputTarget,
 	StylesheetParameterGuard&
-) -> return_type {
-	if ( this->transformation_ != nullptr ) {
-		std::stringstream      emptyStream("<dummy/>");
-		xalan::XSLTInputSource inputSource(emptyStream);
+) {
+	ErrorCapacitor errorCapacitor(&this->transformer_);
 
-		this->transformer_.transform(
-			inputSource,
-			this->transformation_,
-			outputTarget
-		);
-	}
+	std::stringstream      emptyStream("<dummy/>");
+	xalan::XSLTInputSource inputSource(emptyStream);
 
-	return this->error_handler_.getCachedErrors();
+	this->transformer_.transform(
+		inputSource,
+		this->transformation_,
+		outputTarget
+	);
+
+	errorCapacitor.discharge();
 }
 
 }

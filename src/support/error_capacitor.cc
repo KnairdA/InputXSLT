@@ -1,4 +1,4 @@
-#include "error_handler.h"
+#include "error_capacitor.h"
 
 #include <xercesc/sax/SAXParseException.hpp>
 
@@ -19,50 +19,57 @@ inline std::string getMessage(const xercesc::SAXParseException& exception) {
 
 namespace InputXSLT {
 
-ErrorHandler::ErrorHandler():
-	error_cache_{} { }
+ErrorCapacitor::ErrorCapacitor(xalan::XalanTransformer* transformer):
+	transformer_(transformer),
+	error_cache_(new error_cache()) {
+	this->transformer_->setErrorHandler(this);
+	this->transformer_->setProblemListener(this);
+}
 
-void ErrorHandler::warning(const xercesc::SAXParseException& exception) {
-	this->constructErrorCache();
+ErrorCapacitor::~ErrorCapacitor() {
+	this->transformer_->setErrorHandler(nullptr);
+	this->transformer_->setProblemListener(nullptr);
+}
 
+void ErrorCapacitor::discharge() {
+	if ( !this->error_cache_->empty() ) {
+		throw exception(std::move(this->error_cache_));
+	}
+}
+
+void ErrorCapacitor::warning(const xercesc::SAXParseException& exception) {
 	this->error_cache_->emplace_back(
 		"Warning: " + getMessage(exception)
 	);
 }
 
-void ErrorHandler::error(const xercesc::SAXParseException& exception) {
-	this->constructErrorCache();
-
+void ErrorCapacitor::error(const xercesc::SAXParseException& exception) {
 	this->error_cache_->emplace_back(
 		"Error: " + getMessage(exception)
 	);
 }
 
-void ErrorHandler::fatalError(const xercesc::SAXParseException& exception) {
-	this->constructErrorCache();
-
+void ErrorCapacitor::fatalError(const xercesc::SAXParseException& exception) {
 	this->error_cache_->emplace_back(
 		"Fatal error: " + getMessage(exception)
 	);
 }
 
-void ErrorHandler::resetErrors() { }
+void ErrorCapacitor::resetErrors() { }
 
-void ErrorHandler::problem(
+void ErrorCapacitor::problem(
 	xalan::ProblemListenerBase::eSource,
 	xalan::ProblemListenerBase::eClassification,
 	const xalan::XalanDOMString& message,
 	const xalan::Locator*,
 	const xalan::XalanNode*
 ) {
-	this->constructErrorCache();
-
 	this->error_cache_->emplace_back(
 		"XSLT problem: " + toString(message)
 	);
 }
 
-void ErrorHandler::problem(
+void ErrorCapacitor::problem(
 	xalan::ProblemListenerBase::eSource,
 	xalan::ProblemListenerBase::eClassification,
 	const xalan::XalanNode*,
@@ -72,36 +79,29 @@ void ErrorHandler::problem(
 	xalan::XalanFileLoc,
 	xalan::XalanFileLoc
 ) {
-	this->constructErrorCache();
-
 	this->error_cache_->emplace_back(
 		"XSLT problem: " + toString(message)
 	);
 }
 
-void ErrorHandler::problem(
+void ErrorCapacitor::problem(
 	xalan::ProblemListenerBase::eSource,
 	xalan::ProblemListenerBase::eClassification,
 	const xalan::XalanDOMString& message,
 	const xalan::XalanNode*
 ) {
-	this->constructErrorCache();
-
 	this->error_cache_->emplace_back(
 		"XSLT problem: " + toString(message)
 	);
 }
 
-void ErrorHandler::setPrintWriter(xalan::PrintWriter*) { }
+void ErrorCapacitor::setPrintWriter(xalan::PrintWriter*) { }
 
-auto ErrorHandler::getCachedErrors() -> error_cache_ptr {
-	return error_cache_ptr(this->error_cache_.release());
-}
+ErrorCapacitor::exception::exception(error_cache_ptr ptr):
+	error_cache_(std::move(ptr)) { }
 
-void ErrorHandler::constructErrorCache() {
-	if ( !this->error_cache_ ) {
-		this->error_cache_.reset(new error_cache());
-	}
+auto ErrorCapacitor::exception::getCachedErrors() const -> const error_cache* {
+	return this->error_cache_.get();
 }
 
 }

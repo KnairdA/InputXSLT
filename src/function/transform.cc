@@ -41,17 +41,16 @@ xercesc::DOMDocument* FunctionTransform::constructDocument(
 	ResultNodeFacade result(domDocument, rootNode, "result");
 	result.setAttribute("name", targetPath);
 
-	InputXSLT::TransformationFacade transformation(
-		transformationPath,
-		this->include_resolver_
-	);
+	try {
+		InputXSLT::TransformationFacade transformation(
+			transformationPath,
+			this->include_resolver_
+		);
 
-	InputXSLT::TransformationFacade::return_type errors(
-		transformation.generate(targetPath, parameterObject)
-	);
-
-	if ( errors ) {
-		for ( auto&& error : *errors ) {
+		transformation.generate(targetPath, parameterObject);
+	}
+	catch (const ErrorCapacitor::exception& exception) {
+		for ( auto&& error : *(exception.getCachedErrors()) ) {
 			result.setValueNode("error", error);
 		}
 	}

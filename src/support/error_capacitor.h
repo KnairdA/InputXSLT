@@ -1,8 +1,9 @@
-#ifndef INPUTXSLT_SRC_SUPPORT_ERROR_HANDLER_H_
-#define INPUTXSLT_SRC_SUPPORT_ERROR_HANDLER_H_
+#ifndef INPUTXSLT_SRC_SUPPORT_ERROR_CAPACITOR_H_
+#define INPUTXSLT_SRC_SUPPORT_ERROR_CAPACITOR_H_
 
 #include <xercesc/sax/ErrorHandler.hpp>
 #include <xalanc/XSLT/ProblemListener.hpp>
+#include <xalanc/XalanTransformer/XalanTransformer.hpp>
 
 #include <memory>
 #include <vector>
@@ -12,13 +13,18 @@
 
 namespace InputXSLT {
 
-class ErrorHandler : public xercesc::ErrorHandler,
+class ErrorCapacitor : public xercesc::ErrorHandler,
                      public xalan::ProblemListener {
 	public:
+		class exception;
+
 		typedef std::vector<std::string> error_cache;
 		typedef std::unique_ptr<error_cache> error_cache_ptr;
 
-		ErrorHandler();
+		ErrorCapacitor(xalan::XalanTransformer*);
+		~ErrorCapacitor();
+
+		void discharge();
 
 		virtual void warning(const xercesc::SAXParseException&);
 		virtual void error(const xercesc::SAXParseException&);
@@ -53,15 +59,23 @@ class ErrorHandler : public xercesc::ErrorHandler,
 
 		virtual void setPrintWriter(xalan::PrintWriter*);
 
-		error_cache_ptr getCachedErrors();
+	private:
+		xalan::XalanTransformer* const transformer_;
+		error_cache_ptr error_cache_;
+
+};
+
+class ErrorCapacitor::exception {
+	public:
+		exception(error_cache_ptr);
+
+		const error_cache* getCachedErrors() const;
 
 	private:
 		error_cache_ptr error_cache_;
-
-		void constructErrorCache();
 
 };
 
 }
 
-#endif  // INPUTXSLT_SRC_SUPPORT_ERROR_HANDLER_H_
+#endif  // INPUTXSLT_SRC_SUPPORT_ERROR_CAPACITOR_H_
