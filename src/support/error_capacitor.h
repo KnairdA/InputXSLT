@@ -2,6 +2,7 @@
 #define INPUTXSLT_SRC_SUPPORT_ERROR_CAPACITOR_H_
 
 #include <xercesc/sax/ErrorHandler.hpp>
+
 #include <xalanc/XSLT/ProblemListener.hpp>
 #include <xalanc/XalanTransformer/XalanTransformer.hpp>
 
@@ -14,7 +15,7 @@
 namespace InputXSLT {
 
 class ErrorCapacitor : public xercesc::ErrorHandler,
-                     public xalan::ProblemListener {
+                       public xalan::ProblemListener {
 	public:
 		class exception;
 
@@ -42,19 +43,19 @@ class ErrorCapacitor : public xercesc::ErrorHandler,
 		virtual void problem(
 			xalan::ProblemListenerBase::eSource,
 			xalan::ProblemListenerBase::eClassification,
+			const xalan::XalanDOMString&,
+			const xalan::XalanNode*
+		);
+
+		virtual void problem(
+			xalan::ProblemListenerBase::eSource,
+			xalan::ProblemListenerBase::eClassification,
 			const xalan::XalanNode*,
 			const xalan::ElemTemplateElement*,
 			const xalan::XalanDOMString&,
 			const xalan::XalanDOMChar*,
 			xalan::XalanFileLoc,
 			xalan::XalanFileLoc
-		);
-
-		virtual void problem(
-			xalan::ProblemListenerBase::eSource,
-			xalan::ProblemListenerBase::eClassification,
-			const xalan::XalanDOMString&,
-			const xalan::XalanNode*
 		);
 
 		virtual void setPrintWriter(xalan::PrintWriter*);

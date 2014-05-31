@@ -2,6 +2,8 @@
 
 #include <xercesc/sax/SAXParseException.hpp>
 
+#include <xalanc/PlatformSupport/DOMStringPrintWriter.hpp>
+
 #include <iostream>
 
 #include "support/xalan_string.h"
@@ -58,15 +60,45 @@ void ErrorCapacitor::fatalError(const xercesc::SAXParseException& exception) {
 void ErrorCapacitor::resetErrors() { }
 
 void ErrorCapacitor::problem(
-	xalan::ProblemListenerBase::eSource,
-	xalan::ProblemListenerBase::eClassification,
-	const xalan::XalanDOMString& message,
-	const xalan::Locator*,
-	const xalan::XalanNode*
+	xalan::ProblemListenerBase::eSource         source,
+	xalan::ProblemListenerBase::eClassification classification,
+	const xalan::XalanDOMString&                message,
+	const xalan::Locator*                       locator,
+	const xalan::XalanNode*                     node
 ) {
-	this->error_cache_->emplace_back(
-		"XSLT problem: " + toString(message)
+	xalan::XalanDOMString problemSummary;
+	xalan::DOMStringPrintWriter writer(problemSummary);
+
+	defaultFormat(
+		writer,
+		source,
+		classification,
+		message,
+		locator,
+		node
 	);
+
+	this->error_cache_->emplace_back(toString(problemSummary));
+}
+
+void ErrorCapacitor::problem(
+	xalan::ProblemListenerBase::eSource         source,
+	xalan::ProblemListenerBase::eClassification classification,
+	const xalan::XalanDOMString&                message,
+	const xalan::XalanNode*                     node
+) {
+	xalan::XalanDOMString problemSummary;
+	xalan::DOMStringPrintWriter writer(problemSummary);
+
+	defaultFormat(
+		writer,
+		source,
+		classification,
+		message,
+		node
+	);
+
+	this->error_cache_->emplace_back(toString(problemSummary));
 }
 
 void ErrorCapacitor::problem(
@@ -74,26 +106,11 @@ void ErrorCapacitor::problem(
 	xalan::ProblemListenerBase::eClassification,
 	const xalan::XalanNode*,
 	const xalan::ElemTemplateElement*,
-	const xalan::XalanDOMString& message,
+	const xalan::XalanDOMString&,
 	const xalan::XalanDOMChar*,
 	xalan::XalanFileLoc,
 	xalan::XalanFileLoc
-) {
-	this->error_cache_->emplace_back(
-		"XSLT problem: " + toString(message)
-	);
-}
-
-void ErrorCapacitor::problem(
-	xalan::ProblemListenerBase::eSource,
-	xalan::ProblemListenerBase::eClassification,
-	const xalan::XalanDOMString& message,
-	const xalan::XalanNode*
-) {
-	this->error_cache_->emplace_back(
-		"XSLT problem: " + toString(message)
-	);
-}
+) { }
 
 void ErrorCapacitor::setPrintWriter(xalan::PrintWriter*) { }
 
