@@ -20,13 +20,24 @@
 		)
 	</xsl:variable>
 
-	<xsl:copy-of select="dyn:evaluate($command)/output/*"/>
+	<xsl:copy-of select="dyn:evaluate($command)"/>
 </xsl:template>
 
 <xsl:template name="implementation">
-	<xsl:call-template name="formatter">
-		<xsl:with-param name="source" select="InputXSLT:read-file('test.md')"/>
-	</xsl:call-template>
+	<xsl:variable name="result">
+		<xsl:call-template name="formatter">
+			<xsl:with-param name="source" select="InputXSLT:read-file('test.md')"/>
+		</xsl:call-template>
+	</xsl:variable>
+
+	<xsl:choose>
+		<xsl:when test="xalan:nodeset($result)/output/@result = 'success'">
+			<xsl:copy-of select="xalan:nodeset($result)/output/*"/>
+		</xsl:when>
+		<xsl:otherwise>
+			Failure during external text formatting
+		</xsl:otherwise>
+	</xsl:choose>
 </xsl:template>
 
 </xsl:stylesheet>

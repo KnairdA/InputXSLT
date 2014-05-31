@@ -50,13 +50,15 @@ xercesc::DOMDocument* FunctionReadFile::constructDocument(
 		domDocument->getDocumentElement()
 	);
 
-	if ( boost::filesystem::is_regular_file(filePath) ) {
-		ResultNodeFacade result(domDocument, rootNode, "result");
+	ResultNodeFacade result(domDocument, rootNode, "file");
+	result.setAttribute("path", filePath.string());
 
-		result.setAttribute("name", filePath.filename().string());
+	if ( boost::filesystem::is_regular_file(filePath) ) {
+		result.setAttribute("result", "success");
+
 		result.setContent(readFile(filePath));
 	} else {
-		ResultNodeFacade result(domDocument, rootNode, "error");
+		result.setAttribute("result", "success");
 	}
 
 	return domDocument;

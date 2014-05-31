@@ -18,10 +18,14 @@ class ResultNodeFacade {
 		);
 		~ResultNodeFacade();
 
+		xercesc::DOMNode* getNode();
+
 		void setAttribute(const std::string&, const std::string&);
 		void setValueNode(const std::string&, const std::string&);
+
 		void setContent(const std::string&);
 		void setContent(xercesc::DOMNode*);
+		void setContent(xercesc::DOMNodeList*);
 
 	private:
 		xercesc::DOMDocument* const dom_document_;

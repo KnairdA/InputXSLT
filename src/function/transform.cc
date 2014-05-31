@@ -38,8 +38,8 @@ xercesc::DOMDocument* FunctionTransform::constructDocument(
 		domDocument->getDocumentElement()
 	);
 
-	ResultNodeFacade result(domDocument, rootNode, "result");
-	result.setAttribute("name", targetPath);
+	ResultNodeFacade result(domDocument, rootNode, "transformation");
+	result.setAttribute("target", targetPath);
 
 	try {
 		InputXSLT::TransformationFacade transformation(
@@ -48,8 +48,12 @@ xercesc::DOMDocument* FunctionTransform::constructDocument(
 		);
 
 		transformation.generate(targetPath, parameterObject);
+
+		result.setAttribute("result", "success");
 	}
 	catch (const ErrorCapacitor::exception& exception) {
+		result.setAttribute("result", "error");
+
 		for ( auto&& error : *(exception.getCachedErrors()) ) {
 			result.setValueNode("error", error);
 		}

@@ -86,16 +86,19 @@ xercesc::DOMDocument* FunctionExternalTextFormatter::constructDocument(
 
 	boost::process::status status = formatterProcess.wait();
 
+	ResultNodeFacade result(domDocument, rootNode, "output");
+	result.setAttribute("formatter", formatterPath);
+	result.setAttribute("code",      std::to_string(status.exit_status()));
+
 	if ( status.exited() ) {
-		ResultNodeFacade result(domDocument, rootNode, "result");
-
-		result.setValueNode("code", std::to_string(status.exit_status()));
-		result.setContent(importDocumentElement(outputStream, domDocument));
+		result.setAttribute("result", "success");
+		result.setContent(
+			importDocumentElement(outputStream, domDocument)->getChildNodes()
+		);
 	} else {
-		ResultNodeFacade result(domDocument, rootNode, "error");
-
-		result.setValueNode("code", std::to_string(status.exit_status()));
+		result.setAttribute("result", "error");
 	}
+
 
 	return domDocument;
 }

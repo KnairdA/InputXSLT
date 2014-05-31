@@ -1,6 +1,7 @@
 #include "result_node_facade.h"
 
 #include <xercesc/dom/DOMText.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
 
 #include "support/xerces_string_guard.h"
 
@@ -19,6 +20,10 @@ ResultNodeFacade::ResultNodeFacade(
 
 ResultNodeFacade::~ResultNodeFacade() {
 	this->root_node_->appendChild(this->result_node_);
+}
+
+xercesc::DOMNode* ResultNodeFacade::getNode() {
+	return this->result_node_;
 }
 
 void ResultNodeFacade::setAttribute(
@@ -56,6 +61,12 @@ void ResultNodeFacade::setContent(const std::string& content) {
 
 void ResultNodeFacade::setContent(xercesc::DOMNode* node) {
 	this->result_node_->appendChild(node);
+}
+
+void ResultNodeFacade::setContent(xercesc::DOMNodeList* nodes) {
+	for ( std::size_t index = 0; index != nodes->getLength(); ++index ) {
+		this->setContent(nodes->item(index));
+	}
 }
 
 }

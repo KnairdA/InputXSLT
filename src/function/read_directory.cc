@@ -29,11 +29,18 @@ xercesc::DOMDocument* FunctionReadDirectory::constructDocument(
 		domDocument->getDocumentElement()
 	);
 
+	ResultNodeFacade result(domDocument, rootNode, "directory");
+	result.setAttribute("path", directoryPath.string());
+
 	if ( boost::filesystem::is_directory(directoryPath) ) {
+		result.setAttribute("result", "success");
+
+		xercesc::DOMNode* const resultNode = result.getNode();
+
 		fsContext.iterate(
 			directoryPath,
-			[&domDocument, &rootNode](const boost::filesystem::path& p) {
-			ResultNodeFacade result(domDocument, rootNode, "result");
+			[&domDocument, &resultNode](const boost::filesystem::path& p) {
+			ResultNodeFacade result(domDocument, resultNode, "entry");
 
 			switch ( boost::filesystem::status(p).type() ) {
 				case boost::filesystem::regular_file: {
@@ -60,7 +67,7 @@ xercesc::DOMDocument* FunctionReadDirectory::constructDocument(
 			result.setValueNode("full", boost::filesystem::canonical(p).string());
 		});
 	} else {
-		ResultNodeFacade result(domDocument, rootNode, "error");
+		result.setAttribute("result", "error");
 	}
 
 	return domDocument;

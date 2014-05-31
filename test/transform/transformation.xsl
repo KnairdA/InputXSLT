@@ -38,13 +38,13 @@
 	</xsl:variable>
 
 	<xsl:choose>
-		<xsl:when test="xalan:nodeset($result)/result/error">
-			<xsl:copy-of select="xalan:nodeset($result)/result/error"/>
-		</xsl:when>
-		<xsl:otherwise>
+		<xsl:when test="xalan:nodeset($result)/transformation/@result = 'success'">
 			<xsl:copy-of select="
 				InputXSLT:read-xml-file('test_actual.xml')/test_case/transform_test/*
 			"/>
+		</xsl:when>
+		<xsl:otherwise>
+			<xsl:copy-of select="xalan:nodeset($result)/transformation/*"/>
 		</xsl:otherwise>
 	</xsl:choose>
 </xsl:template>
