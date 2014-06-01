@@ -6,7 +6,7 @@
 	exclude-result-prefixes="InputXSLT"
 >
 
-<xsl:include href="[testcase.xsl]"/>
+<xsl:import href="[testcase.xsl]"/>
 
 <xsl:param name="target-file"/>
 <xsl:param name="parent-directory"/>

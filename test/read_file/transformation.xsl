@@ -7,16 +7,14 @@
 	exclude-result-prefixes="InputXSLT xalan"
 >
 
-<xsl:include href="[testcase.xsl]"/>
+<xsl:import href="[testcase.xsl]"/>
 
 <xsl:template name="implementation">
-	<xsl:variable name="result">
-		<xsl:copy-of select="InputXSLT:read-file('test.txt')"/>
-	</xsl:variable>
+	<xsl:variable name="result" select="InputXSLT:read-file('test.txt')"/>
 
 	<xsl:choose>
-		<xsl:when test="xalan:nodeset($result)/file/@result = 'success'">
-			<xsl:value-of select="xalan:nodeset($result)/file"/>
+		<xsl:when test="$result/self::file/@result = 'success'">
+			<xsl:value-of select="$result/self::file"/>
 		</xsl:when>
 		<xsl:otherwise>
 			Error during file io

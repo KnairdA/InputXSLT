@@ -7,16 +7,14 @@
 	exclude-result-prefixes="InputXSLT xalan"
 >
 
-<xsl:include href="[testcase.xsl]"/>
+<xsl:import href="[testcase.xsl]"/>
 
 <xsl:template name="implementation">
-	<xsl:variable name="result">
-		<xsl:copy-of select="InputXSLT:read-directory('../')"/>
-	</xsl:variable>
+	<xsl:variable name="result" select="InputXSLT:read-directory('../')"/>
 
 	<xsl:choose>
-		<xsl:when test="xalan:nodeset($result)/directory/@result = 'success'">
-			<xsl:for-each select="xalan:nodeset($result)/directory/entry">
+		<xsl:when test="$result/self::directory/@result = 'success'">
+			<xsl:for-each select="$result/self::directory/entry">
 				<item type="{@type}">
 					<name><xsl:value-of select="./name"/></name>
 

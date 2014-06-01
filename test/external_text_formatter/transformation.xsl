@@ -8,7 +8,7 @@
 	exclude-result-prefixes="dyn xalan InputXSLT"
 >
 
-<xsl:include href="[testcase.xsl]"/>
+<xsl:import href="[testcase.xsl]"/>
 
 <xsl:template name="formatter">
 	<xsl:param name="source"/>

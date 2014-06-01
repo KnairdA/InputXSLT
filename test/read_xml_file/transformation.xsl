@@ -7,16 +7,14 @@
 	exclude-result-prefixes="InputXSLT xalan"
 >
 
-<xsl:include href="[testcase.xsl]"/>
+<xsl:import href="[testcase.xsl]"/>
 
 <xsl:template name="implementation">
-	<xsl:variable name="result">
-		<xsl:copy-of select="InputXSLT:read-xml-file('test.txt')"/>
-	</xsl:variable>
+	<xsl:variable name="result" select="InputXSLT:read-xml-file('test.txt')"/>
 
 	<xsl:choose>
-		<xsl:when test="xalan:nodeset($result)/file/@result = 'success'">
-			<xsl:for-each select="xalan:nodeset($result)/file/tester/eintrag">
+		<xsl:when test="$result/self::file/@result = 'success'">
+			<xsl:for-each select="$result/self::file/tester/eintrag">
 				<item><xsl:value-of select="."/></item>
 			</xsl:for-each>
 		</xsl:when>
