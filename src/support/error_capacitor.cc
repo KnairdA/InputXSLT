@@ -11,9 +11,18 @@
 
 namespace {
 
+using InputXSLT::XercesStringGuard;
+
 inline std::string getMessage(const xercesc::SAXParseException& exception) {
-	return std::string(
-		*InputXSLT::XercesStringGuard<char>(exception.getMessage())
+	return (
+		std::string(*XercesStringGuard<char>(exception.getMessage()))
+		+ ". (Occurred in entity '"
+		+ std::string(*XercesStringGuard<char>(exception.getSystemId()))
+		+ "', at line "
+		+ std::to_string(exception.getLineNumber())
+		+ ", column "
+		+ std::to_string(exception.getColumnNumber())
+		+ ".)"
 	);
 }
 
