@@ -4,7 +4,7 @@
 
 ## Why?!
 
-Contrary to popular opinion I actually like XSLT as a content transformation language and have built - amongst other things - my personal website on top of it. While I used the XSLT based [Symphony CMS](http://www.getsymphony.com/)  for that particular endeavour, the intention behind the experiment contained within this repository is to develop something like a static content management system based on XSLT.
+Contrary to popular opinion I actually like XSLT as a content transformation language and have built - amongst other things - my personal website on top of it. While I used the XSLT based [Symphony CMS](http://www.getsymphony.com/)  for that particular endeavour, the intention behind the experiment contained within this repository is to develop XSLT extensions enabling the development of static site generators using XSLT as both a template and application language.
 
 ## Current features:
 
@@ -13,6 +13,16 @@ Contrary to popular opinion I actually like XSLT as a content transformation lan
 - external `read-directory` function for read-only directory traversal
 - external `transform` function for executing transformations inside transformations
 - external `external-text-formatter` function for executing text formatters and capturing their XML output
+
+## Examples:
+
+The `test` directory contains black-box test cases for every external function provided by this application which may be used as basic usage examples.
+
+- [`InputXSLT:read-file`](test/read_file/transformation.xsl)
+- [`InputXSLT:read-xml-file`](test/read_xml_file/transformation.xsl)
+- [`InputXSLT:read-directory`](test/read_directory/transformation.xsl)
+- [`InputXSLT:transform`](test/transform/transformation.xsl)
+- [`InputXSLT:external-text-formatter`](test/external_text_formatter/transformation.xsl) (requires [markdown.pl](http://daringfireball.net/projects/markdown/))
 
 ## Requirements:
 
