@@ -41,8 +41,8 @@ set(
 )
 
 add_executable(
-	test
-	test.cc
+	ixslt
+	ixslt.cc
 )
 
 add_library(
@@ -52,7 +52,7 @@ add_library(
 )
 
 target_link_libraries(
-	test
+	ixslt
 	${Libraries}
 )
 
@@ -64,5 +64,5 @@ add_custom_target(
 	COMMAND
 	sh check.sh
 	DEPENDS
-	test
+	ixslt
 )
