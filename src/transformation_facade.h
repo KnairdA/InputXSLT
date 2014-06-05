@@ -6,9 +6,9 @@
 #include <string>
 
 #include "common.h"
-#include "support/error_capacitor.h"
 #include "support/include_entity_resolver.h"
 #include "support/stylesheet_parameter_guard.h"
+#include "support/error/error_multiplexer.h"
 
 namespace InputXSLT {
 
@@ -30,6 +30,7 @@ class TransformationFacade {
 		const xalan::XalanCompiledStylesheet* transformation_;
 
 		xalan::XalanTransformer transformer_;
+		ErrorMultiplexer error_multiplexer_;
 
 		void generate(const std::string&, StylesheetParameterGuard&);
 		void generate(std::basic_ostream<char>&, StylesheetParameterGuard&);

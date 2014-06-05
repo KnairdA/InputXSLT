@@ -1,12 +1,11 @@
-#ifndef INPUTXSLT_SRC_SUPPORT_ERROR_CAPACITOR_H_
-#define INPUTXSLT_SRC_SUPPORT_ERROR_CAPACITOR_H_
+#ifndef INPUTXSLT_SRC_SUPPORT_ERROR_ERROR_MULTIPLEXER_H_
+#define INPUTXSLT_SRC_SUPPORT_ERROR_ERROR_MULTIPLEXER_H_
 
 #include <xercesc/sax/ErrorHandler.hpp>
 
 #include <xalanc/XSLT/ProblemListener.hpp>
 #include <xalanc/XalanTransformer/XalanTransformer.hpp>
 
-#include <memory>
 #include <vector>
 #include <string>
 
@@ -14,18 +13,17 @@
 
 namespace InputXSLT {
 
-class ErrorCapacitor : public xercesc::ErrorHandler,
-                       public xalan::ProblemListener {
+class ErrorMultiplexer : public xercesc::ErrorHandler,
+                         public xalan::ProblemListener {
 	public:
-		class exception;
+		enum class ErrorType;
+		struct Receiver;
 
-		typedef std::vector<std::string> error_cache;
-		typedef std::unique_ptr<error_cache> error_cache_ptr;
+		ErrorMultiplexer(xalan::XalanTransformer*);
+		~ErrorMultiplexer();
 
-		ErrorCapacitor(xalan::XalanTransformer*);
-		~ErrorCapacitor();
-
-		void discharge();
+		void connectReceiver(Receiver*);
+		void disconnectReceiver(Receiver*);
 
 		virtual void warning(const xercesc::SAXParseException&);
 		virtual void error(const xercesc::SAXParseException&);
@@ -62,21 +60,25 @@ class ErrorCapacitor : public xercesc::ErrorHandler,
 
 	private:
 		xalan::XalanTransformer* const transformer_;
-		error_cache_ptr error_cache_;
+
+		std::vector<Receiver*> receivers_;
+
+		void multiplex(const ErrorType, const std::string&);
 
 };
 
-class ErrorCapacitor::exception {
-	public:
-		exception(error_cache_ptr);
+enum class ErrorMultiplexer::ErrorType {
+	Warning,
+	Error
+};
 
-		const error_cache* getCachedErrors() const;
-
-	private:
-		error_cache_ptr error_cache_;
-
+struct ErrorMultiplexer::Receiver {
+	virtual void receive(
+		const ErrorMultiplexer::ErrorType,
+		const std::string&
+	) = 0;
 };
 
 }
 
-#endif  // INPUTXSLT_SRC_SUPPORT_ERROR_CAPACITOR_H_
+#endif  // INPUTXSLT_SRC_SUPPORT_ERROR_ERROR_MULTIPLEXER_H_

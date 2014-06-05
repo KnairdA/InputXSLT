@@ -1,10 +1,10 @@
-#include "error_capacitor.h"
+#include "error_multiplexer.h"
 
 #include <xercesc/sax/SAXParseException.hpp>
 
 #include <xalanc/PlatformSupport/DOMStringPrintWriter.hpp>
 
-#include <iostream>
+#include <algorithm>
 
 #include "support/xalan_string.h"
 #include "support/xerces_string_guard.h"
@@ -12,6 +12,7 @@
 namespace {
 
 using InputXSLT::XercesStringGuard;
+using InputXSLT::ErrorMultiplexer;
 
 inline std::string getMessage(const xercesc::SAXParseException& exception) {
 	return (
@@ -26,49 +27,73 @@ inline std::string getMessage(const xercesc::SAXParseException& exception) {
 	);
 }
 
+inline ErrorMultiplexer::ErrorType toErrorType(
+	const xalan::ProblemListenerBase::eClassification classification) {
+	switch ( classification ) {
+		case xalan::ProblemListenerBase::eClassification::eMessage ||
+		     xalan::ProblemListenerBase::eClassification::eWarning: {
+			return ErrorMultiplexer::ErrorType::Warning;
+		}
+		default: {
+			return ErrorMultiplexer::ErrorType::Error;
+		}
+	}
+}
+
 }
 
 namespace InputXSLT {
 
-ErrorCapacitor::ErrorCapacitor(xalan::XalanTransformer* transformer):
+ErrorMultiplexer::ErrorMultiplexer(xalan::XalanTransformer* transformer):
 	transformer_(transformer),
-	error_cache_(new error_cache()) {
+	receivers_() {
 	this->transformer_->setErrorHandler(this);
 	this->transformer_->setProblemListener(this);
 }
 
-ErrorCapacitor::~ErrorCapacitor() {
+ErrorMultiplexer::~ErrorMultiplexer() {
 	this->transformer_->setErrorHandler(nullptr);
 	this->transformer_->setProblemListener(nullptr);
 }
 
-void ErrorCapacitor::discharge() {
-	if ( !this->error_cache_->empty() ) {
-		throw exception(std::move(this->error_cache_));
-	}
+void ErrorMultiplexer::connectReceiver(Receiver* receiver) {
+	this->receivers_.push_back(receiver);
 }
 
-void ErrorCapacitor::warning(const xercesc::SAXParseException& exception) {
-	this->error_cache_->emplace_back(
+void ErrorMultiplexer::disconnectReceiver(Receiver* receiver) {
+	this->receivers_.erase(
+		std::remove(
+			this->receivers_.begin(),
+			this->receivers_.end(),
+			receiver
+		)
+	);
+}
+
+void ErrorMultiplexer::warning(const xercesc::SAXParseException& exception) {
+	this->multiplex(
+		ErrorType::Warning,
 		"Warning: " + getMessage(exception)
 	);
 }
 
-void ErrorCapacitor::error(const xercesc::SAXParseException& exception) {
-	this->error_cache_->emplace_back(
+void ErrorMultiplexer::error(const xercesc::SAXParseException& exception) {
+	this->multiplex(
+		ErrorType::Error,
 		"Error: " + getMessage(exception)
 	);
 }
 
-void ErrorCapacitor::fatalError(const xercesc::SAXParseException& exception) {
-	this->error_cache_->emplace_back(
+void ErrorMultiplexer::fatalError(const xercesc::SAXParseException& exception) {
+	this->multiplex(
+		ErrorType::Error,
 		"Fatal error: " + getMessage(exception)
 	);
 }
 
-void ErrorCapacitor::resetErrors() { }
+void ErrorMultiplexer::resetErrors() { }
 
-void ErrorCapacitor::problem(
+void ErrorMultiplexer::problem(
 	xalan::ProblemListenerBase::eSource         source,
 	xalan::ProblemListenerBase::eClassification classification,
 	const xalan::XalanDOMString&                message,
@@ -87,10 +112,13 @@ void ErrorCapacitor::problem(
 		node
 	);
 
-	this->error_cache_->emplace_back(toString(problemSummary));
+	this->multiplex(
+		toErrorType(classification),
+		toString(problemSummary)
+	);
 }
 
-void ErrorCapacitor::problem(
+void ErrorMultiplexer::problem(
 	xalan::ProblemListenerBase::eSource         source,
 	xalan::ProblemListenerBase::eClassification classification,
 	const xalan::XalanDOMString&                message,
@@ -107,10 +135,13 @@ void ErrorCapacitor::problem(
 		node
 	);
 
-	this->error_cache_->emplace_back(toString(problemSummary));
+	this->multiplex(
+		toErrorType(classification),
+		toString(problemSummary)
+	);
 }
 
-void ErrorCapacitor::problem(
+void ErrorMultiplexer::problem(
 	xalan::ProblemListenerBase::eSource,
 	xalan::ProblemListenerBase::eClassification,
 	const xalan::XalanNode*,
@@ -121,13 +152,19 @@ void ErrorCapacitor::problem(
 	xalan::XalanFileLoc
 ) { }
 
-void ErrorCapacitor::setPrintWriter(xalan::PrintWriter*) { }
+void ErrorMultiplexer::setPrintWriter(xalan::PrintWriter*) { }
 
-ErrorCapacitor::exception::exception(error_cache_ptr ptr):
-	error_cache_(std::move(ptr)) { }
-
-auto ErrorCapacitor::exception::getCachedErrors() const -> const error_cache* {
-	return this->error_cache_.get();
+void ErrorMultiplexer::multiplex(
+	const ErrorType type,
+	const std::string& message
+) {
+	std::for_each(
+		this->receivers_.begin(),
+		this->receivers_.end(),
+		[&type, &message](Receiver* const receiver) -> void {
+			receiver->receive(type, message);
+		}
+	);
 }
 
 }

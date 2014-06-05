@@ -7,6 +7,8 @@
 
 #include <sstream>
 
+#include "support/error/error_capacitor.h"
+
 namespace InputXSLT {
 
 TransformationFacade::TransformationFacade(
@@ -14,10 +16,11 @@ TransformationFacade::TransformationFacade(
 	IncludeEntityResolver* resolver
 ):
 	transformation_{},
-	transformer_() {
+	transformer_(),
+	error_multiplexer_(&transformer_) {
 	this->transformer_.setEntityResolver(resolver);
 
-	ErrorCapacitor errorCapacitor(&this->transformer_);
+	ErrorCapacitor errorCapacitor(&this->error_multiplexer_);
 
 	this->transformer_.compileStylesheet(
 		xalan::XSLTInputSource(transformation.data()),
@@ -68,7 +71,7 @@ void TransformationFacade::generate(
 	xalan::XSLTResultTarget&& outputTarget,
 	StylesheetParameterGuard&
 ) {
-	ErrorCapacitor errorCapacitor(&this->transformer_);
+	ErrorCapacitor errorCapacitor(&this->error_multiplexer_);
 
 	std::stringstream      emptyStream("<dummy/>");
 	xalan::XSLTInputSource inputSource(emptyStream);

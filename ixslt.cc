@@ -1,12 +1,13 @@
-#include "plattform_guard.h"
-#include "transformation_facade.h"
-
 #include "boost/optional.hpp"
 #include "boost/program_options.hpp"
 
 #include <string>
 #include <vector>
 #include <iostream>
+
+#include "plattform_guard.h"
+#include "transformation_facade.h"
+#include "support/error/error_capacitor.h"
 
 boost::optional<boost::program_options::variables_map> input(
 	int argc,

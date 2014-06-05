@@ -7,6 +7,7 @@
 #include "transformation_facade.h"
 #include "support/xerces_string_guard.h"
 #include "support/dom/result_node_facade.h"
+#include "support/error/error_capacitor.h"
 
 namespace InputXSLT {
 
