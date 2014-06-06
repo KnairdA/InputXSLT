@@ -27,15 +27,15 @@ inline std::string getMessage(const xercesc::SAXParseException& exception) {
 	);
 }
 
-inline ErrorMultiplexer::ErrorType toErrorType(
+inline ErrorMultiplexer::error_type toErrorType(
 	const xalan::ProblemListenerBase::eClassification classification) {
 	switch ( classification ) {
 		case xalan::ProblemListenerBase::eClassification::eMessage ||
 		     xalan::ProblemListenerBase::eClassification::eWarning: {
-			return ErrorMultiplexer::ErrorType::Warning;
+			return ErrorMultiplexer::error_type::warning;
 		}
 		default: {
-			return ErrorMultiplexer::ErrorType::Error;
+			return ErrorMultiplexer::error_type::error;
 		}
 	}
 }
@@ -56,11 +56,11 @@ ErrorMultiplexer::~ErrorMultiplexer() {
 	this->transformer_->setProblemListener(nullptr);
 }
 
-void ErrorMultiplexer::connectReceiver(Receiver* receiver) {
+void ErrorMultiplexer::connectReceiver(receiver* receiver) {
 	this->receivers_.push_back(receiver);
 }
 
-void ErrorMultiplexer::disconnectReceiver(Receiver* receiver) {
+void ErrorMultiplexer::disconnectReceiver(receiver* receiver) {
 	this->receivers_.erase(
 		std::remove(
 			this->receivers_.begin(),
@@ -72,21 +72,21 @@ void ErrorMultiplexer::disconnectReceiver(Receiver* receiver) {
 
 void ErrorMultiplexer::warning(const xercesc::SAXParseException& exception) {
 	this->multiplex(
-		ErrorType::Warning,
+		error_type::warning,
 		"Warning: " + getMessage(exception)
 	);
 }
 
 void ErrorMultiplexer::error(const xercesc::SAXParseException& exception) {
 	this->multiplex(
-		ErrorType::Error,
+		error_type::error,
 		"Error: " + getMessage(exception)
 	);
 }
 
 void ErrorMultiplexer::fatalError(const xercesc::SAXParseException& exception) {
 	this->multiplex(
-		ErrorType::Error,
+		error_type::error,
 		"Fatal error: " + getMessage(exception)
 	);
 }
@@ -155,16 +155,25 @@ void ErrorMultiplexer::problem(
 void ErrorMultiplexer::setPrintWriter(xalan::PrintWriter*) { }
 
 void ErrorMultiplexer::multiplex(
-	const ErrorType type,
+	const error_type type,
 	const std::string& message
 ) {
 	std::for_each(
 		this->receivers_.begin(),
 		this->receivers_.end(),
-		[&type, &message](Receiver* const receiver) -> void {
+		[&type, &message](receiver* const receiver) -> void {
 			receiver->receive(type, message);
 		}
 	);
+}
+
+ErrorMultiplexer::receiver::receiver(ErrorMultiplexer* multiplexer):
+	multiplexer_(multiplexer) {
+	this->multiplexer_->connectReceiver(this);
+}
+
+ErrorMultiplexer::receiver::~receiver() {
+	this->multiplexer_->disconnectReceiver(this);
 }
 
 }

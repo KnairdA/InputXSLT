@@ -7,9 +7,24 @@
 
 #include <sstream>
 
-#include "support/error/error_capacitor.h"
-
 namespace InputXSLT {
+
+auto TransformationFacade::try_create(
+	const std::string& transformation,
+	IncludeEntityResolver* resolver,
+	const std::function<void(const ErrorCapacitor::error_cache&)>& handleErrors
+) -> ptr{
+	try {
+		return ptr(
+			new InputXSLT::TransformationFacade(transformation, resolver)
+		);
+	}
+	catch (const ErrorCapacitor::exception& exception) {
+		handleErrors(*exception);
+
+		return ptr();
+	}
+}
 
 TransformationFacade::TransformationFacade(
 	const std::string& transformation,
@@ -17,7 +32,8 @@ TransformationFacade::TransformationFacade(
 ):
 	transformation_{},
 	transformer_(),
-	error_multiplexer_(&transformer_) {
+	error_multiplexer_(&transformer_),
+	warning_capacitor_(&error_multiplexer_) {
 	this->transformer_.setEntityResolver(resolver);
 
 	ErrorCapacitor errorCapacitor(&this->error_multiplexer_);
@@ -34,6 +50,10 @@ TransformationFacade::~TransformationFacade() {
 	this->transformer_.destroyStylesheet(
 		this->transformation_
 	);
+}
+
+WarningCapacitor::warning_cache_ptr TransformationFacade::getCachedWarnings() {
+	return this->warning_capacitor_.discharge();
 }
 
 void TransformationFacade::generate(

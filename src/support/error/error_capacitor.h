@@ -7,7 +7,7 @@
 
 namespace InputXSLT {
 
-class ErrorCapacitor : public ErrorMultiplexer::Receiver {
+class ErrorCapacitor : public ErrorMultiplexer::receiver {
 	public:
 		class exception;
 
@@ -15,17 +15,15 @@ class ErrorCapacitor : public ErrorMultiplexer::Receiver {
 		typedef std::unique_ptr<error_cache> error_cache_ptr;
 
 		ErrorCapacitor(ErrorMultiplexer*);
-		~ErrorCapacitor();
 
 		void discharge();
 
 		virtual void receive(
-			const ErrorMultiplexer::ErrorType,
+			const ErrorMultiplexer::error_type,
 			const std::string&
 		);
 
 	private:
-		ErrorMultiplexer* const multiplexer_;
 		error_cache_ptr error_cache_;
 
 };
@@ -34,7 +32,7 @@ class ErrorCapacitor::exception {
 	public:
 		exception(error_cache_ptr);
 
-		const error_cache* getCachedErrors() const;
+		const error_cache& operator*() const;
 
 	private:
 		error_cache_ptr error_cache_;

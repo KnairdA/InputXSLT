@@ -7,7 +7,26 @@
 
 #include "plattform_guard.h"
 #include "transformation_facade.h"
-#include "support/error/error_capacitor.h"
+
+class WarningGuard {
+	public:
+		WarningGuard(InputXSLT::TransformationFacade* transformation):
+			transformation_(transformation) { };
+
+		~WarningGuard() {
+			InputXSLT::WarningCapacitor::warning_cache_ptr warnings(
+				this->transformation_->getCachedWarnings()
+			);
+
+			for ( auto&& warning : *warnings ) {
+				std::cerr << warning << std::endl;
+			}
+		};
+
+	private:
+		InputXSLT::TransformationFacade* const transformation_;
+
+};
 
 boost::optional<boost::program_options::variables_map> input(
 	int argc,
@@ -57,6 +76,12 @@ boost::optional<boost::program_options::variables_map> input(
 	return boost::make_optional(variables);
 }
 
+void handleErrors(const InputXSLT::ErrorCapacitor::error_cache& errors) {
+	for ( auto&& error : errors ) {
+		std::cerr << error << std::endl;
+	}
+}
+
 bool process(const boost::program_options::variables_map& variables) {
 	std::vector<std::string> includePath;
 
@@ -66,29 +91,32 @@ bool process(const boost::program_options::variables_map& variables) {
 
 	InputXSLT::PlattformGuard plattform(includePath);
 
-	try {
-		InputXSLT::TransformationFacade transformation(
-			variables["transformation"].as<std::string>(),
-			plattform.getEntityResolver()
-		);
+	if ( auto transformation = InputXSLT::TransformationFacade::try_create(
+		variables["transformation"].as<std::string>(),
+		plattform.getEntityResolver(),
+		handleErrors
+	) ) {
+		WarningGuard guard(transformation.get());
 
-		if ( variables.count("target") ) {
-			transformation.generate(
-				variables["target"].as<std::string>()
-			);
-		} else {
-			transformation.generate(std::cout);
+		try {
+			if ( variables.count("target") ) {
+				transformation->generate(
+					variables["target"].as<std::string>()
+				);
+			} else {
+				transformation->generate(std::cout);
+			}
+
+			return true;
 		}
+		catch (const InputXSLT::ErrorCapacitor::exception& exception) {
+			handleErrors(*exception);
 
-		return true;
-	}
-	catch (const InputXSLT::ErrorCapacitor::exception& exception) {
-		for ( auto&& error : *(exception.getCachedErrors()) ) {
-			std::cerr << error << std::endl;
+			return false;
 		}
-
-		return false;
 	}
+
+	return false;
 }
 
 int main(int argc, char** argv) {

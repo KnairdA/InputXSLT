@@ -3,14 +3,8 @@
 namespace InputXSLT {
 
 ErrorCapacitor::ErrorCapacitor(ErrorMultiplexer* multiplexer):
-	multiplexer_(multiplexer),
-	error_cache_(new error_cache()) {
-	this->multiplexer_->connectReceiver(this);
-}
-
-ErrorCapacitor::~ErrorCapacitor() {
-	this->multiplexer_->disconnectReceiver(this);
-}
+	ErrorMultiplexer::receiver(multiplexer),
+	error_cache_(new error_cache()) { }
 
 void ErrorCapacitor::discharge() {
 	if ( !this->error_cache_->empty() ) {
@@ -19,10 +13,10 @@ void ErrorCapacitor::discharge() {
 }
 
 void ErrorCapacitor::receive(
-	const ErrorMultiplexer::ErrorType type,
+	const ErrorMultiplexer::error_type type,
 	const std::string& message
 ) {
-	if ( type == ErrorMultiplexer::ErrorType::Error ) {
+	if ( type == ErrorMultiplexer::error_type::error ) {
 		this->error_cache_->emplace_back(message);
 	}
 }
@@ -30,8 +24,8 @@ void ErrorCapacitor::receive(
 ErrorCapacitor::exception::exception(error_cache_ptr ptr):
 	error_cache_(std::move(ptr)) { }
 
-auto ErrorCapacitor::exception::getCachedErrors() const -> const error_cache* {
-	return this->error_cache_.get();
+auto ErrorCapacitor::exception::operator*() const -> const error_cache& {
+	return *(this->error_cache_.get());
 }
 
 }

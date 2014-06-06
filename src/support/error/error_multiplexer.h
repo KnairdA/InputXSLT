@@ -16,14 +16,14 @@ namespace InputXSLT {
 class ErrorMultiplexer : public xercesc::ErrorHandler,
                          public xalan::ProblemListener {
 	public:
-		enum class ErrorType;
-		struct Receiver;
+		enum class error_type;
+		class receiver;
 
 		ErrorMultiplexer(xalan::XalanTransformer*);
 		~ErrorMultiplexer();
 
-		void connectReceiver(Receiver*);
-		void disconnectReceiver(Receiver*);
+		void connectReceiver(receiver*);
+		void disconnectReceiver(receiver*);
 
 		virtual void warning(const xercesc::SAXParseException&);
 		virtual void error(const xercesc::SAXParseException&);
@@ -61,22 +61,30 @@ class ErrorMultiplexer : public xercesc::ErrorHandler,
 	private:
 		xalan::XalanTransformer* const transformer_;
 
-		std::vector<Receiver*> receivers_;
+		std::vector<receiver*> receivers_;
 
-		void multiplex(const ErrorType, const std::string&);
+		void multiplex(const error_type, const std::string&);
 
 };
 
-enum class ErrorMultiplexer::ErrorType {
-	Warning,
-	Error
+enum class ErrorMultiplexer::error_type {
+	warning,
+	error
 };
 
-struct ErrorMultiplexer::Receiver {
-	virtual void receive(
-		const ErrorMultiplexer::ErrorType,
-		const std::string&
-	) = 0;
+class ErrorMultiplexer::receiver {
+	public:
+		receiver(ErrorMultiplexer*);
+		virtual ~receiver();
+
+		virtual void receive(
+			const ErrorMultiplexer::error_type,
+			const std::string&
+		) = 0;
+
+	private:
+		ErrorMultiplexer* const multiplexer_;
+
 };
 
 }

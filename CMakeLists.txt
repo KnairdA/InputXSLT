@@ -35,6 +35,7 @@ set(
 	src/support/include_entity_resolver.cc
 	src/support/error/error_multiplexer.cc
 	src/support/error/error_capacitor.cc
+	src/support/error/warning_capacitor.cc
 	src/support/tuple/xobject_value.cc
 	src/support/dom/document_cache.cc
 	src/support/dom/document_cache_item.cc

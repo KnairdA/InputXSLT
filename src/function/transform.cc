@@ -9,6 +9,23 @@
 #include "support/dom/result_node_facade.h"
 #include "support/error/error_capacitor.h"
 
+namespace {
+
+using InputXSLT::ErrorCapacitor;
+
+inline std::function<void(const ErrorCapacitor::error_cache&)> handleErrors(
+	InputXSLT::ResultNodeFacade& result) {
+	return [&result](const ErrorCapacitor::error_cache& errors) {
+		result.setAttribute("result", "error");
+
+		for ( auto&& error : errors ) {
+			result.setValueNode("error", error);
+		}
+	};
+}
+
+}
+
 namespace InputXSLT {
 
 xercesc::DOMDocument* FunctionTransform::constructDocument(
@@ -42,21 +59,26 @@ xercesc::DOMDocument* FunctionTransform::constructDocument(
 	ResultNodeFacade result(domDocument, rootNode, "transformation");
 	result.setAttribute("target", targetPath);
 
-	try {
-		InputXSLT::TransformationFacade transformation(
-			transformationPath,
-			this->include_resolver_
+	if ( auto transformation = TransformationFacade::try_create(
+		transformationPath,
+		this->include_resolver_,
+		handleErrors(result)
+	) ) {
+		try {
+			transformation->generate(targetPath, parameterObject);
+
+			result.setAttribute("result", "success");
+		}
+		catch (const ErrorCapacitor::exception& exception) {
+			handleErrors(result)(*exception);
+		}
+
+		WarningCapacitor::warning_cache_ptr warnings(
+			transformation->getCachedWarnings()
 		);
 
-		transformation.generate(targetPath, parameterObject);
-
-		result.setAttribute("result", "success");
-	}
-	catch (const ErrorCapacitor::exception& exception) {
-		result.setAttribute("result", "error");
-
-		for ( auto&& error : *(exception.getCachedErrors()) ) {
-			result.setValueNode("error", error);
+		for ( auto&& warning : *warnings ) {
+			result.setValueNode("warning", warning);
 		}
 	}
 
