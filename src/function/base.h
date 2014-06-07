@@ -12,8 +12,9 @@
 #include "support/xalan_string.h"
 #include "support/filesystem_context.h"
 #include "support/include_entity_resolver.h"
-#include "support/tuple/mapper.h"
 #include "support/dom/document_cache.h"
+#include "support/type/sequence.h"
+#include "support/type/xobject_value.h"
 
 namespace InputXSLT {
 
@@ -22,18 +23,18 @@ template <
 	typename... Types
 >
 class FunctionBase : public xalan::Function {
-	public:
-		typedef std::tuple<Types...> parameter_tuple;
+	static const std::size_t parameter_count = sizeof...(Types);
 
+	public:
 		FunctionBase(IncludeEntityResolver* resolver):
 			include_resolver_(resolver),
 			document_cache_(std::make_shared<DomDocumentCache>()) { }
 
 		virtual xalan::XObjectPtr execute(
 			xalan::XPathExecutionContext& executionContext,
-			xalan::XalanNode* context,
-			const XObjectArgVectorType& parameters,
-			const xalan::Locator* locator
+			xalan::XalanNode*             context,
+			const XObjectArgVectorType&   parameters,
+			const xalan::Locator*         locator
 		) const {
 			this->validateParameters(
 				parameters,
@@ -43,25 +44,22 @@ class FunctionBase : public xalan::Function {
 			);
 
 			xalan::XalanDocument* const domDocument(
-				this->document_cache_->create(
-					static_cast<Implementation*>(
-						const_cast<FunctionBase*>(this)
-					)->constructDocument(
-						FilesystemContext(locator),
-						Mapper::template construct<parameter_tuple>(parameters)
-					)
+				this->callConstructDocument(
+					parameters,
+					locator,
+					typename IndexSequence<parameter_count>::type()
 				)
 			);
 
-			xalan::XPathExecutionContext::BorrowReturnMutableNodeRefList nodeList(
+			xalan::XPathExecutionContext::BorrowReturnMutableNodeRefList nodes(
 				executionContext
 			);
 
-			nodeList->addNodes(
+			nodes->addNodes(
 				*domDocument->getDocumentElement()->getChildNodes()
 			);
 
-			return executionContext.getXObjectFactory().createNodeSet(nodeList);
+			return executionContext.getXObjectFactory().createNodeSet(nodes);
 		}
 
 		virtual FunctionBase* clone(
@@ -84,12 +82,31 @@ class FunctionBase : public xalan::Function {
 		const xalan::XalanDOMString& getError(
 			xalan::XalanDOMString& result) const {
 			result.assign(std::string(
-				"The function expects "                                 +
-				std::to_string(std::tuple_size<parameter_tuple>::value) +
+				"The function expects "          +
+				std::to_string(parameter_count) +
 				" parameter(s)"
 			).data());
 
 			return result;
+		}
+
+		template <unsigned... Index>
+		inline xalan::XalanDocument* callConstructDocument(
+			const XObjectArgVectorType& parameters,
+			const xalan::Locator* locator,
+			Sequence<Index...>
+		) const {
+			return this->document_cache_->create(
+				static_cast<Implementation*>(
+					const_cast<FunctionBase*>(this)
+				)->constructDocument(
+					FilesystemContext(locator),
+					XObjectValue::get<typename std::tuple_element<
+						Index,
+						std::tuple<Types...>
+					>::type>(parameters[Index])...
+				)
+			);
 		}
 
 		inline void validateParameters(
@@ -106,7 +123,7 @@ class FunctionBase : public xalan::Function {
 				}
 			);
 
-			if ( parameters.size() != std::tuple_size<parameter_tuple>::value || anyNull ) {
+			if ( parameters.size() != parameter_count || anyNull ) {
 				xalan::XPathExecutionContext::GetAndReleaseCachedString guard(
 					executionContext
 				);

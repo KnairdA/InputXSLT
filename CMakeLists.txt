@@ -36,7 +36,7 @@ set(
 	src/support/error/error_multiplexer.cc
 	src/support/error/error_capacitor.cc
 	src/support/error/warning_capacitor.cc
-	src/support/tuple/xobject_value.cc
+	src/support/type/xobject_value.cc
 	src/support/dom/document_cache.cc
 	src/support/dom/document_cache_item.cc
 	src/support/dom/result_node_facade.cc

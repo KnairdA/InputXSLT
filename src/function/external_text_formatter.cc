@@ -44,16 +44,9 @@ namespace InputXSLT {
 
 xercesc::DOMDocument* FunctionExternalTextFormatter::constructDocument(
 	const InputXSLT::FilesystemContext&,
-	const FunctionBase::parameter_tuple& parameters
+	std::string formatterPath,
+	std::string stdinText
 ) {
-	const std::string& formatterPath(
-		std::get<0>(parameters)
-	);
-
-	const std::string& stdinText(
-		std::get<1>(parameters)
-	);
-
 	xercesc::DOMDocument* const domDocument(
 		xercesc::DOMImplementation::getImplementation()->createDocument(
 			nullptr,

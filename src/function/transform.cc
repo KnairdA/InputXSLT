@@ -30,19 +30,12 @@ namespace InputXSLT {
 
 xercesc::DOMDocument* FunctionTransform::constructDocument(
 	const InputXSLT::FilesystemContext& fsContext,
-	const FunctionBase::parameter_tuple& parameters
+	std::string                         transformationPath,
+	std::string                         targetPath,
+	xalan::XObjectPtr                   parameterObject
 ) {
-	const std::string transformationPath(
-		fsContext.resolve(std::get<0>(parameters)).string()
-	);
-
-	const std::string targetPath(
-		fsContext.resolve(std::get<1>(parameters)).string()
-	);
-
-	const xalan::XObjectPtr& parameterObject(
-		std::get<2>(parameters)
-	);
+	transformationPath = fsContext.resolve(transformationPath).string();
+	targetPath         = fsContext.resolve(targetPath).string();
 
 	xercesc::DOMDocument* const domDocument(
 		xercesc::DOMImplementation::getImplementation()->createDocument(

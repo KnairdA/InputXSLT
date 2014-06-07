@@ -26,9 +26,8 @@ namespace InputXSLT {
 
 xercesc::DOMDocument* FunctionReadFile::constructDocument(
 	const FilesystemContext& fsContext,
-	const FunctionBase::parameter_tuple& parameters
+	std::string rawPath
 ) {
-	const std::string& rawPath = std::get<0>(parameters);
 	boost::filesystem::path filePath(fsContext.resolve(rawPath));
 
 	if ( !(boost::filesystem::exists(filePath) &&

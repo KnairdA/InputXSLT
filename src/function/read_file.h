@@ -17,7 +17,7 @@ class FunctionReadFile : public FunctionBase<
 
 		xercesc::DOMDocument* constructDocument(
 			const FilesystemContext&,
-			const FunctionBase::parameter_tuple&
+			std::string
 		);
 
 };
