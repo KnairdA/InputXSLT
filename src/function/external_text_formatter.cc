@@ -84,10 +84,21 @@ xercesc::DOMDocument* FunctionExternalTextFormatter::constructDocument(
 	result.setAttribute("code",      std::to_string(status.exit_status()));
 
 	if ( status.exited() ) {
-		result.setAttribute("result", "success");
-		result.setContent(
-			importDocumentElement(outputStream, domDocument)->getChildNodes()
-		);
+		try {
+			result.setContent(
+				importDocumentElement(outputStream, domDocument)->getChildNodes()
+			);
+
+			result.setAttribute("result", "success");
+		}
+		catch ( const xercesc::DOMException& exception ) {
+			result.setAttribute("result", "error");
+
+			result.setValueNode(
+				"error",
+				*XercesStringGuard<char>(exception.msg)
+			);
+		}
 	} else {
 		result.setAttribute("result", "error");
 	}

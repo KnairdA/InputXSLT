@@ -82,7 +82,7 @@ class FunctionBase : public xalan::Function {
 		const xalan::XalanDOMString& getError(
 			xalan::XalanDOMString& result) const {
 			result.assign(std::string(
-				"The function expects "          +
+				"The function expects "         +
 				std::to_string(parameter_count) +
 				" parameter(s)"
 			).data());

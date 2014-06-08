@@ -61,11 +61,21 @@ xercesc::DOMDocument* FunctionReadXmlFile::constructDocument(
 	result.setAttribute("path", filePath.string());
 
 	if ( boost::filesystem::is_regular_file(filePath) ) {
-		result.setAttribute("result", "success");
+		try {
+			result.setContent(
+				importDocumentElement(filePath.string(), domDocument)
+			);
 
-		result.setContent(
-			importDocumentElement(filePath.string(), domDocument)
-		);
+			result.setAttribute("result", "success");
+		}
+		catch ( const xercesc::DOMException& exception ) {
+			result.setAttribute("result", "error");
+
+			result.setValueNode(
+				"error",
+				*XercesStringGuard<char>(exception.msg)
+			);
+		}
 	} else {
 		result.setAttribute("result", "error");
 	}
