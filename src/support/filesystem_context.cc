@@ -8,11 +8,9 @@
 
 namespace InputXSLT {
 
-FilesystemContext::FilesystemContext(const xalan::Locator* locator):
+FilesystemContext::FilesystemContext(const boost::filesystem::path& path):
 	path_(boost::filesystem::canonical(
-		boost::filesystem::path(
-			*XercesStringGuard<char>(locator->getSystemId()) + 7
-		).parent_path().string()
+		path.parent_path()
 	)) { }
 
 FilesystemContext::FilesystemContext(const std::string& path):

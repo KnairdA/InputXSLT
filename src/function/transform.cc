@@ -34,9 +34,6 @@ xercesc::DOMDocument* FunctionTransform::constructDocument(
 	std::string                         targetPath,
 	xalan::XObjectPtr                   parameterObject
 ) {
-	transformationPath = fsContext.resolve(transformationPath).string();
-	targetPath         = fsContext.resolve(targetPath).string();
-
 	xercesc::DOMDocument* const domDocument(
 		xercesc::DOMImplementation::getImplementation()->createDocument(
 			nullptr,
@@ -50,15 +47,22 @@ xercesc::DOMDocument* FunctionTransform::constructDocument(
 	);
 
 	ResultNodeFacade result(domDocument, rootNode, "transformation");
-	result.setAttribute("target", targetPath);
+
+	result.setAttribute(
+		"target",
+		boost::filesystem::path(targetPath).filename().string()
+	);
 
 	if ( auto transformation = TransformationFacade::try_create(
-		transformationPath,
+		fsContext.resolve(transformationPath).string(),
 		this->include_resolver_,
 		handleErrors(result)
 	) ) {
 		try {
-			transformation->generate(targetPath, parameterObject);
+			transformation->generate(
+				fsContext.resolve(targetPath).string(),
+				parameterObject
+			);
 
 			result.setAttribute("result", "success");
 		}

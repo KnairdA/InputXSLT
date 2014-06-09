@@ -10,6 +10,13 @@ namespace {
 
 using InputXSLT::XercesStringGuard;
 
+inline boost::filesystem::path getPathFromSystemId(
+	const XMLCh* const systemId) {
+	return boost::filesystem::path(
+		*XercesStringGuard<char>(systemId) + 7
+	);
+}
+
 boost::optional<std::string> extractFilePath(const XMLCh* const rawPath) {
 	const std::string filePath         = *XercesStringGuard<char>(rawPath);
 	const std::size_t leadingDelimiter = filePath.find_first_of('[');
@@ -42,21 +49,24 @@ xercesc::InputSource* IncludeEntityResolver::resolveEntity(
 	const XMLCh* const systemId
 ) {
 	if ( systemId != nullptr ) {
-		if ( auto filePath = extractFilePath(systemId) ) {
-			if ( auto resolvedPath = this->resolve(*filePath) ) {
-				return new xercesc::LocalFileInputSource(
-					*XercesStringGuard<XMLCh>((*resolvedPath).string())
-				);
-			} else {
-				return new xercesc::LocalFileInputSource(
-					*XercesStringGuard<XMLCh>(*filePath)
-				);
-			}
-		} else {
-			return nullptr;
-		}
+		return new xercesc::LocalFileInputSource(
+			*XercesStringGuard<XMLCh>(this->resolve(systemId).string())
+		);
 	} else {
 		return nullptr;
+	}
+}
+
+boost::filesystem::path IncludeEntityResolver::resolve(
+	const XMLCh* const rawPath) const {
+	if ( auto filePath = extractFilePath(rawPath) ) {
+		if ( auto resolvedPath = this->resolve(*filePath) ) {
+			return *resolvedPath;
+		} else {
+			return getPathFromSystemId(rawPath);
+		}
+	} else {
+		return getPathFromSystemId(rawPath);
 	}
 }
 

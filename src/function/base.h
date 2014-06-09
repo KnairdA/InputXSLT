@@ -100,7 +100,11 @@ class FunctionBase : public xalan::Function {
 				static_cast<Implementation*>(
 					const_cast<FunctionBase*>(this)
 				)->constructDocument(
-					FilesystemContext(locator),
+					FilesystemContext(
+						this->include_resolver_->resolve(
+							locator->getSystemId()
+						)
+					),
 					XObjectValue::get<typename std::tuple_element<
 						Index,
 						std::tuple<Types...>
