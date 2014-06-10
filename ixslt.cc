@@ -43,6 +43,11 @@ boost::optional<boost::program_options::variables_map> input(
 			"transformation file"
 		)
 		(
+			"input",
+			boost::program_options::value<std::string>(),
+			"input file"
+		)
+		(
 			"target",
 			boost::program_options::value<std::string>(),
 			"target file"
@@ -90,12 +95,24 @@ bool process(const boost::program_options::variables_map& variables) {
 	};
 
 	InputXSLT::PlattformGuard plattform(includePath);
+	InputXSLT::TransformationFacade::ptr transformation{};
 
-	if ( auto transformation = InputXSLT::TransformationFacade::try_create(
-		variables["transformation"].as<std::string>(),
-		plattform.getEntityResolver(),
-		handleErrors
-	) ) {
+	if ( variables.count("input") ) {
+		transformation = InputXSLT::TransformationFacade::try_create(
+			handleErrors,
+			variables["input"].as<std::string>(),
+			variables["transformation"].as<std::string>(),
+			plattform.getEntityResolver()
+		);
+	} else {
+		transformation = InputXSLT::TransformationFacade::try_create(
+			handleErrors,
+			variables["transformation"].as<std::string>(),
+			plattform.getEntityResolver()
+		);
+	}
+
+	if ( transformation ) {
 		WarningGuard guard(transformation.get());
 
 		try {

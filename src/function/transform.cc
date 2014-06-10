@@ -54,9 +54,9 @@ xercesc::DOMDocument* FunctionTransform::constructDocument(
 	);
 
 	if ( auto transformation = TransformationFacade::try_create(
+		handleErrors(result),
 		fsContext.resolve(transformationPath).string(),
-		this->include_resolver_,
-		handleErrors(result)
+		this->include_resolver_
 	) ) {
 		try {
 			transformation->generate(

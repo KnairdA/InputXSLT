@@ -9,27 +9,22 @@
 
 namespace InputXSLT {
 
-auto TransformationFacade::try_create(
-	const std::string& transformation,
-	IncludeEntityResolver* resolver,
-	const std::function<void(const ErrorCapacitor::error_cache&)>& handleErrors
-) -> ptr{
-	try {
-		return ptr(
-			new InputXSLT::TransformationFacade(transformation, resolver)
-		);
-	}
-	catch (const ErrorCapacitor::exception& exception) {
-		handleErrors(*exception);
-
-		return ptr();
-	}
-}
-
 TransformationFacade::TransformationFacade(
 	const std::string& transformation,
 	IncludeEntityResolver* resolver
 ):
+	TransformationFacade(
+		std::string{},
+		transformation,
+		resolver
+	) { }
+
+TransformationFacade::TransformationFacade(
+	const std::string& input,
+	const std::string& transformation,
+	IncludeEntityResolver* resolver
+):
+	input_{},
 	transformation_{},
 	transformer_(),
 	error_multiplexer_(&transformer_),
@@ -37,6 +32,20 @@ TransformationFacade::TransformationFacade(
 	this->transformer_.setEntityResolver(resolver);
 
 	ErrorCapacitor errorCapacitor(&this->error_multiplexer_);
+
+	if ( input.empty() ) {
+		std::stringstream dummyStream("<dummy/>");
+
+		this->transformer_.parseSource(
+			xalan::XSLTInputSource(dummyStream),
+			this->input_
+		);
+	} else {
+		this->transformer_.parseSource(
+			xalan::XSLTInputSource(input.data()),
+			this->input_
+		);
+	}
 
 	this->transformer_.compileStylesheet(
 		xalan::XSLTInputSource(transformation.data()),
@@ -47,6 +56,10 @@ TransformationFacade::TransformationFacade(
 }
 
 TransformationFacade::~TransformationFacade() {
+	this->transformer_.destroyParsedSource(
+		this->input_
+	);
+
 	this->transformer_.destroyStylesheet(
 		this->transformation_
 	);
@@ -93,11 +106,8 @@ void TransformationFacade::generate(
 ) {
 	ErrorCapacitor errorCapacitor(&this->error_multiplexer_);
 
-	std::stringstream      emptyStream("<dummy/>");
-	xalan::XSLTInputSource inputSource(emptyStream);
-
 	this->transformer_.transform(
-		inputSource,
+		*(this->input_),
 		this->transformation_,
 		outputTarget
 	);

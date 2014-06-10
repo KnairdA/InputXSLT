@@ -20,13 +20,19 @@ class TransformationFacade {
 	public:
 		typedef std::unique_ptr<TransformationFacade> ptr;
 
+		template <typename... Arguments>
 		static ptr try_create(
-			const std::string&,
-			IncludeEntityResolver*,
-			const std::function<void(const ErrorCapacitor::error_cache&)>&
+			const std::function<void(const ErrorCapacitor::error_cache&)>&,
+			Arguments&&...
 		);
 
 		TransformationFacade(const std::string&, IncludeEntityResolver*);
+		TransformationFacade(
+			const std::string&,
+			const std::string&,
+			IncludeEntityResolver*
+		);
+
 		~TransformationFacade();
 
 		template <typename Target>
@@ -41,6 +47,7 @@ class TransformationFacade {
 		WarningCapacitor::warning_cache_ptr getCachedWarnings();
 
 	private:
+		const xalan::XalanParsedSource* input_;
 		const xalan::XalanCompiledStylesheet* transformation_;
 
 		xalan::XalanTransformer transformer_;
@@ -52,6 +59,25 @@ class TransformationFacade {
 		void generate(xalan::XSLTResultTarget&&, StylesheetParameterGuard&);
 
 };
+
+template <typename... Arguments>
+auto TransformationFacade::try_create(
+	const std::function<void(const ErrorCapacitor::error_cache&)>& handleErrors,
+	Arguments&&... arguments
+) -> ptr {
+	try {
+		return ptr(
+			new InputXSLT::TransformationFacade(
+				std::forward<Arguments>(arguments)...
+			)
+		);
+	}
+	catch (const ErrorCapacitor::exception& exception) {
+		handleErrors(*exception);
+
+		return ptr();
+	}
+}
 
 template <typename Target>
 void TransformationFacade::generate(Target& target) {
