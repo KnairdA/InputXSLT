@@ -63,7 +63,7 @@ boost::filesystem::path IncludeEntityResolver::resolve(
 		if ( auto resolvedPath = this->resolve(*filePath) ) {
 			return *resolvedPath;
 		} else {
-			return getPathFromSystemId(rawPath);
+			return *filePath;
 		}
 	} else {
 		return getPathFromSystemId(rawPath);
