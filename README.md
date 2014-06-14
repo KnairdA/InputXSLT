@@ -28,7 +28,7 @@ The `test` directory contains black-box test cases for every external function p
 
 - CMake
 - C++ compiler with C++11 support
-- Apache [Xalan](https://xalan.apache.org/) XSLT Processor
+- Apache [Xalan](https://xalan.apache.org/) XSLT Processor (preferably built with ICU flags)
 - Apache [Xerces](https://xerces.apache.org/) XML Library
 - Boost [Filesystem](http://www.boost.org/doc/libs/1_55_0/libs/filesystem/doc/index.htm)
 - Boost [Program Options](http://www.boost.org/doc/libs/1_55_0/doc/html/program_options.html)

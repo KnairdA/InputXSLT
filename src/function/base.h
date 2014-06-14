@@ -90,7 +90,7 @@ class FunctionBase : public xalan::Function {
 			return result;
 		}
 
-		template <unsigned... Index>
+		template <std::size_t... Index>
 		inline xalan::XalanDocument* callConstructDocument(
 			const XObjectArgVectorType& parameters,
 			const xalan::Locator* locator,
