@@ -1,9 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<test_case>&lt;?xml version="1.0"?&gt;
-&lt;tester&gt;
-	&lt;eintrag&gt;Hello 1&lt;/eintrag&gt;
-	&lt;eintrag&gt;Hello 2&lt;/eintrag&gt;
-	&lt;eintrag&gt;Hello 3&lt;/eintrag&gt;
-	&lt;eintrag&gt;Hello 4&lt;/eintrag&gt;
-&lt;/tester&gt;
+<test_case># Markdown Test
+
+__Lorem ipsum__ dolor sit amet, _consectetur_ adipisicing elit, sed do `eiusmod` tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+
+&gt; Duis aute irure dolor in reprehenderit in voluptate
+&gt; velit esse cillum dolore eu fugiat nulla pariatur.
+
+Excepteur sint **occaecat** cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+* Test 1
+* Test 2
+* Test 3
+* Test 4
+
+Test Test Test
+
+	template &lt;
+		typename Target,
+		std::size_t Index = 0,
+		typename Current  = std::tuple&lt;&gt;,
+		enable_if&lt;Index == std::tuple_size&lt;Target&gt;::value&gt; = 0
+	&gt;
+	inline Target construct(
+		const xalan::XPathExecutionContext::XObjectArgVectorType&amp;,
+		Current&amp;&amp; current
+	) {
+		return current;
+	}
 </test_case>

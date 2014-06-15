@@ -7,7 +7,6 @@
 
 #include "common.h"
 #include "function/read_file.h"
-#include "function/read_xml_file.h"
 #include "function/read_directory.h"
 #include "function/transform.h"
 #include "function/external_text_formatter.h"
@@ -27,12 +26,6 @@ PlattformGuard::PlattformGuard(const std::vector<std::string>& path):
 		customNamespace,
 		xalan::XalanDOMString("read-file"),
 		InputXSLT::FunctionReadFile(&this->include_resolver_)
-	);
-
-	xalan::XalanTransformer::installExternalFunctionGlobal(
-		customNamespace,
-		xalan::XalanDOMString("read-xml-file"),
-		InputXSLT::FunctionReadXmlFile(&this->include_resolver_)
 	);
 
 	xalan::XalanTransformer::installExternalFunctionGlobal(

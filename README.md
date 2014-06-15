@@ -8,8 +8,7 @@ Contrary to popular opinion I actually like XSLT as a content transformation lan
 
 ## Current features:
 
-- external `read-file` function for read-only access to text files
-- external `read-xml-file` function for read-only access to XML files
+- external `read-file` function for read-only access to both plain and xml files
 - external `read-directory` function for read-only directory traversal
 - external `transform` function for executing transformations inside transformations
 - external `external-text-formatter` function for executing text formatters and capturing their XML output
@@ -18,8 +17,8 @@ Contrary to popular opinion I actually like XSLT as a content transformation lan
 
 The `test` directory contains black-box test cases for every external function provided by this application which may be used as basic usage examples.
 
-- [`InputXSLT:read-file`](test/read_file/transformation.xsl)
-- [`InputXSLT:read-xml-file`](test/read_xml_file/transformation.xsl)
+- [`InputXSLT:read-file` (plain)](test/read_file/transformation.xsl)
+- [`InputXSLT:read-file` (xml)](test/read_xml_file/transformation.xsl)
 - [`InputXSLT:read-directory`](test/read_directory/transformation.xsl)
 - [`InputXSLT:transform`](test/transform/transformation.xsl)
 - [`InputXSLT:external-text-formatter`](test/external_text_formatter/transformation.xsl) (requires [markdown.pl](http://daringfireball.net/projects/markdown/))

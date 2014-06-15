@@ -10,7 +10,7 @@
 <xsl:import href="[testcase.xsl]"/>
 
 <xsl:template name="implementation">
-	<xsl:variable name="result" select="InputXSLT:read-file('test.txt')"/>
+	<xsl:variable name="result" select="InputXSLT:read-file('test.md')"/>
 
 	<xsl:choose>
 		<xsl:when test="$result/self::file/@result = 'success'">

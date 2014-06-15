@@ -40,7 +40,7 @@
 	<xsl:choose>
 		<xsl:when test="xalan:nodeset($result)/transformation/@result = 'success'">
 			<xsl:copy-of select="
-				InputXSLT:read-xml-file('test_actual.xml')/test_case/transform_test/*
+				InputXSLT:read-file('test_actual.xml')/test_case/transform_test/*
 			"/>
 		</xsl:when>
 		<xsl:otherwise>
