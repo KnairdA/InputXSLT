@@ -14,7 +14,8 @@
 namespace {
 
 inline bool isXmlFile(const boost::filesystem::path& filePath) {
-	return filePath.extension() == ".xml";
+	return filePath.extension() == ".xml" ||
+	       filePath.extension() == ".xsl";
 }
 
 inline xercesc::DOMNode* readXmlFile(

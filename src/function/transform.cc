@@ -30,7 +30,7 @@ namespace InputXSLT {
 
 xercesc::DOMDocument* FunctionTransform::constructDocument(
 	const InputXSLT::FilesystemContext& fsContext,
-	std::string                         transformationPath,
+	xalan::XSLTInputSource              transformationSource,
 	std::string                         targetPath,
 	xalan::XObjectPtr                   parameterObject
 ) {
@@ -55,7 +55,7 @@ xercesc::DOMDocument* FunctionTransform::constructDocument(
 
 	if ( auto transformation = TransformationFacade::try_create(
 		handleErrors(result),
-		fsContext.resolve(transformationPath).string(),
+		transformationSource,
 		this->include_resolver_
 	) ) {
 		try {

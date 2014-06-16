@@ -17,7 +17,7 @@
 
 	<xsl:variable name="command">
 		InputXSLT:transform(
-			$transformation,
+			string($transformation),
 			$target,
 			xalan:nodeset($parameters)
 		)

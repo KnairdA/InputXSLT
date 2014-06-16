@@ -26,10 +26,17 @@ class TransformationFacade {
 			Arguments&&...
 		);
 
-		TransformationFacade(const std::string&, IncludeEntityResolver*);
+		template<typename... Arguments>
+		TransformationFacade(Arguments&&..., IncludeEntityResolver*);
+
 		TransformationFacade(
-			const std::string&,
-			const std::string&,
+			xalan::XSLTInputSource,
+			IncludeEntityResolver*
+		);
+
+		TransformationFacade(
+			xalan::XSLTInputSource,
+			xalan::XSLTInputSource,
 			IncludeEntityResolver*
 		);
 
@@ -78,6 +85,16 @@ auto TransformationFacade::try_create(
 		return ptr();
 	}
 }
+
+template <typename... Arguments>
+TransformationFacade::TransformationFacade(
+	Arguments&&... arguments,
+	IncludeEntityResolver* resolver
+):
+	TransformationFacade(
+		xalan::XSLTInputSource(std::forward<Arguments>(arguments))...,
+		resolver
+	) { }
 
 template <typename Target>
 void TransformationFacade::generate(Target& target) {

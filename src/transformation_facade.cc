@@ -7,21 +7,12 @@
 
 #include <sstream>
 
+#include "support/xerces_string_guard.h"
+
 namespace InputXSLT {
 
 TransformationFacade::TransformationFacade(
-	const std::string& transformation,
-	IncludeEntityResolver* resolver
-):
-	TransformationFacade(
-		std::string{},
-		transformation,
-		resolver
-	) { }
-
-TransformationFacade::TransformationFacade(
-	const std::string& input,
-	const std::string& transformation,
+	xalan::XSLTInputSource transformation,
 	IncludeEntityResolver* resolver
 ):
 	input_{},
@@ -33,22 +24,42 @@ TransformationFacade::TransformationFacade(
 
 	ErrorCapacitor errorCapacitor(&this->error_multiplexer_);
 
-	if ( input.empty() ) {
-		std::stringstream dummyStream("<dummy/>");
+	std::stringstream dummyStream("<dummy/>");
 
-		this->transformer_.parseSource(
-			xalan::XSLTInputSource(dummyStream),
-			this->input_
-		);
-	} else {
-		this->transformer_.parseSource(
-			xalan::XSLTInputSource(input.data()),
-			this->input_
-		);
-	}
+	this->transformer_.parseSource(
+		xalan::XSLTInputSource(dummyStream),
+		this->input_
+	);
 
 	this->transformer_.compileStylesheet(
-		xalan::XSLTInputSource(transformation.data()),
+		transformation,
+		this->transformation_
+	);
+
+	errorCapacitor.discharge();
+}
+
+TransformationFacade::TransformationFacade(
+	xalan::XSLTInputSource input,
+	xalan::XSLTInputSource transformation,
+	IncludeEntityResolver* resolver
+):
+	input_{},
+	transformation_{},
+	transformer_(),
+	error_multiplexer_(&transformer_),
+	warning_capacitor_(&error_multiplexer_) {
+	this->transformer_.setEntityResolver(resolver);
+
+	ErrorCapacitor errorCapacitor(&this->error_multiplexer_);
+
+	this->transformer_.parseSource(
+		input,
+		this->input_
+	);
+
+	this->transformer_.compileStylesheet(
+		transformation,
 		this->transformation_
 	);
 

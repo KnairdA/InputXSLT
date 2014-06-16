@@ -100,14 +100,14 @@ bool process(const boost::program_options::variables_map& variables) {
 	if ( variables.count("input") ) {
 		transformation = InputXSLT::TransformationFacade::try_create(
 			handleErrors,
-			variables["input"].as<std::string>(),
-			variables["transformation"].as<std::string>(),
+			variables["input"].as<std::string>().data(),
+			variables["transformation"].as<std::string>().data(),
 			plattform.getEntityResolver()
 		);
 	} else {
 		transformation = InputXSLT::TransformationFacade::try_create(
 			handleErrors,
-			variables["transformation"].as<std::string>(),
+			variables["transformation"].as<std::string>().data(),
 			plattform.getEntityResolver()
 		);
 	}
