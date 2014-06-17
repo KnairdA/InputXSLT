@@ -96,16 +96,18 @@ class FunctionBase : public xalan::Function {
 			const xalan::Locator* locator,
 			Sequence<Index...>
 		) const {
+			XObjectValue valueGetter(
+				this->include_resolver_->resolve(
+					locator->getSystemId()
+				),
+				this->include_resolver_
+			);
+
 			return this->document_cache_->create(
 				static_cast<Implementation*>(
 					const_cast<FunctionBase*>(this)
 				)->constructDocument(
-					FilesystemContext(
-						this->include_resolver_->resolve(
-							locator->getSystemId()
-						)
-					),
-					XObjectValue::get<typename std::tuple_element<
+					valueGetter.get<typename std::tuple_element<
 						Index,
 						std::tuple<Types...>
 					>::type>(parameters[Index])...

@@ -29,10 +29,9 @@ inline std::function<void(const ErrorCapacitor::error_cache&)> handleErrors(
 namespace InputXSLT {
 
 xercesc::DOMDocument* FunctionTransform::constructDocument(
-	const InputXSLT::FilesystemContext& fsContext,
-	xalan::XSLTInputSource              transformationSource,
-	std::string                         targetPath,
-	xalan::XObjectPtr                   parameterObject
+	xalan::XSLTInputSource  transformationSource,
+	boost::filesystem::path targetPath,
+	xalan::XObjectPtr       parameterObject
 ) {
 	xercesc::DOMDocument* const domDocument(
 		xercesc::DOMImplementation::getImplementation()->createDocument(
@@ -50,7 +49,7 @@ xercesc::DOMDocument* FunctionTransform::constructDocument(
 
 	result.setAttribute(
 		"target",
-		boost::filesystem::path(targetPath).filename().string()
+		targetPath.filename().string()
 	);
 
 	if ( auto transformation = TransformationFacade::try_create(
@@ -60,7 +59,7 @@ xercesc::DOMDocument* FunctionTransform::constructDocument(
 	) ) {
 		try {
 			transformation->generate(
-				fsContext.resolve(targetPath).string(),
+				targetPath.string(),
 				parameterObject
 			);
 

@@ -10,13 +10,7 @@
 namespace InputXSLT {
 
 xercesc::DOMDocument* FunctionReadDirectory::constructDocument(
-	const InputXSLT::FilesystemContext& fsContext,
-	std::string path
-) {
-	const boost::filesystem::path directoryPath(
-		fsContext.resolve(path)
-	);
-
+	boost::filesystem::path directoryPath) {
 	xercesc::DOMDocument* const domDocument(
 		xercesc::DOMImplementation::getImplementation()->createDocument(
 			nullptr,
@@ -37,7 +31,7 @@ xercesc::DOMDocument* FunctionReadDirectory::constructDocument(
 
 		xercesc::DOMNode* const resultNode = result.getNode();
 
-		fsContext.iterate(
+		FilesystemContext::iterate(
 			directoryPath,
 			[&domDocument, &resultNode](const boost::filesystem::path& p) {
 			ResultNodeFacade result(domDocument, resultNode, "entry");

@@ -4,52 +4,13 @@
 #include <iterator>
 
 #include "support/xalan_string.h"
-#include "support/xerces_string_guard.h"
 
 namespace InputXSLT {
-
-FilesystemContext::FilesystemContext(const boost::filesystem::path& path):
-	path_(boost::filesystem::canonical(
-		path.parent_path()
-	)) { }
-
-FilesystemContext::FilesystemContext(const std::string& path):
-	path_(boost::filesystem::canonical(path)) { }
-
-boost::filesystem::path FilesystemContext::resolve(
-	const std::string& path) const {
-	const boost::filesystem::path targetPath(path);
-
-	if ( targetPath.is_absolute() ) {
-		return targetPath;
-	} else {
-		return absolute(this->path_ / targetPath);
-	}
-}
-
-boost::filesystem::path FilesystemContext::resolve(
-	const xalan::XalanDOMString& path) const {
-	return this->resolve(toString(path));
-}
-
-void FilesystemContext::iterate(
-	const std::string& path,
-	const std::function<void(const boost::filesystem::path&)>& func
-) const {
-	this->iterate(this->resolve(path), func);
-}
-
-void FilesystemContext::iterate(
-	const xalan::XalanDOMString& path,
-	const std::function<void(const boost::filesystem::path&)>& func
-) const {
-	this->iterate(toString(path), func);
-}
 
 void FilesystemContext::iterate(
 	const boost::filesystem::path& directory,
 	const std::function<void(const boost::filesystem::path&)>& func
-) const {
+) {
 	std::vector<boost::filesystem::path> directoryItems;
 
 	std::copy_if(
@@ -72,6 +33,28 @@ void FilesystemContext::iterate(
 		directoryItems.end(),
 		func
 	);
+}
+
+FilesystemContext::FilesystemContext(const boost::filesystem::path& path):
+	path_(boost::filesystem::canonical(
+		path.parent_path()
+	)) { }
+
+FilesystemContext::FilesystemContext(const std::string& path):
+	path_(boost::filesystem::canonical(path)) { }
+
+boost::filesystem::path FilesystemContext::resolve(
+	const xalan::XalanDOMString& path) const {
+	return this->resolve(toString(path));
+}
+
+boost::filesystem::path FilesystemContext::resolve(
+	const boost::filesystem::path& path) const {
+	if ( path.is_absolute() ) {
+		return path;
+	} else {
+		return absolute(this->path_ / path);
+	}
 }
 
 }

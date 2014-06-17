@@ -49,18 +49,7 @@ inline std::string readPlainFile(const boost::filesystem::path& filePath) {
 namespace InputXSLT {
 
 xercesc::DOMDocument* FunctionReadFile::constructDocument(
-	const FilesystemContext& fsContext,
-	std::string rawPath
-) {
-	boost::filesystem::path filePath(fsContext.resolve(rawPath));
-
-	if ( !(boost::filesystem::exists(filePath) &&
-	       boost::filesystem::is_regular_file(filePath)) ) {
-		if ( auto resolvedPath = this->include_resolver_->resolve(rawPath) ) {
-			filePath = *resolvedPath;
-		}
-	}
-
+	boost::filesystem::path filePath) {
 	xercesc::DOMDocument* const domDocument(
 		xercesc::DOMImplementation::getImplementation()->createDocument(
 			nullptr,

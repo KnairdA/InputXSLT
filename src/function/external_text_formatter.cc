@@ -43,7 +43,6 @@ inline xercesc::DOMNode* importDocumentElement(
 namespace InputXSLT {
 
 xercesc::DOMDocument* FunctionExternalTextFormatter::constructDocument(
-	const InputXSLT::FilesystemContext&,
 	std::string formatterPath,
 	std::string stdinText
 ) {

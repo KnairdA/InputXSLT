@@ -4,13 +4,26 @@
 #include <xalanc/XPath/XObject.hpp>
 
 #include "common.h"
+#include "support/filesystem_context.h"
+#include "support/include_entity_resolver.h"
 
 namespace InputXSLT {
 
-namespace XObjectValue {
-	template <typename Type>
-	Type get(const xalan::XObjectPtr&);
-}
+class XObjectValue {
+	public:
+		XObjectValue(
+			const boost::filesystem::path&,
+			const IncludeEntityResolver*
+		);
+
+		template <typename Type>
+		Type get(const xalan::XObjectPtr&) const;
+
+	private:
+		const FilesystemContext filesystem_context_;
+		const IncludeEntityResolver* const include_resolver_;
+
+};
 
 }
 

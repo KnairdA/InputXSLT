@@ -1,13 +1,15 @@
 #ifndef INPUTXSLT_SRC_FUNCTION_READ_FILE_H_
 #define INPUTXSLT_SRC_FUNCTION_READ_FILE_H_
 
+#include "boost/filesystem.hpp"
+
 #include "base.h"
 
 namespace InputXSLT {
 
 class FunctionReadFile : public FunctionBase<
 	FunctionReadFile,
-	std::string
+	boost::filesystem::path
 > {
 	public:
 		using FunctionBase::FunctionBase;
@@ -15,10 +17,7 @@ class FunctionReadFile : public FunctionBase<
 	protected:
 		friend FunctionBase;
 
-		xercesc::DOMDocument* constructDocument(
-			const FilesystemContext&,
-			std::string
-		);
+		xercesc::DOMDocument* constructDocument(boost::filesystem::path);
 
 };
 

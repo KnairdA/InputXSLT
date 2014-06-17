@@ -3,6 +3,8 @@
 
 #include <xalanc/XSLT/XSLTInputSource.hpp>
 
+#include "boost/filesystem.hpp"
+
 #include "base.h"
 
 namespace InputXSLT {
@@ -10,7 +12,7 @@ namespace InputXSLT {
 class FunctionTransform : public FunctionBase<
 	FunctionTransform,
 	xalan::XSLTInputSource,
-	std::string,
+	boost::filesystem::path,
 	xalan::XObjectPtr
 > {
 	public:
@@ -20,9 +22,8 @@ class FunctionTransform : public FunctionBase<
 		friend FunctionBase;
 
 		xercesc::DOMDocument* constructDocument(
-			const FilesystemContext&,
 			xalan::XSLTInputSource,
-			std::string,
+			boost::filesystem::path,
 			xalan::XObjectPtr
 		);
 

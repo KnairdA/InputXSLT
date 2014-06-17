@@ -71,7 +71,7 @@ boost::filesystem::path IncludeEntityResolver::resolve(
 }
 
 boost::optional<boost::filesystem::path> IncludeEntityResolver::resolve(
-	const std::string& filePath) const {
+	const boost::filesystem::path& filePath) const {
 	for ( auto&& context : this->path_ ) {
 		const boost::filesystem::path resolvedPath(
 			context.resolve(filePath)
