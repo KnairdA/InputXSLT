@@ -28,23 +28,14 @@ std::string XObjectValue::get<std::string>(
 template <>
 boost::filesystem::path XObjectValue::get<boost::filesystem::path>(
 	const xalan::XObjectPtr& ptr) const {
-	const boost::filesystem::path rawPath(
-		toString(ptr->str())
+	const std::string rawPath(
+		this->get<std::string>(ptr)
 	);
 
-	const boost::filesystem::path filePath(
-		this->filesystem_context_.resolve(rawPath)
-	);
-
-	if ( !(boost::filesystem::exists(filePath) &&
-		   boost::filesystem::is_regular_file(filePath)) ) {
-		if ( auto resolvedPath = this->include_resolver_->resolve(rawPath) ) {
-			return *resolvedPath;
-		} else {
-			return filePath;
-		}
+	if ( auto resolvedPath = this->include_resolver_->resolve(rawPath) ) {
+		return *resolvedPath;
 	} else {
-		return filePath;
+		return this->filesystem_context_.resolve(rawPath);
 	}
 }
 

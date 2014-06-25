@@ -15,6 +15,8 @@ namespace InputXSLT {
 
 class IncludeEntityResolver : public xercesc::EntityResolver {
 	public:
+		static boost::filesystem::path getPathFromSystemId(const XMLCh* const);
+
 		IncludeEntityResolver(const std::vector<std::string>&);
 
 		xercesc::InputSource* resolveEntity(
@@ -22,13 +24,15 @@ class IncludeEntityResolver : public xercesc::EntityResolver {
 			const XMLCh* const
 		);
 
-		boost::filesystem::path resolve(
-			const XMLCh* const) const;
 		boost::optional<boost::filesystem::path> resolve(
-			const boost::filesystem::path&) const;
+			const std::string&) const;
 
 	private:
 		const std::vector<FilesystemContext> path_;
+
+		boost::optional<boost::filesystem::path> tryIncludePaths(
+			const boost::filesystem::path&) const;
+
 
 };
 

@@ -97,7 +97,7 @@ class FunctionBase : public xalan::Function {
 			Sequence<Index...>
 		) const {
 			XObjectValue valueGetter(
-				this->include_resolver_->resolve(
+				IncludeEntityResolver::getPathFromSystemId(
 					locator->getSystemId()
 				),
 				this->include_resolver_

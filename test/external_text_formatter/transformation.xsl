@@ -26,7 +26,7 @@
 <xsl:template name="implementation">
 	<xsl:variable name="result">
 		<xsl:call-template name="formatter">
-			<xsl:with-param name="source" select="InputXSLT:read-file('test.md')"/>
+			<xsl:with-param name="source" select="InputXSLT:read-file('[test.md]')"/>
 		</xsl:call-template>
 	</xsl:variable>
 
