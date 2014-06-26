@@ -4,6 +4,8 @@
 #include <xercesc/dom/DOMImplementation.hpp>
 #include <xercesc/dom/DOMElement.hpp>
 
+#include <sstream>
+
 #include "transformation_facade.h"
 #include "support/xerces_string_guard.h"
 #include "support/dom/result_node_facade.h"
@@ -30,7 +32,6 @@ namespace InputXSLT {
 
 xercesc::DOMDocument* FunctionTransform::constructDocument(
 	xalan::XSLTInputSource  transformationSource,
-	boost::filesystem::path targetPath,
 	xalan::XObjectPtr       parameterObject
 ) {
 	xercesc::DOMDocument* const domDocument(
@@ -47,20 +48,21 @@ xercesc::DOMDocument* FunctionTransform::constructDocument(
 
 	ResultNodeFacade result(domDocument, rootNode, "transformation");
 
-	result.setAttribute(
-		"target",
-		targetPath.filename().string()
-	);
-
 	if ( auto transformation = TransformationFacade::try_create(
 		handleErrors(result),
 		transformationSource,
 		this->include_resolver_
 	) ) {
 		try {
+			std::stringstream targetStream;
+
 			transformation->generate(
-				targetPath.string(),
+				targetStream,
 				parameterObject
+			);
+
+			result.setContent(
+				targetStream.str()
 			);
 
 			result.setAttribute("result", "success");

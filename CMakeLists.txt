@@ -25,6 +25,7 @@ set(
 	src/plattform_guard.cc
 	src/transformation_facade.cc
 	src/function/read_file.cc
+	src/function/write_file.cc
 	src/function/read_directory.cc
 	src/function/transform.cc
 	src/function/external_text_formatter.cc

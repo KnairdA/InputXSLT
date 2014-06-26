@@ -6,7 +6,8 @@
 #include <xercesc/parsers/XercesDOMParser.hpp>
 #include <xercesc/framework/LocalFileInputSource.hpp>
 
-#include "boost/filesystem/fstream.hpp"
+#include <boost/optional.hpp>
+#include <boost/filesystem/fstream.hpp>
 
 #include "support/xerces_string_guard.h"
 #include "support/dom/result_node_facade.h"
@@ -18,7 +19,7 @@ inline bool isXmlFile(const boost::filesystem::path& filePath) {
 	       filePath.extension() == ".xsl";
 }
 
-inline xercesc::DOMNode* readXmlFile(
+boost::optional<xercesc::DOMNode*> readXmlFile(
 	const boost::filesystem::path& filePath,
 	xercesc::DOMDocument* const domDocument
 ) {
@@ -29,19 +30,32 @@ inline xercesc::DOMNode* readXmlFile(
 	xercesc::XercesDOMParser parser;
 	parser.parse(file);
 
-	return domDocument->importNode(
-		parser.getDocument()->getDocumentElement(),
-		true
-	);
+	if ( parser.getErrorCount() == 0 ) {
+		return boost::make_optional(
+			domDocument->importNode(
+				parser.getDocument()->getDocumentElement(),
+				true
+			)
+		);
+	} else {
+		return boost::optional<xercesc::DOMNode*>();
+	}
 }
 
-inline std::string readPlainFile(const boost::filesystem::path& filePath) {
+boost::optional<std::string> readPlainFile(
+	const boost::filesystem::path& filePath) {
 	boost::filesystem::ifstream file(filePath);
 
-	return std::string(
-		(std::istreambuf_iterator<char>(file)),
-		(std::istreambuf_iterator<char>())
-	);
+	if ( file.is_open() ) {
+		return boost::make_optional(
+			std::string(
+				(std::istreambuf_iterator<char>(file)),
+				(std::istreambuf_iterator<char>())
+			)
+		);
+	} else {
+		return boost::optional<std::string>();
+	}
 }
 
 }
@@ -70,18 +84,26 @@ xercesc::DOMDocument* FunctionReadFile::constructDocument(
 			if ( isXmlFile(filePath) ) {
 				result.setAttribute("type", "xml");
 
-				result.setContent(
-					readXmlFile(filePath.string(), domDocument)
-				);
+				if ( auto importedNode = readXmlFile(filePath, domDocument) ) {
+					result.setContent(*importedNode);
+
+					result.setAttribute("result", "success");
+				} else {
+					result.setAttribute("result", "error");
+				}
 			} else {
 				result.setAttribute("type", "plain");
 
-				result.setContent(
-					readPlainFile(filePath)
-				);
-			}
+				if ( auto plainContent = readPlainFile(filePath) ) {
+					result.setContent(*plainContent);
 
-			result.setAttribute("result", "success");
+					result.setAttribute("result", "success");
+				} else {
+					result.setAttribute("result", "error");
+				}
+
+				result.setAttribute("result", "success");
+			}
 		}
 		catch ( const xercesc::DOMException& exception ) {
 			result.setAttribute("result", "error");

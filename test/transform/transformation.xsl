@@ -12,23 +12,63 @@
 
 <xsl:template name="transformer">
 	<xsl:param name="transformation"/>
+	<xsl:param name="parameters"/>
+
+	<xsl:variable name="stylesheet" select="
+		InputXSLT:read-file(string($transformation))
+	"/>
+
+	<xsl:choose>
+		<xsl:when test="$stylesheet/self::file/@result = 'success'">
+			<transformation result="success">
+				<xsl:copy-of select="
+					InputXSLT:transform(
+						$stylesheet/self::file/*,
+						xalan:nodeset($parameters)
+					)/self::transformation/text()
+				"/>
+			</transformation>
+		</xsl:when>
+		<xsl:otherwise>
+			<transformation result="error">
+				<xsl:copy-of select="$stylesheet/self::file/*"/>
+			</transformation>
+		</xsl:otherwise>
+	</xsl:choose>
+</xsl:template>
+
+<xsl:template name="generator">
+	<xsl:param name="transformation"/>
 	<xsl:param name="target"/>
 	<xsl:param name="parameters"/>
 
-	<xsl:variable name="command">
-		InputXSLT:transform(
-			string($transformation),
-			string($target),
-			xalan:nodeset($parameters)
-		)
+	<xsl:variable name="result">
+		<xsl:call-template name="transformer">
+			<xsl:with-param name="transformation" select="$transformation"/>
+			<xsl:with-param name="parameters" select="$parameters"/>
+		</xsl:call-template>
 	</xsl:variable>
 
-	<xsl:copy-of select="dyn:evaluate($command)"/>
+	<xsl:choose>
+		<xsl:when test="xalan:nodeset($result)/transformation/@result = 'success'">
+			<xsl:variable name="writeResult" select="
+				InputXSLT:write-file(
+					string($target),
+					xalan:nodeset($result)/transformation/text()
+				)
+			"/>
+
+			<transformation result="success" target="{$target}"/>
+		</xsl:when>
+		<xsl:otherwise>
+			<transformation result="error" target="{$target}"/>
+		</xsl:otherwise>
+	</xsl:choose>
 </xsl:template>
 
 <xsl:template name="implementation">
 	<xsl:variable name="result">
-		<xsl:call-template name="transformer">
+		<xsl:call-template name="generator">
 			<xsl:with-param name="transformation">test.xsl</xsl:with-param>
 			<xsl:with-param name="target">test_actual.xml</xsl:with-param>
 			<xsl:with-param name="parameters">
