@@ -14,9 +14,7 @@
 	<xsl:param name="transformation"/>
 	<xsl:param name="parameters"/>
 
-	<xsl:variable name="stylesheet" select="
-		InputXSLT:read-file(string($transformation))
-	"/>
+	<xsl:variable name="stylesheet" select="InputXSLT:read-file($transformation)"/>
 
 	<xsl:choose>
 		<xsl:when test="$stylesheet/self::file/@result = 'success'">
@@ -53,15 +51,15 @@
 		<xsl:when test="xalan:nodeset($result)/transformation/@result = 'success'">
 			<xsl:variable name="writeResult" select="
 				InputXSLT:write-file(
-					string($target),
+					$target,
 					xalan:nodeset($result)/transformation/text()
 				)
 			"/>
 
-			<transformation result="success" target="{$target}"/>
+			<generator result="success" target="{$target}"/>
 		</xsl:when>
 		<xsl:otherwise>
-			<transformation result="error" target="{$target}"/>
+			<generator result="error" target="{$target}"/>
 		</xsl:otherwise>
 	</xsl:choose>
 </xsl:template>
@@ -78,13 +76,13 @@
 	</xsl:variable>
 
 	<xsl:choose>
-		<xsl:when test="xalan:nodeset($result)/transformation/@result = 'success'">
+		<xsl:when test="xalan:nodeset($result)/generator/@result = 'success'">
 			<xsl:copy-of select="
 				InputXSLT:read-file('test_actual.xml')/test_case/transform_test/*
 			"/>
 		</xsl:when>
 		<xsl:otherwise>
-			<xsl:copy-of select="xalan:nodeset($result)/transformation/*"/>
+			<xsl:copy-of select="xalan:nodeset($result)/generator/*"/>
 		</xsl:otherwise>
 	</xsl:choose>
 </xsl:template>

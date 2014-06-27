@@ -28,4 +28,7 @@
 <item type="directory">
 <name>transform</name>
 </item>
+<item type="directory">
+<name>write_file</name>
+</item>
 </test_case>
