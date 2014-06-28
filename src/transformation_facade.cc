@@ -66,16 +66,6 @@ TransformationFacade::TransformationFacade(
 	errorCapacitor.discharge();
 }
 
-TransformationFacade::~TransformationFacade() {
-	this->transformer_.destroyParsedSource(
-		this->input_
-	);
-
-	this->transformer_.destroyStylesheet(
-		this->transformation_
-	);
-}
-
 WarningCapacitor::warning_cache_ptr TransformationFacade::getCachedWarnings() {
 	return this->warning_capacitor_.discharge();
 }

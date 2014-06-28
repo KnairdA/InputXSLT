@@ -20,6 +20,8 @@ class TransformationFacade {
 	public:
 		typedef std::unique_ptr<TransformationFacade> ptr;
 
+		class input;
+
 		template <typename... Arguments>
 		static ptr try_create(
 			const std::function<void(const ErrorCapacitor::error_cache&)>&,
@@ -39,8 +41,6 @@ class TransformationFacade {
 			xalan::XSLTInputSource,
 			IncludeEntityResolver*
 		);
-
-		~TransformationFacade();
 
 		template <typename Target>
 		void generate(Target&);
