@@ -12,6 +12,7 @@ namespace InputXSLT {
 class FunctionTransform : public FunctionBase<
 	FunctionTransform,
 	xalan::XSLTInputSource,
+	xalan::XSLTInputSource,
 	xalan::XObjectPtr
 > {
 	public:
@@ -21,6 +22,7 @@ class FunctionTransform : public FunctionBase<
 		friend FunctionBase;
 
 		xercesc::DOMDocument* constructDocument(
+			xalan::XSLTInputSource,
 			xalan::XSLTInputSource,
 			xalan::XObjectPtr
 		);

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
-<tester>
-	<eintrag>Hello 1</eintrag>
-	<eintrag>Hello 2</eintrag>
-	<eintrag>Hello 3</eintrag>
-	<eintrag>Hello 4</eintrag>
-</tester>
+<test>
+	<entry>Hello 1</entry>
+	<entry>Hello 2</entry>
+	<entry>Hello 3</entry>
+	<entry>Hello 4</entry>
+</test>

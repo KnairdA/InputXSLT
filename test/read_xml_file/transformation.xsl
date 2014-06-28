@@ -14,7 +14,7 @@
 
 	<xsl:choose>
 		<xsl:when test="$result/self::file/@result = 'success'">
-			<xsl:for-each select="$result/self::file/tester/eintrag">
+			<xsl:for-each select="$result/self::file/test/entry">
 				<item><xsl:value-of select="."/></item>
 			</xsl:for-each>
 		</xsl:when>

@@ -31,6 +31,7 @@ inline std::function<void(const ErrorCapacitor::error_cache&)> handleErrors(
 namespace InputXSLT {
 
 xercesc::DOMDocument* FunctionTransform::constructDocument(
+	xalan::XSLTInputSource  inputSource,
 	xalan::XSLTInputSource  transformationSource,
 	xalan::XObjectPtr       parameterObject
 ) {
@@ -50,6 +51,7 @@ xercesc::DOMDocument* FunctionTransform::constructDocument(
 
 	if ( auto transformation = TransformationFacade::try_create(
 		handleErrors(result),
+		inputSource,
 		transformationSource,
 		this->include_resolver_
 	) ) {
