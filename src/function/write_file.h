@@ -8,7 +8,7 @@ namespace InputXSLT {
 class FunctionWriteFile : public FunctionBase<
 	FunctionWriteFile,
 	boost::filesystem::path,
-	std::string
+	xalan::XalanNode*
 > {
 	public:
 		using FunctionBase::FunctionBase;
@@ -18,7 +18,7 @@ class FunctionWriteFile : public FunctionBase<
 
 		xercesc::DOMDocument* constructDocument(
 			boost::filesystem::path,
-			std::string
+			xalan::XalanNode* const
 		);
 
 };

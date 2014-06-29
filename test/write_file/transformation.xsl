@@ -10,12 +10,17 @@
 <xsl:import href="[testcase.xsl]"/>
 
 <xsl:template name="implementation">
-	<xsl:variable name="result" select="InputXSLT:write-file('test.txt', 'Hello world!')"/>
-	<xsl:variable name="content" select="InputXSLT:read-file('test.txt')"/>
+	<xsl:variable name="testContent">
+		<content>
+			<entry>Hello world!</entry>
+		</content>
+	</xsl:variable>
+	<xsl:variable name="result" select="InputXSLT:write-file('test.xml', $testContent)"/>
+	<xsl:variable name="actualContent" select="InputXSLT:read-file('test.xml')"/>
 
 	<xsl:choose>
-		<xsl:when test="$content/self::file/@result = 'success'">
-			<xsl:value-of select="$content/self::file/text()"/>
+		<xsl:when test="$actualContent/self::file/@result = 'success'">
+			<xsl:value-of select="$actualContent/self::file/content/entry"/>
 		</xsl:when>
 		<xsl:otherwise>
 			Error during file io

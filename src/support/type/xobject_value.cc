@@ -46,24 +46,34 @@ xalan::XObjectPtr XObjectValue::get<xalan::XObjectPtr>(
 }
 
 template <>
-xalan::XSLTInputSource XObjectValue::get<xalan::XSLTInputSource>(
+xalan::XalanNode* XObjectValue::get<xalan::XalanNode*>(
 	const xalan::XObjectPtr& ptr) const {
 	switch ( ptr->getType() ) {
 		case xalan::XObject::eObjectType::eTypeNodeSet: {
-			return xalan::XSLTInputSource(
-				ptr->nodeset().item(0)
-			);
+			return ptr->nodeset().item(0);
 		}
 		case xalan::XObject::eObjectType::eTypeResultTreeFrag: {
-			return xalan::XSLTInputSource(
-				ptr->rtree().getFirstChild()
-			);
+			return ptr->rtree().getFirstChild();
 		}
 		default: {
-			return xalan::XSLTInputSource(
-				this->get<boost::filesystem::path>(ptr).string().data()
-			);
+			return nullptr;
 		}
+	}
+}
+
+template <>
+xalan::XSLTInputSource XObjectValue::get<xalan::XSLTInputSource>(
+	const xalan::XObjectPtr& ptr) const {
+	xalan::XalanNode* const node(
+		this->get<xalan::XalanNode*>(ptr)
+	);
+
+	if ( node == nullptr ) {
+		return xalan::XSLTInputSource(
+			this->get<boost::filesystem::path>(ptr).string().data()
+		);
+	} else {
+		return xalan::XSLTInputSource(node);
 	}
 }
 

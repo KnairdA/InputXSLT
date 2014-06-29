@@ -1,5 +1,10 @@
 #include "write_file.h"
 
+#include <xalanc/PlatformSupport/XalanOutputStreamPrintWriter.hpp>
+#include <xalanc/PlatformSupport/XalanStdOutputStream.hpp>
+#include <xalanc/XMLSupport/FormatterToXML.hpp>
+#include <xalanc/XMLSupport/FormatterTreeWalker.hpp>
+
 #include <xercesc/dom/DOMDocument.hpp>
 #include <xercesc/dom/DOMImplementation.hpp>
 #include <xercesc/dom/DOMElement.hpp>
@@ -7,21 +12,47 @@
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 
+#include "support/xalan_string.h"
 #include "support/xerces_string_guard.h"
 #include "support/dom/result_node_facade.h"
 
 namespace {
 
-bool writeFile(
+bool serializeNodeToFile(
 	const boost::filesystem::path& filePath,
-	const std::string&             content
+	xalan::XalanNode* const        contentNode
 ) {
-	boost::filesystem::ofstream file(filePath);
+	const xalan::XalanNode::NodeType contentType(
+		contentNode->getNodeType()
+	);
 
-	if ( file.is_open() ) {
-		file << content << std::endl;
+	if ( contentType != xalan::XalanNode::DOCUMENT_NODE &&
+	     contentType != xalan::XalanNode::ATTRIBUTE_NODE ) {
+		boost::filesystem::ofstream file(filePath);
 
-		return true;
+		if ( file.is_open() ) {
+			if ( contentType == xalan::XalanNode::TEXT_NODE ) {
+				file << InputXSLT::toString(contentNode->getNodeValue());
+			} else {
+				xalan::XalanStdOutputStream outputStream(file);
+				xalan::XalanOutputStreamPrintWriter outputWriter(outputStream);
+
+				xalan::FormatterToXML formatter(outputWriter);
+				xalan::FormatterTreeWalker walker(formatter);
+
+				formatter.startDocument();
+
+				walker.traverseSubtree(contentNode);
+
+				formatter.endDocument();
+			}
+
+			file << std::endl;
+
+			return true;
+		} else {
+			return false;
+		}
 	} else {
 		return false;
 	}
@@ -33,7 +64,7 @@ namespace InputXSLT {
 
 xercesc::DOMDocument* FunctionWriteFile::constructDocument(
 	boost::filesystem::path filePath,
-	std::string             content
+	xalan::XalanNode* const contentNode
 ) {
 	xercesc::DOMDocument* const domDocument(
 		xercesc::DOMImplementation::getImplementation()->createDocument(
@@ -50,8 +81,12 @@ xercesc::DOMDocument* FunctionWriteFile::constructDocument(
 	ResultNodeFacade result(domDocument, rootNode, "file");
 	result.setAttribute("path", filePath.string());
 
-	if ( writeFile(filePath, content) ) {
-		result.setAttribute("result", "success");
+	if ( contentNode != nullptr ) {
+		if ( serializeNodeToFile(filePath, contentNode) ) {
+			result.setAttribute("result", "success");
+		} else {
+			result.setAttribute("result", "error");
+		}
 	} else {
 		result.setAttribute("result", "error");
 	}
