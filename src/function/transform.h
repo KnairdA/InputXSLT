@@ -3,8 +3,6 @@
 
 #include <xalanc/XSLT/XSLTInputSource.hpp>
 
-#include <boost/filesystem.hpp>
-
 #include "base.h"
 
 namespace InputXSLT {

@@ -43,8 +43,8 @@ inline xercesc::DOMNode* importDocumentElement(
 namespace InputXSLT {
 
 xercesc::DOMDocument* FunctionExternalTextFormatter::constructDocument(
-	std::string formatterPath,
-	std::string stdinText
+	boost::filesystem::path formatterPath,
+	std::string             stdinText
 ) {
 	xercesc::DOMDocument* const domDocument(
 		xercesc::DOMImplementation::getImplementation()->createDocument(
@@ -79,7 +79,7 @@ xercesc::DOMDocument* FunctionExternalTextFormatter::constructDocument(
 	boost::process::status status = formatterProcess.wait();
 
 	ResultNodeFacade result(domDocument, rootNode, "output");
-	result.setAttribute("formatter", formatterPath);
+	result.setAttribute("formatter", formatterPath.filename().string());
 	result.setAttribute("code",      std::to_string(status.exit_status()));
 
 	if ( status.exited() ) {

@@ -1,13 +1,15 @@
 #ifndef INPUTXSLT_SRC_FUNCTION_EXTERNAL_TEXT_FORMATTER_H_
 #define INPUTXSLT_SRC_FUNCTION_EXTERNAL_TEXT_FORMATTER_H_
 
+#include <boost/filesystem.hpp>
+
 #include "base.h"
 
 namespace InputXSLT {
 
 class FunctionExternalTextFormatter : public FunctionBase<
 	FunctionExternalTextFormatter,
-	std::string,
+	boost::filesystem::path,
 	std::string
 > {
 	public:
@@ -17,7 +19,7 @@ class FunctionExternalTextFormatter : public FunctionBase<
 		friend FunctionBase;
 
 		xercesc::DOMDocument* constructDocument(
-			std::string,
+			boost::filesystem::path,
 			std::string
 		);
 
