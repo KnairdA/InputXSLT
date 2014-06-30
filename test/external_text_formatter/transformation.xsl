@@ -11,22 +11,22 @@
 <xsl:import href="[testcase.xsl]"/>
 
 <xsl:template name="formatter">
-	<xsl:param name="source"/>
+	<xsl:param name="format"/>
+	<xsl:param name="file"/>
 
-	<xsl:variable name="command">
-		InputXSLT:external-text-formatter(
-			'/usr/bin/markdown',
-			$source
-		)
-	</xsl:variable>
+	<xsl:variable name="content" select="InputXSLT:read-file($file)/text()"/>
 
-	<xsl:copy-of select="dyn:evaluate($command)"/>
+	<xsl:copy-of select="InputXSLT:external-text-formatter(
+		$format,
+		$content
+	)"/>
 </xsl:template>
 
 <xsl:template name="implementation">
 	<xsl:variable name="result">
 		<xsl:call-template name="formatter">
-			<xsl:with-param name="source" select="InputXSLT:read-file('[test.md]')"/>
+			<xsl:with-param name="format">/usr/bin/markdown</xsl:with-param>
+			<xsl:with-param name="file">[test.md]</xsl:with-param>
 		</xsl:call-template>
 	</xsl:variable>
 
