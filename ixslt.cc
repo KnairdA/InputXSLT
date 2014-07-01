@@ -1,5 +1,6 @@
 #include "boost/optional.hpp"
 #include "boost/program_options.hpp"
+#include <boost/filesystem/fstream.hpp>
 
 #include <string>
 #include <vector>
@@ -117,9 +118,15 @@ bool process(const boost::program_options::variables_map& variables) {
 
 		try {
 			if ( variables.count("target") ) {
-				transformation->generate(
+				boost::filesystem::ofstream file(
 					variables["target"].as<std::string>()
 				);
+
+				if ( file.is_open() ) {
+					transformation->generate(file);
+				} else {
+					return false;
+				}
 			} else {
 				transformation->generate(std::cout);
 			}

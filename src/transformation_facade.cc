@@ -3,10 +3,6 @@
 #include <xalanc/XSLT/XSLTInputSource.hpp>
 #include <xalanc/XalanTransformer/XalanCompiledStylesheet.hpp>
 
-#include "boost/filesystem.hpp"
-
-#include <sstream>
-
 #include "support/xerces_string_guard.h"
 
 namespace InputXSLT {
@@ -70,39 +66,34 @@ WarningCapacitor::warning_cache_ptr TransformationFacade::getCachedWarnings() {
 	return this->warning_capacitor_.discharge();
 }
 
+void TransformationFacade::generate(std::basic_ostream<char>& targetStream) {
+	StylesheetParameterGuard guard(this->transformer_);
+
+	this->generate(targetStream, guard);
+}
+
 void TransformationFacade::generate(
-	const std::string& targetPath,
-	StylesheetParameterGuard& parameters
+	std::basic_ostream<char>&            targetStream,
+	const StylesheetParameterGuard::map& parameters
 ) {
-	const boost::filesystem::path targetPathHelper(
-		boost::filesystem::absolute(targetPath)
-	);
+	StylesheetParameterGuard guard(this->transformer_, parameters);
 
-	parameters.set(
-		"target-file",      targetPathHelper.filename().string()
-	);
-	parameters.set(
-		"parent-directory", targetPathHelper.parent_path().filename().string()
-	);
-
-	this->generate(
-		xalan::XSLTResultTarget(targetPath.data()),
-		parameters
-	);
+	this->generate(targetStream, guard);
 }
 
 void TransformationFacade::generate(
 	std::basic_ostream<char>& targetStream,
-	StylesheetParameterGuard& parameters
+	const xalan::XObjectPtr&  parameter
 ) {
-	this->generate(
-		xalan::XSLTResultTarget(targetStream),
-		parameters
-	);
+	StylesheetParameterGuard guard(this->transformer_);
+	guard.set("parameters", parameter);
+
+	this->generate(targetStream, guard);
 }
 
+
 void TransformationFacade::generate(
-	xalan::XSLTResultTarget&& outputTarget,
+	std::basic_ostream<char>& targetStream,
 	StylesheetParameterGuard&
 ) {
 	ErrorCapacitor errorCapacitor(&this->error_multiplexer_);
@@ -110,7 +101,7 @@ void TransformationFacade::generate(
 	this->transformer_.transform(
 		*(this->input_),
 		this->transformation_,
-		outputTarget
+		targetStream
 	);
 
 	errorCapacitor.discharge();

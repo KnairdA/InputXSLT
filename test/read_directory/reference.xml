@@ -11,9 +11,6 @@
 <name>common</name>
 </item>
 <item type="directory">
-<name>default_params</name>
-</item>
-<item type="directory">
 <name>external_text_formatter</name>
 </item>
 <item type="directory">

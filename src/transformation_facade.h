@@ -5,6 +5,7 @@
 
 #include <string>
 #include <memory>
+#include <sstream>
 #include <functional>
 
 #include "common.h"
@@ -26,9 +27,6 @@ class TransformationFacade {
 			Arguments&&...
 		);
 
-		template<typename... Arguments>
-		TransformationFacade(Arguments&&..., IncludeEntityResolver*);
-
 		TransformationFacade(
 			xalan::XSLTInputSource,
 			IncludeEntityResolver*
@@ -40,14 +38,9 @@ class TransformationFacade {
 			IncludeEntityResolver*
 		);
 
-		template <typename Target>
-		void generate(Target&);
-
-		template <typename Target>
-		void generate(Target&, const StylesheetParameterGuard::map&);
-
-		template <typename Target>
-		void generate(Target&, const xalan::XObjectPtr&);
+		void generate(std::basic_ostream<char>&);
+		void generate(std::basic_ostream<char>&, const StylesheetParameterGuard::map&);
+		void generate(std::basic_ostream<char>&, const xalan::XObjectPtr&);
 
 		WarningCapacitor::warning_cache_ptr getCachedWarnings();
 
@@ -59,9 +52,10 @@ class TransformationFacade {
 		ErrorMultiplexer error_multiplexer_;
 		WarningCapacitor warning_capacitor_;
 
-		void generate(const std::string&, StylesheetParameterGuard&);
-		void generate(std::basic_ostream<char>&, StylesheetParameterGuard&);
-		void generate(xalan::XSLTResultTarget&&, StylesheetParameterGuard&);
+		void generate(
+			std::basic_ostream<char>&,
+			StylesheetParameterGuard&
+		);
 
 };
 
@@ -82,44 +76,6 @@ auto TransformationFacade::try_create(
 
 		return ptr();
 	}
-}
-
-template <typename... Arguments>
-TransformationFacade::TransformationFacade(
-	Arguments&&... arguments,
-	IncludeEntityResolver* resolver
-):
-	TransformationFacade(
-		xalan::XSLTInputSource(std::forward<Arguments>(arguments))...,
-		resolver
-	) { }
-
-template <typename Target>
-void TransformationFacade::generate(Target& target) {
-	StylesheetParameterGuard guard(this->transformer_);
-
-	this->generate(target, guard);
-}
-
-template <typename Target>
-void TransformationFacade::generate(
-	Target& target,
-	const StylesheetParameterGuard::map& parameters
-) {
-	StylesheetParameterGuard guard(this->transformer_, parameters);
-
-	this->generate(target, guard);
-}
-
-template <typename Target>
-void TransformationFacade::generate(
-	Target& target,
-	const xalan::XObjectPtr& parameter
-) {
-	StylesheetParameterGuard guard(this->transformer_);
-	guard.set("parameters", parameter);
-
-	this->generate(target, guard);
 }
 
 }
