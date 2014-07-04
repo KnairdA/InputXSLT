@@ -49,7 +49,7 @@
 	<xsl:variable name="writerResult">
 		<xsl:call-template name="writer">
 			<xsl:with-param name="file" select="string($target)"/>
-			<xsl:with-param name="content" select="xalan:nodeset($transformerResult)/transformation/text()"/>
+			<xsl:with-param name="content" select="xalan:nodeset($transformerResult)/transformation/*"/>
 		</xsl:call-template>
 	</xsl:variable>
 

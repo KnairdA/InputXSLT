@@ -29,7 +29,7 @@ xercesc::DOMDocument* FunctionReadDirectory::constructDocument(
 	if ( boost::filesystem::is_directory(directoryPath) ) {
 		result.setAttribute("result", "success");
 
-		xercesc::DOMNode* const resultNode = result.getNode();
+		xercesc::DOMNode* const resultNode = result.getResultElement();
 
 		FilesystemContext::iterate(
 			directoryPath,

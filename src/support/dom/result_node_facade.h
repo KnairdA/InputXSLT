@@ -18,7 +18,7 @@ class ResultNodeFacade {
 		);
 		~ResultNodeFacade();
 
-		xercesc::DOMNode* getNode();
+		xercesc::DOMElement* getResultElement();
 
 		void setAttribute(const std::string&, const std::string&);
 		void setValueNode(const std::string&, const std::string&);

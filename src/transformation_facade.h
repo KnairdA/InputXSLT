@@ -39,8 +39,10 @@ class TransformationFacade {
 		);
 
 		void generate(std::basic_ostream<char>&);
-		void generate(std::basic_ostream<char>&, const StylesheetParameterGuard::map&);
 		void generate(std::basic_ostream<char>&, const xalan::XObjectPtr&);
+
+		void generate(xalan::FormatterListener&);
+		void generate(xalan::FormatterListener&, const xalan::XObjectPtr&);
 
 		WarningCapacitor::warning_cache_ptr getCachedWarnings();
 
@@ -51,11 +53,6 @@ class TransformationFacade {
 		xalan::XalanTransformer transformer_;
 		ErrorMultiplexer error_multiplexer_;
 		WarningCapacitor warning_capacitor_;
-
-		void generate(
-			std::basic_ostream<char>&,
-			StylesheetParameterGuard&
-		);
 
 };
 

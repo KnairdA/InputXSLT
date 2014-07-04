@@ -2,6 +2,9 @@
 
 #include <xalanc/XSLT/XSLTInputSource.hpp>
 #include <xalanc/XalanTransformer/XalanCompiledStylesheet.hpp>
+#include <xalanc/PlatformSupport/XalanOutputStreamPrintWriter.hpp>
+#include <xalanc/PlatformSupport/XalanStdOutputStream.hpp>
+#include <xalanc/XMLSupport/FormatterToXML.hpp>
 
 #include "support/xerces_string_guard.h"
 
@@ -66,21 +69,6 @@ WarningCapacitor::warning_cache_ptr TransformationFacade::getCachedWarnings() {
 	return this->warning_capacitor_.discharge();
 }
 
-void TransformationFacade::generate(std::basic_ostream<char>& targetStream) {
-	StylesheetParameterGuard guard(this->transformer_);
-
-	this->generate(targetStream, guard);
-}
-
-void TransformationFacade::generate(
-	std::basic_ostream<char>&            targetStream,
-	const StylesheetParameterGuard::map& parameters
-) {
-	StylesheetParameterGuard guard(this->transformer_, parameters);
-
-	this->generate(targetStream, guard);
-}
-
 void TransformationFacade::generate(
 	std::basic_ostream<char>& targetStream,
 	const xalan::XObjectPtr&  parameter
@@ -88,20 +76,38 @@ void TransformationFacade::generate(
 	StylesheetParameterGuard guard(this->transformer_);
 	guard.set("parameters", parameter);
 
-	this->generate(targetStream, guard);
+	this->generate(targetStream);
 }
 
+void TransformationFacade::generate(std::basic_ostream<char>& targetStream) {
+	StylesheetParameterGuard guard(this->transformer_);
+
+	xalan::XalanStdOutputStream outputStream(targetStream);
+	xalan::XalanOutputStreamPrintWriter outputWriter(outputStream);
+
+	xalan::FormatterToXML formatter(outputWriter);
+	formatter.setDoIndent(true);
+
+	this->generate(formatter);
+}
 
 void TransformationFacade::generate(
-	std::basic_ostream<char>& targetStream,
-	StylesheetParameterGuard&
+	xalan::FormatterListener& formatter,
+	const xalan::XObjectPtr&  parameter
 ) {
+	StylesheetParameterGuard guard(this->transformer_);
+	guard.set("parameters", parameter);
+
+	this->generate(formatter);
+}
+
+void TransformationFacade::generate(xalan::FormatterListener& target) {
 	ErrorCapacitor errorCapacitor(&this->error_multiplexer_);
 
 	this->transformer_.transform(
 		*(this->input_),
 		this->transformation_,
-		targetStream
+		target
 	);
 
 	errorCapacitor.discharge();

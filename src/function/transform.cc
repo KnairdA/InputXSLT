@@ -1,10 +1,10 @@
 #include "transform.h"
 
+#include <xalanc/XercesParserLiaison/FormatterToXercesDOM.hpp>
+
 #include <xercesc/dom/DOMDocument.hpp>
 #include <xercesc/dom/DOMImplementation.hpp>
 #include <xercesc/dom/DOMElement.hpp>
-
-#include <sstream>
 
 #include "transformation_facade.h"
 #include "support/xerces_string_guard.h"
@@ -43,11 +43,11 @@ xercesc::DOMDocument* FunctionTransform::constructDocument(
 		)
 	);
 
-	xercesc::DOMNode* const rootNode(
+	xercesc::DOMElement* const rootElement(
 		domDocument->getDocumentElement()
 	);
 
-	ResultNodeFacade result(domDocument, rootNode, "transformation");
+	ResultNodeFacade result(domDocument, rootElement, "transformation");
 
 	if ( auto transformation = TransformationFacade::try_create(
 		handleErrors(result),
@@ -56,15 +56,14 @@ xercesc::DOMDocument* FunctionTransform::constructDocument(
 		this->include_resolver_
 	) ) {
 		try {
-			std::stringstream targetStream;
-
-			transformation->generate(
-				targetStream,
-				parameterObject
+			xalan::FormatterToXercesDOM formatter(
+				domDocument,
+				result.getResultElement()
 			);
 
-			result.setContent(
-				targetStream.str()
+			transformation->generate(
+				formatter,
+				parameterObject
 			);
 
 			result.setAttribute("result", "success");

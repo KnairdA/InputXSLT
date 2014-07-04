@@ -22,7 +22,7 @@ ResultNodeFacade::~ResultNodeFacade() {
 	this->root_node_->appendChild(this->result_node_);
 }
 
-xercesc::DOMNode* ResultNodeFacade::getNode() {
+xercesc::DOMElement* ResultNodeFacade::getResultElement() {
 	return this->result_node_;
 }
 
