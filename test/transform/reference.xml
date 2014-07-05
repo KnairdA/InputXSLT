@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <test_case>
-<input_tree>
+<input_entries>
 <entry>Hello 1</entry>
 <entry>Hello 2</entry>
 <entry>Hello 3</entry>
 <entry>Hello 4</entry>
-</input_tree>
+</input_entries>
 <parameter_value>42</parameter_value>
 </test_case>

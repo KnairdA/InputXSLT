@@ -1,3 +1,7 @@
+#include <xalanc/PlatformSupport/XalanOutputStreamPrintWriter.hpp>
+#include <xalanc/PlatformSupport/XalanStdOutputStream.hpp>
+#include <xalanc/XMLSupport/FormatterToXML.hpp>
+
 #include "boost/optional.hpp"
 #include "boost/program_options.hpp"
 #include <boost/filesystem/fstream.hpp>
@@ -7,16 +11,18 @@
 #include <iostream>
 
 #include "plattform_guard.h"
-#include "transformation_facade.h"
+#include "transformer_facade.h"
+
+namespace {
 
 class WarningGuard {
 	public:
-		WarningGuard(InputXSLT::TransformationFacade* transformation):
-			transformation_(transformation) { };
+		WarningGuard(InputXSLT::TransformerFacade* transformer):
+			transformer_(transformer) { };
 
 		~WarningGuard() {
 			InputXSLT::WarningCapacitor::warning_cache_ptr warnings(
-				this->transformation_->getCachedWarnings()
+				this->transformer_->getCachedWarnings()
 			);
 
 			for ( auto&& warning : *warnings ) {
@@ -25,7 +31,7 @@ class WarningGuard {
 		};
 
 	private:
-		InputXSLT::TransformationFacade* const transformation_;
+		InputXSLT::TransformerFacade* const transformer_;
 
 };
 
@@ -88,6 +94,36 @@ void handleErrors(const InputXSLT::ErrorCapacitor::error_cache& errors) {
 	}
 }
 
+template <typename... Arguments>
+bool generate(
+	InputXSLT::IncludeEntityResolver* resolver,
+	std::basic_ostream<char>&         target,
+	Arguments&&...                    arguments
+) {
+	InputXSLT::TransformerFacade transformer(resolver);
+	WarningGuard guard(&transformer);
+
+	try {
+		xalan::XalanStdOutputStream         output(target);
+		xalan::XalanOutputStreamPrintWriter writer(output);
+		xalan::FormatterToXML               formatter(writer);
+
+		formatter.setDoIndent(true);
+
+		transformer.generate(
+			std::forward<Arguments>(arguments)...,
+			formatter
+		);
+
+		return true;
+	}
+	catch (const InputXSLT::ErrorCapacitor::exception& exception) {
+		handleErrors(*exception);
+
+		return false;
+	}
+}
+
 bool process(const boost::program_options::variables_map& variables) {
 	std::vector<std::string> includePath;
 
@@ -96,51 +132,48 @@ bool process(const boost::program_options::variables_map& variables) {
 	};
 
 	InputXSLT::PlattformGuard plattform(includePath);
-	InputXSLT::TransformationFacade::ptr transformation{};
 
-	if ( variables.count("input") ) {
-		transformation = InputXSLT::TransformationFacade::try_create(
-			handleErrors,
-			variables["input"].as<std::string>().data(),
-			variables["transformation"].as<std::string>().data(),
-			plattform.getEntityResolver()
+	if ( variables.count("target") ) {
+		boost::filesystem::ofstream file(
+			variables["target"].as<std::string>()
 		);
-	} else {
-		transformation = InputXSLT::TransformationFacade::try_create(
-			handleErrors,
-			variables["transformation"].as<std::string>().data(),
-			plattform.getEntityResolver()
-		);
-	}
 
-	if ( transformation ) {
-		WarningGuard guard(transformation.get());
-
-		try {
-			if ( variables.count("target") ) {
-				boost::filesystem::ofstream file(
-					variables["target"].as<std::string>()
+		if ( file.is_open() ) {
+			if ( variables.count("input") ) {
+				return generate(
+					plattform.getEntityResolver(),
+					file,
+					variables["input"].as<std::string>().data(),
+					variables["transformation"].as<std::string>().data()
 				);
-
-				if ( file.is_open() ) {
-					transformation->generate(file);
-				} else {
-					return false;
-				}
 			} else {
-				transformation->generate(std::cout);
+				return generate(
+					plattform.getEntityResolver(),
+					file,
+					variables["transformation"].as<std::string>().data()
+				);
 			}
-
-			return true;
-		}
-		catch (const InputXSLT::ErrorCapacitor::exception& exception) {
-			handleErrors(*exception);
-
+		} else {
 			return false;
 		}
+	} else {
+		if ( variables.count("input") ) {
+			return generate(
+				plattform.getEntityResolver(),
+				std::cout,
+				variables["input"].as<std::string>().data(),
+				variables["transformation"].as<std::string>().data()
+			);
+		} else {
+			return generate(
+				plattform.getEntityResolver(),
+				std::cout,
+				variables["transformation"].as<std::string>().data()
+			);
+		}
 	}
+}
 
-	return false;
 }
 
 int main(int argc, char** argv) {

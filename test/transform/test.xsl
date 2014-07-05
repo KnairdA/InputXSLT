@@ -14,16 +14,14 @@
 	indent="yes"
 />
 
-<xsl:param name="parameters"/>
-
 <xsl:template match="test">
 <test_case>
 	<transform_test>
-		<input_tree>
-			<xsl:copy-of select="./entry"/>
-		</input_tree>
+		<input_entries>
+			<xsl:copy-of select="./entries/entry"/>
+		</input_entries>
 		<parameter_value>
-			<xsl:copy-of select="$parameters/test * 2"/>
+			<xsl:value-of select="./parameter/test * 2"/>
 		</parameter_value>
 	</transform_test>
 </test_case>

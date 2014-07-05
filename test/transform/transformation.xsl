@@ -23,12 +23,10 @@
 <xsl:template name="transformer">
 	<xsl:param name="input"/>
 	<xsl:param name="transformation"/>
-	<xsl:param name="parameters"/>
 
 	<xsl:copy-of select="InputXSLT:transform(
 		$input,
-		$transformation,
-		$parameters
+		$transformation
 	)"/>
 </xsl:template>
 
@@ -36,13 +34,11 @@
 	<xsl:param name="input"/>
 	<xsl:param name="transformation"/>
 	<xsl:param name="target"/>
-	<xsl:param name="parameters"/>
 
 	<xsl:variable name="transformerResult">
 		<xsl:call-template name="transformer">
-			<xsl:with-param name="input" select="string($input)"/>
+			<xsl:with-param name="input" select="$input"/>
 			<xsl:with-param name="transformation" select="string($transformation)"/>
-			<xsl:with-param name="parameters" select="xalan:nodeset($parameters)"/>
 		</xsl:call-template>
 	</xsl:variable>
 
@@ -62,12 +58,21 @@
 <xsl:template name="implementation">
 	<xsl:variable name="result">
 		<xsl:call-template name="generator">
-			<xsl:with-param name="input">[test.xml]</xsl:with-param>
+			<xsl:with-param name="input">
+				<test>
+					<entries>
+						<entry>Hello 1</entry>
+						<entry>Hello 2</entry>
+						<entry>Hello 3</entry>
+						<entry>Hello 4</entry>
+					</entries>
+					<parameter>
+						<test>21</test>
+					</parameter>
+				</test>
+			</xsl:with-param>
 			<xsl:with-param name="transformation">test.xsl</xsl:with-param>
 			<xsl:with-param name="target">test_actual.xml</xsl:with-param>
-			<xsl:with-param name="parameters">
-				<test>21</test>
-			</xsl:with-param>
 		</xsl:call-template>
 	</xsl:variable>
 

@@ -23,14 +23,13 @@ set(
 set(
 	Sources
 	src/plattform_guard.cc
-	src/transformation_facade.cc
+	src/transformer_facade.cc
 	src/function/read_file.cc
 	src/function/write_file.cc
 	src/function/read_directory.cc
 	src/function/transform.cc
 	src/function/external_text_formatter.cc
 	src/support/filesystem_context.cc
-	src/support/stylesheet_parameter_guard.cc
 	src/support/xalan_string.cc
 	src/support/include_entity_resolver.cc
 	src/support/error/error_multiplexer.cc
