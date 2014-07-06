@@ -10,7 +10,6 @@ Contrary to popular opinion I actually like XSLT as a content transformation lan
 
 - external `read-file` function for read-only access to both plain and xml files
 - external `read-directory` function for read-only directory traversal
-- external `read-directory` function for read-only directory traversal
 - external `transform` function for executing transformations inside transformations
 - external `external-text-formatter` function for executing text formatters and capturing their XML output
 - external `write-file` function for writing files
