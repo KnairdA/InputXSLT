@@ -1,29 +1,21 @@
 #include "read_directory.h"
 
-#include <xercesc/dom/DOMDocument.hpp>
-#include <xercesc/dom/DOMImplementation.hpp>
-#include <xercesc/dom/DOMElement.hpp>
-
 #include "support/xerces_string_guard.h"
 #include "support/dom/result_node_facade.h"
 
 namespace InputXSLT {
 
-xercesc::DOMDocument* FunctionReadDirectory::constructDocument(
+DomDocumentCache::document_ptr FunctionReadDirectory::constructDocument(
 	boost::filesystem::path directoryPath) {
-	xercesc::DOMDocument* const domDocument(
-		xercesc::DOMImplementation::getImplementation()->createDocument(
-			nullptr,
-			*XercesStringGuard<XMLCh>("content"),
-			nullptr
-		)
+	DomDocumentCache::document_ptr domDocument(
+		DomDocumentCache::createDocument()
 	);
 
 	xercesc::DOMNode* const rootNode(
 		domDocument->getDocumentElement()
 	);
 
-	ResultNodeFacade result(domDocument, rootNode, "directory");
+	ResultNodeFacade result(domDocument.get(), rootNode, "directory");
 	result.setAttribute("path", directoryPath.string());
 
 	if ( boost::filesystem::is_directory(directoryPath) ) {
@@ -34,7 +26,7 @@ xercesc::DOMDocument* FunctionReadDirectory::constructDocument(
 		FilesystemContext::iterate(
 			directoryPath,
 			[&domDocument, &resultNode](const boost::filesystem::path& p) {
-			ResultNodeFacade result(domDocument, resultNode, "entry");
+			ResultNodeFacade result(domDocument.get(), resultNode, "entry");
 
 			switch ( boost::filesystem::status(p).type() ) {
 				case boost::filesystem::regular_file: {

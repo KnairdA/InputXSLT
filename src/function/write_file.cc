@@ -5,10 +5,6 @@
 #include <xalanc/XMLSupport/FormatterToXML.hpp>
 #include <xalanc/XMLSupport/FormatterTreeWalker.hpp>
 
-#include <xercesc/dom/DOMDocument.hpp>
-#include <xercesc/dom/DOMImplementation.hpp>
-#include <xercesc/dom/DOMElement.hpp>
-
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 
@@ -34,11 +30,10 @@ bool serializeNodeToFile(
 			if ( contentType == xalan::XalanNode::TEXT_NODE ) {
 				file << InputXSLT::toString(contentNode->getNodeValue());
 			} else {
-				xalan::XalanStdOutputStream outputStream(file);
+				xalan::XalanStdOutputStream         outputStream(file);
 				xalan::XalanOutputStreamPrintWriter outputWriter(outputStream);
-
-				xalan::FormatterToXML formatter(outputWriter);
-				xalan::FormatterTreeWalker walker(formatter);
+				xalan::FormatterToXML               formatter(outputWriter);
+				xalan::FormatterTreeWalker          walker(formatter);
 
 				formatter.startDocument();
 
@@ -62,23 +57,19 @@ bool serializeNodeToFile(
 
 namespace InputXSLT {
 
-xercesc::DOMDocument* FunctionWriteFile::constructDocument(
+DomDocumentCache::document_ptr FunctionWriteFile::constructDocument(
 	boost::filesystem::path filePath,
 	xalan::XalanNode* const contentNode
 ) {
-	xercesc::DOMDocument* const domDocument(
-		xercesc::DOMImplementation::getImplementation()->createDocument(
-			nullptr,
-			*XercesStringGuard<XMLCh>("content"),
-			nullptr
-		)
+	DomDocumentCache::document_ptr domDocument(
+		DomDocumentCache::createDocument()
 	);
 
 	xercesc::DOMNode* const rootNode(
 		domDocument->getDocumentElement()
 	);
 
-	ResultNodeFacade result(domDocument, rootNode, "file");
+	ResultNodeFacade result(domDocument.get(), rootNode, "file");
 	result.setAttribute("path", filePath.string());
 
 	if ( contentNode != nullptr ) {

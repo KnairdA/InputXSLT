@@ -16,7 +16,7 @@ class FunctionWriteFile : public FunctionBase<
 	protected:
 		friend FunctionBase;
 
-		xercesc::DOMDocument* constructDocument(
+		DomDocumentCache::document_ptr constructDocument(
 			boost::filesystem::path,
 			xalan::XalanNode* const
 		);

@@ -11,10 +11,8 @@
 #include <xalanc/XercesParserLiaison/XercesDOMSupport.hpp>
 #include <xalanc/XalanTransformer/XercesDOMWrapperParsedSource.hpp>
 
-#include <xercesc/dom/DOMDocument.hpp>
-#include <xercesc/dom/DOMImplementation.hpp>
-
 #include "support/xerces_string_guard.h"
+#include "support/dom/document_cache.h"
 
 namespace InputXSLT {
 
@@ -59,19 +57,15 @@ void TransformerFacade::generate(
 ) {
 	ErrorCapacitor errorCapacitor(&this->error_multiplexer_);
 
-	xercesc::DOMDocument* const inputDocument(
-		xercesc::DOMImplementation::getImplementation()->createDocument(
-			nullptr,
-			*XercesStringGuard<XMLCh>("dummy"),
-			nullptr
-		)
+	DomDocumentCache::document_ptr inputDocument(
+		DomDocumentCache::createDocument()
 	);
 
 	xalan::XercesParserLiaison parserLiaison;
 	xalan::XercesDOMSupport domSupport(parserLiaison);
 
 	xalan::XercesDOMWrapperParsedSource inputParsedSource(
-		inputDocument,
+		inputDocument.get(),
 		parserLiaison,
 		domSupport
 	);
@@ -81,8 +75,6 @@ void TransformerFacade::generate(
 		transformation,
 		target
 	);
-
-	inputDocument->release();
 
 	errorCapacitor.discharge();
 }
@@ -94,12 +86,12 @@ void TransformerFacade::generate(
 ) {
 	ErrorCapacitor errorCapacitor(&this->error_multiplexer_);
 
-	xercesc::DOMDocument* const inputDocument(
-		xercesc::DOMImplementation::getImplementation()->createDocument()
+	DomDocumentCache::document_ptr inputDocument(
+		DomDocumentCache::createDocument()
 	);
 
 	xalan::FormatterToXercesDOM inputFormatter(
-		inputDocument,
+		inputDocument.get(),
 		inputDocument->getDocumentElement()
 	);
 
@@ -120,8 +112,6 @@ void TransformerFacade::generate(
 		transformation,
 		target
 	);
-
-	inputDocument->release();
 
 	errorCapacitor.discharge();
 }

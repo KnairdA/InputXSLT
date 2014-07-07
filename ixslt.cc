@@ -100,10 +100,10 @@ bool generate(
 	std::basic_ostream<char>&         target,
 	Arguments&&...                    arguments
 ) {
-	InputXSLT::TransformerFacade transformer(resolver);
-	WarningGuard guard(&transformer);
-
 	try {
+		InputXSLT::TransformerFacade transformer(resolver);
+		WarningGuard guard(&transformer);
+
 		xalan::XalanStdOutputStream         output(target);
 		xalan::XalanOutputStreamPrintWriter writer(output);
 		xalan::FormatterToXML               formatter(writer);

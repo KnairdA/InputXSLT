@@ -17,7 +17,8 @@ class FunctionReadDirectory : public FunctionBase<
 	protected:
 		friend FunctionBase;
 
-		xercesc::DOMDocument* constructDocument(boost::filesystem::path);
+		DomDocumentCache::document_ptr constructDocument(
+			boost::filesystem::path);
 
 };
 

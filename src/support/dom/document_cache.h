@@ -14,10 +14,23 @@
 namespace InputXSLT {
 
 class DomDocumentCache {
+	class document_deleter {
+		friend std::unique_ptr<xercesc::DOMDocument, document_deleter>;
+
+		void operator()(xercesc::DOMDocument*);
+	};
+
 	public:
+		typedef std::unique_ptr<
+			xercesc::DOMDocument,
+			document_deleter
+		> document_ptr;
+
+		static document_ptr createDocument();
+
 		DomDocumentCache();
 
-		xalan::XalanDocument* create(xercesc::DOMDocument*);
+		xalan::XalanDocument* create(document_ptr&&);
 
 	private:
 		class item;

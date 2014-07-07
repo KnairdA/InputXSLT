@@ -2,9 +2,6 @@
 
 #include <xalanc/XSLT/XSLTInputSource.hpp>
 
-#include <xercesc/dom/DOMDocument.hpp>
-#include <xercesc/dom/DOMImplementation.hpp>
-#include <xercesc/dom/DOMElement.hpp>
 #include <xercesc/parsers/XercesDOMParser.hpp>
 
 #include <boost/process.hpp>
@@ -42,16 +39,12 @@ inline xercesc::DOMNode* importDocumentElement(
 
 namespace InputXSLT {
 
-xercesc::DOMDocument* FunctionExternalTextFormatter::constructDocument(
+DomDocumentCache::document_ptr FunctionExternalTextFormatter::constructDocument(
 	boost::filesystem::path formatterPath,
 	std::string             stdinText
 ) {
-	xercesc::DOMDocument* const domDocument(
-		xercesc::DOMImplementation::getImplementation()->createDocument(
-			nullptr,
-			*XercesStringGuard<XMLCh>("content"),
-			nullptr
-		)
+	DomDocumentCache::document_ptr domDocument(
+		DomDocumentCache::createDocument()
 	);
 
 	xercesc::DOMNode* const rootNode(
@@ -78,14 +71,17 @@ xercesc::DOMDocument* FunctionExternalTextFormatter::constructDocument(
 
 	boost::process::status status = formatterProcess.wait();
 
-	ResultNodeFacade result(domDocument, rootNode, "output");
+	ResultNodeFacade result(domDocument.get(), rootNode, "output");
 	result.setAttribute("formatter", formatterPath.filename().string());
 	result.setAttribute("code",      std::to_string(status.exit_status()));
 
 	if ( status.exited() ) {
 		try {
 			result.setContent(
-				importDocumentElement(outputStream, domDocument)->getChildNodes()
+				importDocumentElement(
+					outputStream,
+					domDocument.get()
+				)->getChildNodes()
 			);
 
 			result.setAttribute("result", "success");

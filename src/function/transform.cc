@@ -2,10 +2,6 @@
 
 #include <xalanc/XercesParserLiaison/FormatterToXercesDOM.hpp>
 
-#include <xercesc/dom/DOMDocument.hpp>
-#include <xercesc/dom/DOMImplementation.hpp>
-#include <xercesc/dom/DOMElement.hpp>
-
 #include "transformer_facade.h"
 #include "support/xerces_string_guard.h"
 #include "support/dom/result_node_facade.h"
@@ -30,28 +26,24 @@ inline void handleErrors(
 
 namespace InputXSLT {
 
-xercesc::DOMDocument* FunctionTransform::constructDocument(
+DomDocumentCache::document_ptr FunctionTransform::constructDocument(
 	xalan::XSLTInputSource  inputSource,
 	xalan::XSLTInputSource  transformationSource
 ) {
-	xercesc::DOMDocument* const domDocument(
-		xercesc::DOMImplementation::getImplementation()->createDocument(
-			nullptr,
-			*XercesStringGuard<XMLCh>("content"),
-			nullptr
-		)
+	DomDocumentCache::document_ptr domDocument(
+		DomDocumentCache::createDocument()
 	);
 
 	xercesc::DOMElement* const rootElement(
 		domDocument->getDocumentElement()
 	);
 
-	ResultNodeFacade result(domDocument, rootElement, "transformation");
+	ResultNodeFacade result(domDocument.get(), rootElement, "transformation");
 	TransformerFacade transformer(this->include_resolver_);
 
 	try {
 		xalan::FormatterToXercesDOM targetFormatter(
-			domDocument,
+			domDocument.get(),
 			result.getResultElement()
 		);
 

@@ -18,7 +18,7 @@ class FunctionTransform : public FunctionBase<
 	protected:
 		friend FunctionBase;
 
-		xercesc::DOMDocument* constructDocument(
+		DomDocumentCache::document_ptr constructDocument(
 			xalan::XSLTInputSource,
 			xalan::XSLTInputSource
 		);

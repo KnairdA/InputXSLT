@@ -14,19 +14,17 @@ namespace InputXSLT {
 
 class DomDocumentCache::item {
 	public:
-		~item();
-
 		xalan::XalanDocument* getXalanDocument();
 
 	protected:
 		friend DomDocumentCache;
 
-		item(xercesc::DOMDocument*);
+		item(document_ptr&&);
 
 	private:
+		document_ptr document_;
 		xalan::XercesParserLiaison parser_;
 		xalan::XercesDOMSupport dom_support_;
-		xercesc::DOMDocument* const document_;
 		xalan::XercesDOMWrapperParsedSource parsed_source_;
 
 };

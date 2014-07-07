@@ -2,19 +2,15 @@
 
 namespace InputXSLT {
 
-DomDocumentCache::item::item(xercesc::DOMDocument* document):
+DomDocumentCache::item::item(document_ptr&& document):
+	document_(std::move(document)),
 	parser_(),
 	dom_support_(parser_),
-	document_(document),
 	parsed_source_(
-		document_,
+		document_.get(),
 		parser_,
 		dom_support_
 	) { }
-
-DomDocumentCache::item::~item() {
-	this->document_->release();
-}
 
 xalan::XalanDocument* DomDocumentCache::item::getXalanDocument() {
 	return this->parsed_source_.getDocument();

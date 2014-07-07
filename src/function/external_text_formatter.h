@@ -18,7 +18,7 @@ class FunctionExternalTextFormatter : public FunctionBase<
 	protected:
 		friend FunctionBase;
 
-		xercesc::DOMDocument* constructDocument(
+		DomDocumentCache::document_ptr constructDocument(
 			boost::filesystem::path,
 			std::string
 		);

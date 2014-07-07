@@ -1,8 +1,5 @@
 #include "read_file.h"
 
-#include <xercesc/dom/DOMDocument.hpp>
-#include <xercesc/dom/DOMImplementation.hpp>
-#include <xercesc/dom/DOMElement.hpp>
 #include <xercesc/parsers/XercesDOMParser.hpp>
 #include <xercesc/framework/LocalFileInputSource.hpp>
 
@@ -62,21 +59,17 @@ boost::optional<std::string> readPlainFile(
 
 namespace InputXSLT {
 
-xercesc::DOMDocument* FunctionReadFile::constructDocument(
+DomDocumentCache::document_ptr FunctionReadFile::constructDocument(
 	boost::filesystem::path filePath) {
-	xercesc::DOMDocument* const domDocument(
-		xercesc::DOMImplementation::getImplementation()->createDocument(
-			nullptr,
-			*XercesStringGuard<XMLCh>("content"),
-			nullptr
-		)
+	DomDocumentCache::document_ptr domDocument(
+		DomDocumentCache::createDocument()
 	);
 
 	xercesc::DOMNode* const rootNode(
 		domDocument->getDocumentElement()
 	);
 
-	ResultNodeFacade result(domDocument, rootNode, "file");
+	ResultNodeFacade result(domDocument.get(), rootNode, "file");
 	result.setAttribute("path", filePath.string());
 
 	if ( boost::filesystem::is_regular_file(filePath) ) {
@@ -84,7 +77,10 @@ xercesc::DOMDocument* FunctionReadFile::constructDocument(
 			if ( isXmlFile(filePath) ) {
 				result.setAttribute("type", "xml");
 
-				if ( auto importedNode = readXmlFile(filePath, domDocument) ) {
+				if ( auto importedNode = readXmlFile(
+					filePath,
+					domDocument.get()) 
+				) {
 					result.setContent(*importedNode);
 
 					result.setAttribute("result", "success");
