@@ -65,11 +65,7 @@ DomDocumentCache::document_ptr FunctionReadFile::constructDocument(
 		DomDocumentCache::createDocument()
 	);
 
-	xercesc::DOMNode* const rootNode(
-		domDocument->getDocumentElement()
-	);
-
-	ResultNodeFacade result(domDocument.get(), rootNode, "file");
+	ResultNodeFacade result(domDocument.get(), "file");
 	result.setAttribute("path", filePath.string());
 
 	if ( boost::filesystem::is_regular_file(filePath) ) {

@@ -47,10 +47,6 @@ DomDocumentCache::document_ptr FunctionExternalTextFormatter::constructDocument(
 		DomDocumentCache::createDocument()
 	);
 
-	xercesc::DOMNode* const rootNode(
-		domDocument->getDocumentElement()
-	);
-
 	boost::process::context context;
 	context.stdout_behavior = boost::process::capture_stream();
 	context.stdin_behavior  = boost::process::capture_stream();
@@ -71,7 +67,7 @@ DomDocumentCache::document_ptr FunctionExternalTextFormatter::constructDocument(
 
 	boost::process::status status = formatterProcess.wait();
 
-	ResultNodeFacade result(domDocument.get(), rootNode, "output");
+	ResultNodeFacade result(domDocument.get(), "output");
 	result.setAttribute("formatter", formatterPath.filename().string());
 	result.setAttribute("code",      std::to_string(status.exit_status()));
 

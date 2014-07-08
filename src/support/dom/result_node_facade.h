@@ -11,11 +11,13 @@ namespace InputXSLT {
 
 class ResultNodeFacade {
 	public:
+		ResultNodeFacade(xercesc::DOMDocument*, const std::string&);
 		ResultNodeFacade(
 			xercesc::DOMDocument*,
 			xercesc::DOMNode*,
 			const std::string&
 		);
+
 		~ResultNodeFacade();
 
 		xercesc::DOMElement* getResultElement();

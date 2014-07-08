@@ -65,11 +65,7 @@ DomDocumentCache::document_ptr FunctionWriteFile::constructDocument(
 		DomDocumentCache::createDocument()
 	);
 
-	xercesc::DOMNode* const rootNode(
-		domDocument->getDocumentElement()
-	);
-
-	ResultNodeFacade result(domDocument.get(), rootNode, "file");
+	ResultNodeFacade result(domDocument.get(), "file");
 	result.setAttribute("path", filePath.string());
 
 	if ( contentNode != nullptr ) {

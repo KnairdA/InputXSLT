@@ -11,11 +11,7 @@ DomDocumentCache::document_ptr FunctionReadDirectory::constructDocument(
 		DomDocumentCache::createDocument()
 	);
 
-	xercesc::DOMNode* const rootNode(
-		domDocument->getDocumentElement()
-	);
-
-	ResultNodeFacade result(domDocument.get(), rootNode, "directory");
+	ResultNodeFacade result(domDocument.get(), "directory");
 	result.setAttribute("path", directoryPath.string());
 
 	if ( boost::filesystem::is_directory(directoryPath) ) {

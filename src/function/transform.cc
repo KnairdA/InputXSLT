@@ -34,11 +34,7 @@ DomDocumentCache::document_ptr FunctionTransform::constructDocument(
 		DomDocumentCache::createDocument()
 	);
 
-	xercesc::DOMElement* const rootElement(
-		domDocument->getDocumentElement()
-	);
-
-	ResultNodeFacade result(domDocument.get(), rootElement, "transformation");
+	ResultNodeFacade result(domDocument.get(), "transformation");
 	TransformerFacade transformer(this->include_resolver_);
 
 	try {

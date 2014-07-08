@@ -9,8 +9,18 @@ namespace InputXSLT {
 
 ResultNodeFacade::ResultNodeFacade(
 	xercesc::DOMDocument* document,
-	xercesc::DOMNode* node,
-	const std::string& name
+	const std::string&    name
+):
+	ResultNodeFacade(
+		document,
+		document->getDocumentElement(),
+		name
+	) { }
+
+ResultNodeFacade::ResultNodeFacade(
+	xercesc::DOMDocument* document,
+	xercesc::DOMNode*     node,
+	const std::string&    name
 ):
 	dom_document_(document),
 	result_node_(
