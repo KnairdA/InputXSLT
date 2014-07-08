@@ -30,6 +30,10 @@ boost::optional<boost::filesystem::path> extractFilePath(
 	}
 }
 
+inline const XMLCh* shiftSystemIdPastPrefix(const XMLCh* const systemId) {
+	return systemId + 7;
+}
+
 }
 
 namespace InputXSLT {
@@ -37,7 +41,9 @@ namespace InputXSLT {
 boost::filesystem::path IncludeEntityResolver::getPathFromSystemId(
 	const XMLCh* const systemId) {
 	return boost::filesystem::path(
-		*XercesStringGuard<char>(systemId) + 7
+		*XercesStringGuard<char>(
+			shiftSystemIdPastPrefix(systemId)
+		)
 	);
 }
 
@@ -60,7 +66,7 @@ xercesc::InputSource* IncludeEntityResolver::resolveEntity(
 			);
 		} else {
 			return new xercesc::LocalFileInputSource(
-				*XercesStringGuard<XMLCh>(systemIdString)
+				shiftSystemIdPastPrefix(systemId)
 			);
 		}
 	} else {
