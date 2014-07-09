@@ -31,7 +31,7 @@ DomDocumentCache::document_ptr FunctionTransform::constructDocument(
 	xalan::XSLTInputSource  transformationSource
 ) {
 	DomDocumentCache::document_ptr domDocument(
-		DomDocumentCache::createDocument()
+		DomDocumentCache::createDocument("content")
 	);
 
 	ResultNodeFacade result(domDocument.get(), "transformation");

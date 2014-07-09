@@ -62,7 +62,7 @@ namespace InputXSLT {
 DomDocumentCache::document_ptr FunctionReadFile::constructDocument(
 	boost::filesystem::path filePath) {
 	DomDocumentCache::document_ptr domDocument(
-		DomDocumentCache::createDocument()
+		DomDocumentCache::createDocument("content")
 	);
 
 	ResultNodeFacade result(domDocument.get(), "file");

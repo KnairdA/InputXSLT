@@ -11,9 +11,15 @@ namespace InputXSLT {
 
 auto DomDocumentCache::createDocument() -> document_ptr {
 	return document_ptr(
+		xercesc::DOMImplementation::getImplementation()->createDocument()
+	);
+}
+
+auto DomDocumentCache::createDocument(const std::string& name) -> document_ptr {
+	return document_ptr(
 		xercesc::DOMImplementation::getImplementation()->createDocument(
 			nullptr,
-			*XercesStringGuard<XMLCh>("content"),
+			*XercesStringGuard<XMLCh>(name),
 			nullptr
 		)
 	);

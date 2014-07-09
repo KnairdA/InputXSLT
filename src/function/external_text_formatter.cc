@@ -44,7 +44,7 @@ DomDocumentCache::document_ptr FunctionExternalTextFormatter::constructDocument(
 	std::string             stdinText
 ) {
 	DomDocumentCache::document_ptr domDocument(
-		DomDocumentCache::createDocument()
+		DomDocumentCache::createDocument("content")
 	);
 
 	boost::process::context context;

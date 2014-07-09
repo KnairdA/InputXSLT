@@ -21,7 +21,7 @@ boost::optional<boost::filesystem::path> extractFilePath(
 			boost::filesystem::path(
 				rawPath.substr(
 					leadingDelimiter + 1,
-					closingDelimiter - leadingDelimiter - 1
+					closingDelimiter - 1 - leadingDelimiter
 				)
 			)
 		);

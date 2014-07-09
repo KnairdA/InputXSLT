@@ -62,7 +62,7 @@ DomDocumentCache::document_ptr FunctionWriteFile::constructDocument(
 	xalan::XalanNode* const contentNode
 ) {
 	DomDocumentCache::document_ptr domDocument(
-		DomDocumentCache::createDocument()
+		DomDocumentCache::createDocument("content")
 	);
 
 	ResultNodeFacade result(domDocument.get(), "file");

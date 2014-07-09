@@ -27,6 +27,7 @@ class DomDocumentCache {
 		> document_ptr;
 
 		static document_ptr createDocument();
+		static document_ptr createDocument(const std::string&);
 
 		DomDocumentCache();
 
