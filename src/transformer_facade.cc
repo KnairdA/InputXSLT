@@ -3,6 +3,8 @@
 #include <xalanc/PlatformSupport/XalanOutputStreamPrintWriter.hpp>
 #include <xalanc/PlatformSupport/XalanStdOutputStream.hpp>
 
+#include <xalanc/XSLT/StylesheetRoot.hpp>
+#include <xalanc/XalanTransformer/XalanCompiledStylesheet.hpp>
 #include <xalanc/XMLSupport/FormatterToXML.hpp>
 #include <xalanc/XercesParserLiaison/FormatterToXercesDOM.hpp>
 #include <xalanc/XMLSupport/FormatterTreeWalker.hpp>
@@ -13,6 +15,41 @@
 
 #include "support/xerces_string_guard.h"
 #include "support/dom/document_cache.h"
+
+namespace {
+
+std::unique_ptr<xalan::FormatterToXML> augmentFormatterToXML(
+	const xalan::XalanCompiledStylesheet* const transformation,
+	xalan::FormatterListener&                   formatter
+) {
+	const xalan::StylesheetRoot* const stylesheetRoot(
+		transformation->getStylesheetRoot()
+	);
+
+	xalan::XalanDOMString outputVersion;
+	xalan::XalanDOMString outputEncoding;
+	xalan::XalanDOMString outputMediaType;
+	xalan::XalanDOMString outputDoctypePublic;
+	xalan::XalanDOMString outputDoctypeSystem;
+	xalan::XalanDOMString outputStandalone;
+
+	return std::unique_ptr<xalan::FormatterToXML>(
+		new xalan::FormatterToXML(
+			*(formatter.getWriter()),
+			stylesheetRoot->getOutputVersion(outputVersion),
+			stylesheetRoot->getOutputIndent(),
+			0,
+			stylesheetRoot->getOutputEncoding(outputEncoding),
+			stylesheetRoot->getOutputMediaType(outputMediaType),
+			stylesheetRoot->getOutputDoctypePublic(outputDoctypePublic),
+			stylesheetRoot->getOutputDoctypeSystem(outputDoctypeSystem),
+			!stylesheetRoot->getOmitOutputXMLDecl(),
+			stylesheetRoot->getOutputStandalone(outputStandalone)
+		)
+	);
+}
+
+}
 
 namespace InputXSLT {
 
@@ -35,7 +72,7 @@ void TransformerFacade::generate(
 	if ( source.getNode() == nullptr ) {
 		ErrorCapacitor errorCapacitor(&this->error_multiplexer_);
 
-		this->transformer_.transform(
+		this->dispatchTransformer(
 			source,
 			transformation,
 			target
@@ -70,7 +107,7 @@ void TransformerFacade::generate(
 		domSupport
 	);
 
-	this->transformer_.transform(
+	this->dispatchTransformer(
 		inputParsedSource,
 		transformation,
 		target
@@ -107,13 +144,57 @@ void TransformerFacade::generate(
 		domSupport
 	);
 
-	this->transformer_.transform(
+	this->dispatchTransformer(
 		inputParsedSource,
 		transformation,
 		target
 	);
 
 	errorCapacitor.discharge();
+}
+
+template <typename Source>
+void TransformerFacade::dispatchTransformer(
+	const Source&                 source,
+	const xalan::XSLTInputSource& transformation,
+	xalan::FormatterListener&     target
+) {
+	const xalan::XalanCompiledStylesheet* compiledTransformation{};
+
+	this->transformer_.compileStylesheet(
+		transformation,
+		compiledTransformation
+	);
+
+	switch ( target.getOutputFormat() ) {
+		case xalan::FormatterListener::eFormat::OUTPUT_METHOD_XML: {
+			auto formatter = augmentFormatterToXML(
+				compiledTransformation,
+				target
+			);
+
+			this->transformer_.transform(
+				source,
+				compiledTransformation,
+				*formatter
+			);
+
+			break;
+		}
+		default: {
+			this->transformer_.transform(
+				source,
+				compiledTransformation,
+				target
+			);
+
+			break;
+		}
+	}
+
+	this->transformer_.destroyStylesheet(
+		compiledTransformation
+	);
 }
 
 }

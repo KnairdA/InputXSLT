@@ -39,6 +39,14 @@ class TransformerFacade {
 			xalan::FormatterListener&
 		);
 
+		template <typename Source>
+		void dispatchTransformer(
+			const Source&,
+			const xalan::XSLTInputSource&,
+			xalan::FormatterListener&
+		);
+
+
 };
 
 }
