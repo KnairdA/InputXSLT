@@ -7,29 +7,12 @@
 #include "support/dom/result_node_facade.h"
 #include "support/error/error_capacitor.h"
 
-namespace {
-
-using InputXSLT::ErrorCapacitor;
-
-inline void handleErrors(
-	InputXSLT::ResultNodeFacade&       result,
-	const ErrorCapacitor::error_cache& errors
-) {
-	result.setAttribute("result", "error");
-
-	for ( auto&& error : errors ) {
-		result.setValueNode("error", error);
-	}
-}
-
-}
-
 namespace InputXSLT {
 
 DomDocumentCache::document_ptr FunctionTransform::constructDocument(
 	xalan::XSLTInputSource  inputSource,
 	xalan::XSLTInputSource  transformationSource
-) {
+) const {
 	DomDocumentCache::document_ptr domDocument(
 		DomDocumentCache::createDocument("content")
 	);
@@ -52,7 +35,11 @@ DomDocumentCache::document_ptr FunctionTransform::constructDocument(
 		result.setAttribute("result", "success");
 	}
 	catch (const ErrorCapacitor::exception& exception) {
-		handleErrors(result, *exception);
+		result.setAttribute("result", "error");
+
+		for ( auto&& error : *exception ) {
+			result.setValueNode("error", error);
+		}
 	}
 
 	WarningCapacitor::warning_cache_ptr warnings(

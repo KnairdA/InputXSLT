@@ -19,7 +19,7 @@ class FunctionWriteFile : public FunctionBase<
 		DomDocumentCache::document_ptr constructDocument(
 			boost::filesystem::path,
 			xalan::XalanNode* const
-		);
+		) const;
 
 };
 

@@ -60,7 +60,7 @@ namespace InputXSLT {
 DomDocumentCache::document_ptr FunctionWriteFile::constructDocument(
 	boost::filesystem::path filePath,
 	xalan::XalanNode* const contentNode
-) {
+) const {
 	DomDocumentCache::document_ptr domDocument(
 		DomDocumentCache::createDocument("content")
 	);

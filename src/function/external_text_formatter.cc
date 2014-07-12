@@ -42,7 +42,7 @@ namespace InputXSLT {
 DomDocumentCache::document_ptr FunctionExternalTextFormatter::constructDocument(
 	boost::filesystem::path formatterPath,
 	std::string             stdinText
-) {
+) const {
 	DomDocumentCache::document_ptr domDocument(
 		DomDocumentCache::createDocument("content")
 	);

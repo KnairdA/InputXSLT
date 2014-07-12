@@ -6,7 +6,7 @@
 namespace InputXSLT {
 
 DomDocumentCache::document_ptr FunctionReadDirectory::constructDocument(
-	boost::filesystem::path directoryPath) {
+	boost::filesystem::path directoryPath) const {
 	DomDocumentCache::document_ptr domDocument(
 		DomDocumentCache::createDocument("content")
 	);

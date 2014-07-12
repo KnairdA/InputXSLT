@@ -21,7 +21,7 @@ class FunctionExternalTextFormatter : public FunctionBase<
 		DomDocumentCache::document_ptr constructDocument(
 			boost::filesystem::path,
 			std::string
-		);
+		) const;
 
 };
 

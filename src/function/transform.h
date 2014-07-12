@@ -21,7 +21,7 @@ class FunctionTransform : public FunctionBase<
 		DomDocumentCache::document_ptr constructDocument(
 			xalan::XSLTInputSource,
 			xalan::XSLTInputSource
-		);
+		) const;
 
 };
 

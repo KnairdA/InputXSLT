@@ -104,9 +104,7 @@ class FunctionBase : public xalan::Function {
 			);
 
 			return this->document_cache_->create(
-				static_cast<Implementation*>(
-					const_cast<FunctionBase*>(this)
-				)->constructDocument(
+				static_cast<const Implementation*>(this)->constructDocument(
 					valueGetter.get<typename std::tuple_element<
 						Index,
 						std::tuple<Types...>

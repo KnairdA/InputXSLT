@@ -46,7 +46,6 @@ class TransformerFacade {
 			xalan::FormatterListener&
 		);
 
-
 };
 
 }

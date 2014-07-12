@@ -18,7 +18,7 @@ class FunctionReadFile : public FunctionBase<
 		friend FunctionBase;
 
 		DomDocumentCache::document_ptr constructDocument(
-			boost::filesystem::path);
+			boost::filesystem::path) const;
 
 };
 
