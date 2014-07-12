@@ -28,6 +28,7 @@ set(
 	src/function/write_file.cc
 	src/function/read_directory.cc
 	src/function/transform.cc
+	src/function/generate.cc
 	src/function/external_text_formatter.cc
 	src/support/filesystem_context.cc
 	src/support/xalan_string.cc

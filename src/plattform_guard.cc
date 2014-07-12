@@ -10,6 +10,7 @@
 #include "function/write_file.h"
 #include "function/read_directory.h"
 #include "function/transform.h"
+#include "function/generate.h"
 #include "function/external_text_formatter.h"
 
 namespace InputXSLT {
@@ -45,6 +46,12 @@ PlattformGuard::PlattformGuard(const std::vector<std::string>& path):
 		customNamespace,
 		xalan::XalanDOMString("transform"),
 		InputXSLT::FunctionTransform(&this->include_resolver_)
+	);
+
+	xalan::XalanTransformer::installExternalFunctionGlobal(
+		customNamespace,
+		xalan::XalanDOMString("generate"),
+		InputXSLT::FunctionGenerate(&this->include_resolver_)
 	);
 
 	xalan::XalanTransformer::installExternalFunctionGlobal(

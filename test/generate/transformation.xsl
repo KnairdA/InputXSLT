@@ -10,19 +10,21 @@
 
 <xsl:import href="[testcase.xsl]"/>
 
-<xsl:template name="transformer">
+<xsl:template name="generator">
 	<xsl:param name="input"/>
 	<xsl:param name="transformation"/>
+	<xsl:param name="target"/>
 
-	<xsl:copy-of select="InputXSLT:transform(
+	<xsl:copy-of select="InputXSLT:generate(
 		$input,
-		string($transformation)
+		string($transformation),
+		string($target)
 	)"/>
 </xsl:template>
 
 <xsl:template name="implementation">
 	<xsl:variable name="result">
-		<xsl:call-template name="transformer">
+		<xsl:call-template name="generator">
 			<xsl:with-param name="input">
 				<test>
 					<entries>
@@ -37,17 +39,18 @@
 				</test>
 			</xsl:with-param>
 			<xsl:with-param name="transformation">[test.xsl]</xsl:with-param>
+			<xsl:with-param name="target">test_actual.xml</xsl:with-param>
 		</xsl:call-template>
 	</xsl:variable>
 
-	<xsl:variable name="transformation" select="xalan:nodeset($result)/transformation"/>
+	<xsl:variable name="generation" select="xalan:nodeset($result)/generation"/>
 
 	<xsl:choose>
-		<xsl:when test="$transformation/@result = 'success'">
-			<xsl:copy-of select="$transformation/test_case/transform_test/*"/>
+		<xsl:when test="$generation/@result = 'success'">
+			<xsl:copy-of select="InputXSLT:read-file('test_actual.xml')/test_case/transform_test/*"/>
 		</xsl:when>
 		<xsl:otherwise>
-			<xsl:copy-of select="$transformation/*"/>
+			<xsl:copy-of select="$generation/*"/>
 		</xsl:otherwise>
 	</xsl:choose>
 </xsl:template>
