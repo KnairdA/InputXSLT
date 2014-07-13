@@ -49,6 +49,44 @@ std::unique_ptr<xalan::FormatterToXML> augmentFormatterToXML(
 	);
 }
 
+class compiled_stylesheet_deleter {
+	public:
+		compiled_stylesheet_deleter(xalan::XalanTransformer* transformer):
+			transformer_(transformer) { }
+
+		void operator()(const xalan::XalanCompiledStylesheet* transformation) {
+			this->transformer_->destroyStylesheet(transformation);
+		}
+
+	private:
+		xalan::XalanTransformer* const transformer_;
+
+};
+
+typedef std::unique_ptr<
+	const xalan::XalanCompiledStylesheet,
+	compiled_stylesheet_deleter
+> CompiledStylesheetPtr;
+
+CompiledStylesheetPtr compileStylesheet(
+	xalan::XalanTransformer* const transformer,
+	const xalan::XSLTInputSource&  transformation
+) {
+	const xalan::XalanCompiledStylesheet* compiled{};
+
+	if ( transformer->compileStylesheet(transformation, compiled) == 0 ) {
+		return CompiledStylesheetPtr(
+			compiled,
+			compiled_stylesheet_deleter(transformer)
+		);
+	} else {
+		return CompiledStylesheetPtr(
+			nullptr,
+			compiled_stylesheet_deleter(transformer)
+		);
+	}
+}
+
 }
 
 namespace InputXSLT {
@@ -159,42 +197,36 @@ void TransformerFacade::dispatchTransformer(
 	const xalan::XSLTInputSource& transformation,
 	xalan::FormatterListener&     target
 ) {
-	const xalan::XalanCompiledStylesheet* compiledTransformation{};
+	if ( auto compiledTransformation = compileStylesheet(
+		&(this->transformer_),
+		transformation
+	) ) {
+		switch ( target.getOutputFormat() ) {
+			case xalan::FormatterListener::eFormat::OUTPUT_METHOD_XML: {
+				auto formatter = augmentFormatterToXML(
+					compiledTransformation.get(),
+					target
+				);
 
-	this->transformer_.compileStylesheet(
-		transformation,
-		compiledTransformation
-	);
+				this->transformer_.transform(
+					source,
+					compiledTransformation.get(),
+					*formatter
+				);
 
-	switch ( target.getOutputFormat() ) {
-		case xalan::FormatterListener::eFormat::OUTPUT_METHOD_XML: {
-			auto formatter = augmentFormatterToXML(
-				compiledTransformation,
-				target
-			);
+				break;
+			}
+			default: {
+				this->transformer_.transform(
+					source,
+					compiledTransformation.get(),
+					target
+				);
 
-			this->transformer_.transform(
-				source,
-				compiledTransformation,
-				*formatter
-			);
-
-			break;
-		}
-		default: {
-			this->transformer_.transform(
-				source,
-				compiledTransformation,
-				target
-			);
-
-			break;
+				break;
+			}
 		}
 	}
-
-	this->transformer_.destroyStylesheet(
-		compiledTransformation
-	);
 }
 
 }
