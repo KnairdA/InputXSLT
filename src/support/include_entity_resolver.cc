@@ -40,11 +40,17 @@ namespace InputXSLT {
 
 boost::filesystem::path IncludeEntityResolver::getPathFromSystemId(
 	const XMLCh* const systemId) {
-	return boost::filesystem::path(
+	const std::string rawPath(
 		*XercesStringGuard<char>(
 			shiftSystemIdPastPrefix(systemId)
 		)
 	);
+
+	if ( auto extractedPath = extractFilePath(rawPath) ) {
+		return *extractedPath;
+	} else {
+		return boost::filesystem::path(rawPath);
+	}
 }
 
 IncludeEntityResolver::IncludeEntityResolver(
