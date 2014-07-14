@@ -27,6 +27,8 @@ The `test` directory contains black-box test cases for every external function p
 - [`InputXSLT:external-text-formatter`](test/external_text_formatter/transformation.xsl) (requires [markdown.pl](http://daringfireball.net/projects/markdown/))
 - [`InputXSLT:write-file`](test/write_file/transformation.xsl)
 
+Concepts of how static sites may be generated using InputXSLT are being evaluated in [TestXSLT](https://github.com/KnairdA/TestXSLT).
+
 ## Requirements:
 
 - CMake
