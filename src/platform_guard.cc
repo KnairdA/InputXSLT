@@ -1,4 +1,4 @@
-#include "plattform_guard.h"
+#include "platform_guard.h"
 
 #include <xalanc/Include/PlatformDefinitions.hpp>
 #include <xalanc/XalanTransformer/XalanTransformer.hpp>
@@ -15,7 +15,7 @@
 
 namespace InputXSLT {
 
-PlattformGuard::PlattformGuard(const std::vector<std::string>& path):
+PlatformGuard::PlatformGuard(const std::vector<std::string>& path):
 	include_resolver_(path) {
 	xercesc::XMLPlatformUtils::Initialize();
 	xalan::XalanTransformer::initialize();
@@ -61,11 +61,11 @@ PlattformGuard::PlattformGuard(const std::vector<std::string>& path):
 	);
 }
 
-PlattformGuard::~PlattformGuard() {
+PlatformGuard::~PlatformGuard() {
 	xalan::XalanTransformer::terminate();
 }
 
-IncludeEntityResolver* PlattformGuard::getEntityResolver() {
+IncludeEntityResolver* PlatformGuard::getEntityResolver() {
 	return &this->include_resolver_;
 }
 

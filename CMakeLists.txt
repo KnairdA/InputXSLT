@@ -22,7 +22,7 @@ set(
 
 set(
 	Sources
-	src/plattform_guard.cc
+	src/platform_guard.cc
 	src/transformer_facade.cc
 	src/function/read_file.cc
 	src/function/write_file.cc

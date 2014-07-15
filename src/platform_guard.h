@@ -1,5 +1,5 @@
-#ifndef INPUTXSLT_SRC_PLATTFORM_GUARD_H_
-#define INPUTXSLT_SRC_PLATTFORM_GUARD_H_
+#ifndef INPUTXSLT_SRC_PLATFORM_GUARD_H_
+#define INPUTXSLT_SRC_PLATFORM_GUARD_H_
 
 #include <string>
 #include <vector>
@@ -8,10 +8,10 @@
 
 namespace InputXSLT {
 
-class PlattformGuard {
+class PlatformGuard {
 	public:
-		PlattformGuard(const std::vector<std::string>&);
-		~PlattformGuard();
+		PlatformGuard(const std::vector<std::string>&);
+		~PlatformGuard();
 
 		IncludeEntityResolver* getEntityResolver();
 
@@ -22,4 +22,4 @@ class PlattformGuard {
 
 }
 
-#endif  // INPUTXSLT_SRC_PLATTFORM_GUARD_H_
+#endif  // INPUTXSLT_SRC_PLATFORM_GUARD_H_

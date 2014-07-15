@@ -10,7 +10,7 @@
 #include <vector>
 #include <iostream>
 
-#include "plattform_guard.h"
+#include "platform_guard.h"
 #include "transformer_facade.h"
 
 namespace {
@@ -131,7 +131,7 @@ bool process(const boost::program_options::variables_map& variables) {
 		includePath = variables["include"].as<std::vector<std::string>>();
 	};
 
-	InputXSLT::PlattformGuard plattform(includePath);
+	InputXSLT::PlatformGuard platform(includePath);
 
 	if ( variables.count("target") ) {
 		boost::filesystem::ofstream file(
@@ -141,14 +141,14 @@ bool process(const boost::program_options::variables_map& variables) {
 		if ( file.is_open() ) {
 			if ( variables.count("input") ) {
 				return generate(
-					plattform.getEntityResolver(),
+					platform.getEntityResolver(),
 					file,
 					variables["input"].as<std::string>().data(),
 					variables["transformation"].as<std::string>().data()
 				);
 			} else {
 				return generate(
-					plattform.getEntityResolver(),
+					platform.getEntityResolver(),
 					file,
 					variables["transformation"].as<std::string>().data()
 				);
@@ -159,14 +159,14 @@ bool process(const boost::program_options::variables_map& variables) {
 	} else {
 		if ( variables.count("input") ) {
 			return generate(
-				plattform.getEntityResolver(),
+				platform.getEntityResolver(),
 				std::cout,
 				variables["input"].as<std::string>().data(),
 				variables["transformation"].as<std::string>().data()
 			);
 		} else {
 			return generate(
-				plattform.getEntityResolver(),
+				platform.getEntityResolver(),
 				std::cout,
 				variables["transformation"].as<std::string>().data()
 			);
