@@ -26,6 +26,8 @@ class FilesystemContext {
 		boost::filesystem::path resolve(const xalan::XalanDOMString&) const;
 		boost::filesystem::path resolve(const boost::filesystem::path&) const;
 
+		boost::filesystem::path getBase() const;
+
 	private:
 		const boost::filesystem::path path_;
 

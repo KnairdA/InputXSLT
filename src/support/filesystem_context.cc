@@ -57,4 +57,8 @@ boost::filesystem::path FilesystemContext::resolve(
 	}
 }
 
+boost::filesystem::path FilesystemContext::getBase() const {
+	return this->path_;
+}
+
 }

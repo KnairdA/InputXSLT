@@ -9,6 +9,7 @@
 #include <string>
 
 #include "support/xalan_string.h"
+#include "support/xerces_string_guard.h"
 
 namespace InputXSLT {
 
@@ -73,7 +74,15 @@ xalan::XSLTInputSource XObjectValue::get<xalan::XSLTInputSource>(
 			this->get<boost::filesystem::path>(ptr).string().data()
 		);
 	} else {
-		return xalan::XSLTInputSource(node);
+		xalan::XSLTInputSource source(node);
+
+		source.setSystemId(
+			*XercesStringGuard<XMLCh>(
+				this->filesystem_context_.getBase().string()
+			)
+		);
+
+		return source;
 	}
 }
 
