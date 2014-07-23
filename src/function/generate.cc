@@ -26,6 +26,7 @@ DomDocumentCache::document_ptr FunctionGenerate::constructDocument(
 	ResultNodeFacade result(domDocument.get(), "generation");
 	result.setAttribute("path", targetPath.string());
 
+	boost::filesystem::create_directories(targetPath.parent_path());
 	boost::filesystem::ofstream file(targetPath);
 
 	if ( file.is_open() ) {

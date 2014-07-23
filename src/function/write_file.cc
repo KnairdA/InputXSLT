@@ -24,6 +24,7 @@ bool serializeNodeToFile(
 
 	if ( contentType != xalan::XalanNode::DOCUMENT_NODE &&
 	     contentType != xalan::XalanNode::ATTRIBUTE_NODE ) {
+		boost::filesystem::create_directories(filePath.parent_path());
 		boost::filesystem::ofstream file(filePath);
 
 		if ( file.is_open() ) {
