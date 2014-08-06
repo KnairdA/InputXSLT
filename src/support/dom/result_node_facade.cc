@@ -74,7 +74,7 @@ void ResultNodeFacade::setContent(xercesc::DOMNode* node) {
 }
 
 void ResultNodeFacade::setContent(xercesc::DOMNodeList* nodes) {
-	for ( std::size_t index = 0; index != nodes->getLength(); ++index ) {
+	for ( std::size_t index = 0; index < nodes->getLength(); ++index ) {
 		this->setContent(nodes->item(index));
 	}
 }
