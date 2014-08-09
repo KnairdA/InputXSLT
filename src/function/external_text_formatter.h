@@ -9,7 +9,7 @@ namespace InputXSLT {
 
 class FunctionExternalTextFormatter : public FunctionBase<
 	FunctionExternalTextFormatter,
-	boost::filesystem::path,
+	std::string,
 	std::string
 > {
 	public:
@@ -19,7 +19,7 @@ class FunctionExternalTextFormatter : public FunctionBase<
 		friend FunctionBase;
 
 		DomDocumentCache::document_ptr constructDocument(
-			boost::filesystem::path,
+			std::string,
 			std::string
 		) const;
 

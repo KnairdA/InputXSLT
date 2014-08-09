@@ -25,7 +25,7 @@
 <xsl:template name="implementation">
 	<xsl:variable name="result">
 		<xsl:call-template name="formatter">
-			<xsl:with-param name="format">/usr/bin/markdown</xsl:with-param>
+			<xsl:with-param name="format">markdown</xsl:with-param>
 			<xsl:with-param name="file">[test.md]</xsl:with-param>
 		</xsl:call-template>
 	</xsl:variable>

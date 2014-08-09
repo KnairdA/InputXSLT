@@ -37,8 +37,6 @@ DomDocumentCache::document_ptr FunctionGenerate::constructDocument(
 			xalan::XalanOutputStreamPrintWriter writer(output);
 			xalan::FormatterToXML               targetFormatter(writer);
 
-			targetFormatter.setDoIndent(true);
-
 			transformer.generate(
 				inputSource,
 				transformationSource,
