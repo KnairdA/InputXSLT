@@ -5,6 +5,29 @@
 
 #include "support/xalan_string.h"
 
+namespace {
+
+const std::string workingDirectory(".");
+
+inline boost::filesystem::path determineBasePath(
+	const boost::filesystem::path& path) {
+	const boost::filesystem::path basePath(
+		boost::filesystem::is_directory(path) ? path : path.parent_path()
+	);
+
+	if ( basePath == boost::filesystem::current_path() ) {
+		return workingDirectory;
+	} else {
+		if ( path.is_absolute() ) {
+			return path;
+		} else {
+			return workingDirectory / path;
+		}
+	}
+}
+
+}
+
 namespace InputXSLT {
 
 void FilesystemContext::iterate(
@@ -36,12 +59,10 @@ void FilesystemContext::iterate(
 }
 
 FilesystemContext::FilesystemContext(const boost::filesystem::path& path):
-	path_(boost::filesystem::canonical(
-		path.parent_path()
-	)) { }
+	path_(determineBasePath(path)) { }
 
 FilesystemContext::FilesystemContext(const std::string& path):
-	path_(boost::filesystem::canonical(path)) { }
+	FilesystemContext(boost::filesystem::path(path)) { }
 
 boost::filesystem::path FilesystemContext::resolve(
 	const xalan::XalanDOMString& path) const {
@@ -53,7 +74,7 @@ boost::filesystem::path FilesystemContext::resolve(
 	if ( path.is_absolute() ) {
 		return path;
 	} else {
-		return absolute(this->path_ / path);
+		return this->path_ / path;
 	}
 }
 
