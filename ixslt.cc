@@ -2,8 +2,8 @@
 #include <xalanc/PlatformSupport/XalanStdOutputStream.hpp>
 #include <xalanc/XMLSupport/FormatterToXML.hpp>
 
-#include "boost/optional.hpp"
-#include "boost/program_options.hpp"
+#include <boost/optional.hpp>
+#include <boost/program_options.hpp>
 #include <boost/filesystem/fstream.hpp>
 
 #include <string>

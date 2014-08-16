@@ -4,7 +4,8 @@
 #include <xalanc/XalanDOM/XalanDocumentFragment.hpp>
 
 #include <boost/algorithm/string.hpp>
-#include "boost/filesystem.hpp"
+#include <boost/filesystem.hpp>
+#include <boost/optional.hpp>
 
 #include <string>
 
@@ -24,6 +25,16 @@ template <>
 std::string XObjectValue::get<std::string>(
 	const xalan::XObjectPtr& ptr) const {
 	return boost::trim_copy(toString(ptr->str()));
+}
+
+template <>
+boost::optional<std::string> XObjectValue::get<boost::optional<std::string>>(
+	const xalan::XObjectPtr& ptr) const {
+	if ( ptr.null() ) {
+		return boost::optional<std::string>();
+	} else {
+		return this->get<std::string>(ptr);
+	}
 }
 
 template <>

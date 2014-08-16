@@ -4,7 +4,7 @@
 #include <xercesc/sax/EntityResolver.hpp>
 #include <xercesc/sax/InputSource.hpp>
 
-#include "boost/optional.hpp"
+#include <boost/optional.hpp>
 
 #include <string>
 #include <vector>

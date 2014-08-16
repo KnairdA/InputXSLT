@@ -4,7 +4,7 @@
 #include <xalanc/XalanDOM/XalanDOMString.hpp>
 #include <xalanc/XPath/Function.hpp>
 
-#include "boost/filesystem.hpp"
+#include <boost/filesystem.hpp>
 
 #include <string>
 #include <functional>

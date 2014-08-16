@@ -2,7 +2,7 @@
 
 #include <xercesc/framework/LocalFileInputSource.hpp>
 
-#include "boost/filesystem.hpp"
+#include <boost/filesystem.hpp>
 
 #include "support/xalan_string.h"
 #include "support/xerces_string_guard.h"

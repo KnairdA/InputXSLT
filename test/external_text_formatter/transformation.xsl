@@ -16,7 +16,7 @@
 
 	<xsl:variable name="content" select="InputXSLT:read-file($file)/text()"/>
 
-	<xsl:copy-of select="InputXSLT:external-text-formatter(
+	<xsl:copy-of select="InputXSLT:external-command(
 		$format,
 		$content
 	)"/>

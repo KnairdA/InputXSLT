@@ -29,7 +29,7 @@ set(
 	src/function/read_directory.cc
 	src/function/transform.cc
 	src/function/generate.cc
-	src/function/external_text_formatter.cc
+	src/function/external_command.cc
 	src/support/filesystem_context.cc
 	src/support/xalan_string.cc
 	src/support/include_entity_resolver.cc

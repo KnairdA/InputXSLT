@@ -11,7 +11,7 @@
 #include "function/read_directory.h"
 #include "function/transform.h"
 #include "function/generate.h"
-#include "function/external_text_formatter.h"
+#include "function/external_command.h"
 
 namespace InputXSLT {
 
@@ -56,8 +56,8 @@ PlatformGuard::PlatformGuard(const std::vector<std::string>& path):
 
 	xalan::XalanTransformer::installExternalFunctionGlobal(
 		customNamespace,
-		xalan::XalanDOMString("external-text-formatter"),
-		InputXSLT::FunctionExternalTextFormatter(&this->include_resolver_)
+		xalan::XalanDOMString("external-command"),
+		InputXSLT::FunctionExternalCommand(&this->include_resolver_)
 	);
 }
 

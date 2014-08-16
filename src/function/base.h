@@ -5,6 +5,8 @@
 #include <xalanc/XPath/Function.hpp>
 #include <xalanc/XPath/XObject.hpp>
 
+#include <boost/optional.hpp>
+
 #include <memory>
 #include <tuple>
 
@@ -14,6 +16,7 @@
 #include "support/include_entity_resolver.h"
 #include "support/dom/document_cache.h"
 #include "support/type/sequence.h"
+#include "support/type/filter.h"
 #include "support/type/xobject_value.h"
 
 namespace InputXSLT {
@@ -23,7 +26,13 @@ template <
 	typename... Types
 >
 class FunctionBase : public xalan::Function {
-	static const std::size_t parameter_count = sizeof...(Types);
+	static const std::size_t parameter_count          = sizeof...(Types);
+	static const std::size_t optional_parameter_count = std::tuple_size<
+		typename filter_derived<
+			boost::optional_detail::optional_tag,
+			Types...
+		>::type
+	>::value;
 
 	public:
 		FunctionBase(IncludeEntityResolver* resolver):
@@ -108,16 +117,20 @@ class FunctionBase : public xalan::Function {
 					valueGetter.get<typename std::tuple_element<
 						Index,
 						std::tuple<Types...>
-					>::type>(parameters[Index])...
+					>::type>(
+						Index < parameters.size()
+						? parameters[Index]
+						: xalan::XObjectPtr()
+					)...
 				)
 			);
 		}
 
 		inline void validateParameters(
-			const XObjectArgVectorType& parameters,
+			const XObjectArgVectorType&   parameters,
 			xalan::XPathExecutionContext& executionContext,
-			xalan::XalanNode* context,
-			const xalan::Locator* locator
+			xalan::XalanNode*             context,
+			const xalan::Locator*         locator
 		) const {
 			const bool anyNull = std::any_of(
 				parameters.begin(),
@@ -127,7 +140,9 @@ class FunctionBase : public xalan::Function {
 				}
 			);
 
-			if ( parameters.size() != parameter_count || anyNull ) {
+			if ( parameters.size() > parameter_count          ||
+			     parameters.size() < optional_parameter_count ||
+			     anyNull ) {
 				xalan::XPathExecutionContext::GetAndReleaseCachedString guard(
 					executionContext
 				);

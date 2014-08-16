@@ -1,4 +1,4 @@
-#include "external_text_formatter.h"
+#include "external_command.h"
 
 #include <xalanc/XSLT/XSLTInputSource.hpp>
 
@@ -39,9 +39,9 @@ inline xercesc::DOMNode* importDocumentElement(
 
 namespace InputXSLT {
 
-DomDocumentCache::document_ptr FunctionExternalTextFormatter::constructDocument(
-	std::string formatterCommand,
-	std::string stdinText
+DomDocumentCache::document_ptr FunctionExternalCommand::constructDocument(
+	std::string                  command,
+	boost::optional<std::string> stdinText
 ) const {
 	DomDocumentCache::document_ptr domDocument(
 		DomDocumentCache::createDocument("content")
@@ -52,23 +52,21 @@ DomDocumentCache::document_ptr FunctionExternalTextFormatter::constructDocument(
 	context.stdout_behavior = boost::process::capture_stream();
 	context.stdin_behavior  = boost::process::capture_stream();
 
-	boost::process::child formatterProcess(
-		boost::process::launch_shell(
-			formatterCommand,
-			context
-		)
+	boost::process::child commandProcess(
+		boost::process::launch_shell(command, context)
 	);
 
-	boost::process::postream& inputStream  = formatterProcess.get_stdin();
-	boost::process::pistream& outputStream = formatterProcess.get_stdout();
+	if ( stdinText ) {
+		boost::process::postream& inputStream = commandProcess.get_stdin();
+		inputStream << *stdinText;
+		inputStream.close();
+	}
 
-	inputStream << stdinText;
-	inputStream.close();
-
-	boost::process::status status = formatterProcess.wait();
+	boost::process::pistream& outputStream = commandProcess.get_stdout();
+	boost::process::status status          = commandProcess.wait();
 
 	ResultNodeFacade result(domDocument.get(), "output");
-	result.setAttribute("formatter", formatterCommand);
+	result.setAttribute("command", command);
 	result.setAttribute("code",      std::to_string(status.exit_status()));
 
 	if ( status.exited() ) {
