@@ -26,8 +26,9 @@ template <
 	typename... Types
 >
 class FunctionBase : public xalan::Function {
-	static const std::size_t parameter_count          = sizeof...(Types);
-	static const std::size_t optional_parameter_count = std::tuple_size<
+	static const std::size_t maximum_parameter_count = sizeof...(Types);
+	static const std::size_t minimum_parameter_count = maximum_parameter_count
+	                                                 - std::tuple_size<
 		typename filter_derived<
 			boost::optional_detail::optional_tag,
 			Types...
@@ -56,7 +57,7 @@ class FunctionBase : public xalan::Function {
 				this->callConstructDocument(
 					parameters,
 					locator,
-					typename IndexSequence<parameter_count>::type()
+					typename IndexSequence<maximum_parameter_count>::type()
 				)
 			);
 
@@ -90,11 +91,25 @@ class FunctionBase : public xalan::Function {
 
 		const xalan::XalanDOMString& getError(
 			xalan::XalanDOMString& result) const {
-			result.assign(std::string(
-				"The function expects "         +
-				std::to_string(parameter_count) +
-				" parameter(s)"
-			).data());
+			const std::string startText("The function expects ");
+			const std::string endText(" parameter(s)");
+
+			if ( minimum_parameter_count == maximum_parameter_count ) {
+				result.assign(std::string(
+					startText
+					+ std::to_string(minimum_parameter_count) 
+					+ endText
+				).data());
+			} else {
+				result.assign(std::string(
+					startText
+					+ "between "
+					+ std::to_string(minimum_parameter_count) 
+					+ " and "
+					+ std::to_string(maximum_parameter_count) 
+					+ endText
+				).data());
+			}
 
 			return result;
 		}
@@ -140,8 +155,8 @@ class FunctionBase : public xalan::Function {
 				}
 			);
 
-			if ( parameters.size() > parameter_count          ||
-			     parameters.size() < optional_parameter_count ||
+			if ( parameters.size() > maximum_parameter_count ||
+			     parameters.size() < minimum_parameter_count ||
 			     anyNull ) {
 				xalan::XPathExecutionContext::GetAndReleaseCachedString guard(
 					executionContext

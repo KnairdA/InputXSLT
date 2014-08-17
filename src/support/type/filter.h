@@ -7,13 +7,13 @@
 namespace InputXSLT {
 
 template <
-	typename BaseReference,
+	typename Base,
 	typename Head,
 	typename... Tail
 >
 struct filter_derived {
 	typedef typename std::conditional<
-		std::is_base_of<BaseReference, Head>::value,
+		std::is_base_of<Base, Head>::value,
 		std::tuple<Head, Tail...>,
 		std::tuple<Tail...>
 	>::type type;
