@@ -41,7 +41,7 @@ namespace InputXSLT {
 
 DomDocumentCache::document_ptr FunctionExternalCommand::constructDocument(
 	std::string                  command,
-	boost::optional<std::string> stdinText
+	boost::optional<std::string> input
 ) const {
 	DomDocumentCache::document_ptr domDocument(
 		DomDocumentCache::createDocument("content")
@@ -56,18 +56,18 @@ DomDocumentCache::document_ptr FunctionExternalCommand::constructDocument(
 		boost::process::launch_shell(command, context)
 	);
 
-	if ( stdinText ) {
+	if ( input ) {
 		boost::process::postream& inputStream = commandProcess.get_stdin();
-		inputStream << *stdinText;
+		inputStream << *input;
 		inputStream.close();
 	}
 
 	boost::process::pistream& outputStream = commandProcess.get_stdout();
 	boost::process::status status          = commandProcess.wait();
 
-	ResultNodeFacade result(domDocument.get(), "output");
-	result.setAttribute("command", command);
-	result.setAttribute("code",      std::to_string(status.exit_status()));
+	ResultNodeFacade result(domDocument.get(), "command");
+	result.setAttribute("executed", command);
+	result.setAttribute("code",     std::to_string(status.exit_status()));
 
 	if ( status.exited() ) {
 		try {

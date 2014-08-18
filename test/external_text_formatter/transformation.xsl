@@ -11,15 +11,11 @@
 <xsl:import href="[testcase.xsl]"/>
 
 <xsl:template name="formatter">
-	<xsl:param name="format"/>
-	<xsl:param name="file"/>
-
+	<xsl:param    name="format"/>
+	<xsl:param    name="file"/>
 	<xsl:variable name="content" select="InputXSLT:read-file($file)/text()"/>
 
-	<xsl:copy-of select="InputXSLT:external-command(
-		$format,
-		$content
-	)"/>
+	<xsl:copy-of select="InputXSLT:external-command($format, $content)"/>
 </xsl:template>
 
 <xsl:template name="implementation">
@@ -31,8 +27,8 @@
 	</xsl:variable>
 
 	<xsl:choose>
-		<xsl:when test="xalan:nodeset($result)/output/@result = 'success'">
-			<xsl:copy-of select="xalan:nodeset($result)/output/*"/>
+		<xsl:when test="xalan:nodeset($result)/command/@result = 'success'">
+			<xsl:copy-of select="xalan:nodeset($result)/command/node()"/>
 		</xsl:when>
 		<xsl:otherwise>
 			Failure during external text formatting
