@@ -12,7 +12,7 @@ namespace InputXSLT {
 class XObjectValue {
 	public:
 		XObjectValue(
-			const boost::filesystem::path&,
+			const FilesystemContext*,
 			const IncludeEntityResolver*
 		);
 
@@ -20,7 +20,7 @@ class XObjectValue {
 		Type get(const xalan::XObjectPtr&) const;
 
 	private:
-		const FilesystemContext filesystem_context_;
+		const FilesystemContext*     const filesystem_context_;
 		const IncludeEntityResolver* const include_resolver_;
 
 };

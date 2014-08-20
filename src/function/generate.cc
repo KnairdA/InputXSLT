@@ -15,9 +15,10 @@
 namespace InputXSLT {
 
 DomDocumentCache::document_ptr FunctionGenerate::constructDocument(
-	xalan::XSLTInputSource  inputSource,
-	xalan::XSLTInputSource  transformationSource,
-	boost::filesystem::path targetPath
+	const FilesystemContext&,
+	xalan::XSLTInputSource   inputSource,
+	xalan::XSLTInputSource   transformationSource,
+	boost::filesystem::path  targetPath
 ) const {
 	DomDocumentCache::document_ptr domDocument(
 		DomDocumentCache::createDocument("content")

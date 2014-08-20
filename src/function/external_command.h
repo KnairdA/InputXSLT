@@ -20,6 +20,7 @@ class FunctionExternalCommand : public FunctionBase<
 		friend FunctionBase;
 
 		DomDocumentCache::document_ptr constructDocument(
+			const FilesystemContext&,
 			std::string,
 			boost::optional<std::string>
 		) const;

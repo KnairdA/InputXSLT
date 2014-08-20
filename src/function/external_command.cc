@@ -40,6 +40,7 @@ inline xercesc::DOMNode* importDocumentElement(
 namespace InputXSLT {
 
 DomDocumentCache::document_ptr FunctionExternalCommand::constructDocument(
+	const FilesystemContext&     fsContext,
 	std::string                  command,
 	boost::optional<std::string> input
 ) const {
@@ -51,6 +52,9 @@ DomDocumentCache::document_ptr FunctionExternalCommand::constructDocument(
 	context.environment     = boost::process::self::get_environment(); 
 	context.stdout_behavior = boost::process::capture_stream();
 	context.stdin_behavior  = boost::process::capture_stream();
+	context.work_directory  = boost::filesystem::canonical(
+		fsContext.getBase().parent_path()
+	).string();
 
 	boost::process::child commandProcess(
 		boost::process::launch_shell(command, context)

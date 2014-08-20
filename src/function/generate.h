@@ -20,6 +20,7 @@ class FunctionGenerate : public FunctionBase<
 		friend FunctionBase;
 
 		DomDocumentCache::document_ptr constructDocument(
+			const FilesystemContext&,
 			xalan::XSLTInputSource,
 			xalan::XSLTInputSource,
 			boost::filesystem::path

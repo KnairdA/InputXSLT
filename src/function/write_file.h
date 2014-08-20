@@ -17,6 +17,7 @@ class FunctionWriteFile : public FunctionBase<
 		friend FunctionBase;
 
 		DomDocumentCache::document_ptr constructDocument(
+			const FilesystemContext&,
 			boost::filesystem::path,
 			xalan::XalanNode* const
 		) const;

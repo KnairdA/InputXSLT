@@ -19,6 +19,7 @@ class FunctionTransform : public FunctionBase<
 		friend FunctionBase;
 
 		DomDocumentCache::document_ptr constructDocument(
+			const FilesystemContext&,
 			xalan::XSLTInputSource,
 			xalan::XSLTInputSource
 		) const;

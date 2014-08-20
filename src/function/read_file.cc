@@ -60,7 +60,9 @@ boost::optional<std::string> readPlainFile(
 namespace InputXSLT {
 
 DomDocumentCache::document_ptr FunctionReadFile::constructDocument(
-	boost::filesystem::path filePath) const {
+	const FilesystemContext&,
+	boost::filesystem::path  filePath
+) const {
 	DomDocumentCache::document_ptr domDocument(
 		DomDocumentCache::createDocument("content")
 	);

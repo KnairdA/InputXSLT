@@ -15,10 +15,10 @@
 namespace InputXSLT {
 
 XObjectValue::XObjectValue(
-	const boost::filesystem::path& path,
-	const IncludeEntityResolver*   resolver
+	const FilesystemContext*     context,
+	const IncludeEntityResolver* resolver
 ):
-	filesystem_context_(path),
+	filesystem_context_(context),
 	include_resolver_(resolver) { }
 
 template <>
@@ -47,7 +47,7 @@ boost::filesystem::path XObjectValue::get<boost::filesystem::path>(
 	if ( auto resolvedPath = this->include_resolver_->resolve(rawPath) ) {
 		return *resolvedPath;
 	} else {
-		return this->filesystem_context_.resolve(rawPath);
+		return this->filesystem_context_->resolve(rawPath);
 	}
 }
 
@@ -89,7 +89,7 @@ xalan::XSLTInputSource XObjectValue::get<xalan::XSLTInputSource>(
 
 		source.setSystemId(
 			*XercesStringGuard<XMLCh>(
-				this->filesystem_context_.getBase().string()
+				this->filesystem_context_->getBase().string()
 			)
 		);
 

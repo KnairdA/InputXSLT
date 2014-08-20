@@ -120,15 +120,17 @@ class FunctionBase : public xalan::Function {
 			const xalan::Locator*       locator,
 			Sequence<Index...>
 		) const {
-			XObjectValue valueGetter(
+			const FilesystemContext context(
 				IncludeEntityResolver::getPathFromSystemId(
 					locator->getSystemId()
-				),
-				this->include_resolver_
+				)
 			);
+
+			XObjectValue valueGetter(&context, this->include_resolver_);
 
 			return this->document_cache_->create(
 				static_cast<const Implementation*>(this)->constructDocument(
+					context,
 					valueGetter.get<typename std::tuple_element<
 						Index,
 						std::tuple<Types...>
