@@ -52,6 +52,17 @@ boost::filesystem::path XObjectValue::get<boost::filesystem::path>(
 }
 
 template <>
+boost::optional<boost::filesystem::path>
+XObjectValue::get<boost::optional<boost::filesystem::path>>(
+	const xalan::XObjectPtr& ptr) const {
+	if ( ptr.null() ) {
+		return boost::optional<boost::filesystem::path>();
+	} else {
+		return this->get<boost::filesystem::path>(ptr);
+	}
+}
+
+template <>
 xalan::XObjectPtr XObjectValue::get<xalan::XObjectPtr>(
 	const xalan::XObjectPtr& ptr) const {
 	return ptr;

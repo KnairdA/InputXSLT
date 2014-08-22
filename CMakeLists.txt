@@ -27,7 +27,6 @@ set(
 	src/function/read_file.cc
 	src/function/write_file.cc
 	src/function/read_directory.cc
-	src/function/transform.cc
 	src/function/generate.cc
 	src/function/external_command.cc
 	src/support/filesystem_context.cc

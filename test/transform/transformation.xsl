@@ -14,7 +14,7 @@
 	<xsl:param name="input"/>
 	<xsl:param name="transformation"/>
 
-	<xsl:copy-of select="InputXSLT:transform(
+	<xsl:copy-of select="InputXSLT:generate(
 		$input,
 		string($transformation)
 	)"/>
@@ -40,7 +40,7 @@
 		</xsl:call-template>
 	</xsl:variable>
 
-	<xsl:variable name="transformation" select="xalan:nodeset($result)/transformation"/>
+	<xsl:variable name="transformation" select="xalan:nodeset($result)/generation"/>
 
 	<xsl:choose>
 		<xsl:when test="$transformation/@result = 'success'">

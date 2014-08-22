@@ -11,7 +11,7 @@ class FunctionGenerate : public FunctionBase<
 	FunctionGenerate,
 	xalan::XSLTInputSource,
 	xalan::XSLTInputSource,
-	boost::filesystem::path
+	boost::optional<boost::filesystem::path>
 > {
 	public:
 		using FunctionBase::FunctionBase;
@@ -23,7 +23,7 @@ class FunctionGenerate : public FunctionBase<
 			const FilesystemContext&,
 			xalan::XSLTInputSource,
 			xalan::XSLTInputSource,
-			boost::filesystem::path
+			boost::optional<boost::filesystem::path>
 		) const;
 
 };

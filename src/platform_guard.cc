@@ -9,7 +9,6 @@
 #include "function/read_file.h"
 #include "function/write_file.h"
 #include "function/read_directory.h"
-#include "function/transform.h"
 #include "function/generate.h"
 #include "function/external_command.h"
 
@@ -40,12 +39,6 @@ PlatformGuard::PlatformGuard(const std::vector<std::string>& path):
 		customNamespace,
 		xalan::XalanDOMString("read-directory"),
 		InputXSLT::FunctionReadDirectory(&this->include_resolver_)
-	);
-
-	xalan::XalanTransformer::installExternalFunctionGlobal(
-		customNamespace,
-		xalan::XalanDOMString("transform"),
-		InputXSLT::FunctionTransform(&this->include_resolver_)
 	);
 
 	xalan::XalanTransformer::installExternalFunctionGlobal(
