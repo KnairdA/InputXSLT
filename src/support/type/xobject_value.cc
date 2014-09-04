@@ -100,7 +100,9 @@ xalan::XSLTInputSource XObjectValue::get<xalan::XSLTInputSource>(
 
 		source.setSystemId(
 			*XercesStringGuard<XMLCh>(
-				this->filesystem_context_->getBase().string()
+				"file://" + boost::filesystem::absolute(
+					this->filesystem_context_->getBase()
+				).string()
 			)
 		);
 
