@@ -12,6 +12,7 @@
 
 #include "platform_guard.h"
 #include "transformer_facade.h"
+#include "support/xerces_string_guard.h"
 
 namespace {
 
@@ -32,6 +33,31 @@ class WarningGuard {
 
 	private:
 		InputXSLT::TransformerFacade* const transformer_;
+
+};
+
+class StreamInputSource {
+	public:
+		StreamInputSource(
+			const boost::filesystem::path& actualPath,
+			const boost::filesystem::path& contextPath
+		):
+			file_(actualPath),
+			source_(file_) {
+			this->source_.setSystemId(
+				*InputXSLT::XercesStringGuard<XMLCh>(
+					"file://" + contextPath.string()
+				)
+			);
+		}
+
+		xalan::XSLTInputSource& operator*() {
+			return this->source_;
+		}
+
+	private:
+		boost::filesystem::ifstream file_;
+		xalan::XSLTInputSource source_;
 
 };
 
@@ -133,6 +159,11 @@ bool process(const boost::program_options::variables_map& variables) {
 
 	InputXSLT::PlatformGuard platform(includePath);
 
+	StreamInputSource transformationSource(
+		variables["transformation"].as<std::string>(),
+		boost::filesystem::current_path()
+	);
+
 	if ( variables.count("target") ) {
 		boost::filesystem::ofstream file(
 			variables["target"].as<std::string>()
@@ -144,13 +175,13 @@ bool process(const boost::program_options::variables_map& variables) {
 					platform.getEntityResolver(),
 					file,
 					variables["input"].as<std::string>().data(),
-					variables["transformation"].as<std::string>().data()
+					*transformationSource
 				);
 			} else {
 				return generate(
 					platform.getEntityResolver(),
 					file,
-					variables["transformation"].as<std::string>().data()
+					*transformationSource
 				);
 			}
 		} else {
@@ -162,13 +193,13 @@ bool process(const boost::program_options::variables_map& variables) {
 				platform.getEntityResolver(),
 				std::cout,
 				variables["input"].as<std::string>().data(),
-				variables["transformation"].as<std::string>().data()
+				*transformationSource
 			);
 		} else {
 			return generate(
 				platform.getEntityResolver(),
 				std::cout,
-				variables["transformation"].as<std::string>().data()
+				*transformationSource
 			);
 		}
 	}
