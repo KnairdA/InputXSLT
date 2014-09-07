@@ -26,7 +26,7 @@ The `test` directory contains black-box test cases for every external function p
 - [`InputXSLT:external-command` (text formatting)](test/external_text_formatter/transformation.xsl) (requires [markdown.pl](http://daringfireball.net/projects/markdown/))
 - [`InputXSLT:write-file`](test/write_file/transformation.xsl)
 
-Concepts of how static sites may be generated using InputXSLT are being evaluated in [TestXSLT](https://github.com/KnairdA/TestXSLT).
+The [new version of my personal blog](https://github.com/KnairdA/blog.kummerlaender.eu) is currently being developed based on this project and makes for a good example of how static sites may be generated using InputXSLT.
 
 ## Requirements:
 
