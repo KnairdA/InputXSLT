@@ -41,8 +41,8 @@ std::unique_ptr<xalan::FormatterToXML> augmentFormatterToXML(
 			xalan::FormatterToXML::eDefaultIndentAmount,
 			stylesheetRoot->getOutputEncoding(outputEncoding),
 			stylesheetRoot->getOutputMediaType(outputMediaType),
-			stylesheetRoot->getOutputDoctypePublic(outputDoctypePublic),
 			stylesheetRoot->getOutputDoctypeSystem(outputDoctypeSystem),
+			stylesheetRoot->getOutputDoctypePublic(outputDoctypePublic),
 			!stylesheetRoot->getOmitOutputXMLDecl(),
 			stylesheetRoot->getOutputStandalone(outputStandalone)
 		)
