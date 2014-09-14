@@ -1,10 +1,10 @@
 # InputXSLT
 
-... is a proof-of-concept implementation of external ~~read-only~~ file access functions for XSLT based on Apache [xalan](https://xalan.apache.org/) and [xerces](https://xerces.apache.org/).
+…is a Apache [Xalan](https://xalan.apache.org/) and [Xerces](https://xerces.apache.org/) based XSLT extension enabling access to external commands, the filesystem and calling further transformations from inside a transformation.
 
 ## Why?!
 
-Contrary to popular opinion I actually like XSLT as a content transformation language and have built - amongst other things - my personal website on top of it. While I used the XSLT based [Symphony CMS](http://www.getsymphony.com/)  for that particular endeavour, the intention behind the experiment contained within this repository is to develop XSLT extensions enabling the development of static site generators using XSLT as both a template and application language.
+Contrary to popular opinion I actually like XSLT as a content transformation language and have built - amongst other things - my personal website on top of it. While I used the XSLT based [Symphony CMS](http://www.getsymphony.com/)  for that particular endeavour, the intention behind this project is to develop XSLT extensions enabling the development of static site generators using XSLT as both a template and application language.
 
 ## Current features:
 
@@ -31,7 +31,7 @@ The [new version of my personal blog](https://github.com/KnairdA/blog.kummerlaen
 ## Requirements:
 
 - CMake
-- C++ compiler with C++11 support
+- C++ compiler with C++14 support
 - Apache [Xalan](https://xalan.apache.org/) XSLT Processor (preferably built with ICU flags)
 - Apache [Xerces](https://xerces.apache.org/) XML Library
 - Boost [Filesystem](http://www.boost.org/doc/libs/1_55_0/libs/filesystem/doc/index.htm)
