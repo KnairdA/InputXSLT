@@ -33,7 +33,7 @@ xalan::XalanDocument* DomDocumentCache::create(document_ptr&& document) {
 	std::lock_guard<std::mutex> guard(this->write_mutex_);
 
 	this->cache_.emplace(
-		new item(
+		std::make_unique<item>(
 			std::move(document)
 		)
 	);

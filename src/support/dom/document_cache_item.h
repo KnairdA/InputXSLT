@@ -17,7 +17,7 @@ class DomDocumentCache::item {
 		xalan::XalanDocument* getXalanDocument();
 
 	protected:
-		friend DomDocumentCache;
+		friend std::unique_ptr<item> std::make_unique<item>(document_ptr&&);
 
 		item(document_ptr&&);
 

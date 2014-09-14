@@ -12,7 +12,6 @@ class ErrorCapacitor : public ErrorMultiplexer::receiver {
 		class exception;
 
 		typedef std::vector<std::string> error_cache;
-		typedef std::unique_ptr<error_cache> error_cache_ptr;
 
 		ErrorCapacitor(ErrorMultiplexer*);
 
@@ -24,18 +23,18 @@ class ErrorCapacitor : public ErrorMultiplexer::receiver {
 		);
 
 	private:
-		error_cache_ptr error_cache_;
+		std::unique_ptr<error_cache> error_cache_;
 
 };
 
 class ErrorCapacitor::exception {
 	public:
-		exception(error_cache_ptr);
+		exception(std::unique_ptr<error_cache>);
 
 		const error_cache& operator*() const;
 
 	private:
-		error_cache_ptr error_cache_;
+		std::unique_ptr<error_cache> error_cache_;
 
 };
 

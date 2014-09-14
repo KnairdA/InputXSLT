@@ -3,7 +3,7 @@ project(InputXSLT)
 
 set(
 	CMAKE_CXX_FLAGS
-	"${CMAKE_CXX_FLAGS} -std=c++11 -W -Wall -Wextra -Winline -pedantic"
+	"${CMAKE_CXX_FLAGS} -std=c++14 -W -Wall -Wextra -Winline -pedantic"
 )
 
 include_directories(

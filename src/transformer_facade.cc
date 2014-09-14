@@ -33,19 +33,17 @@ std::unique_ptr<xalan::FormatterToXML> augmentFormatterToXML(
 	xalan::XalanDOMString outputDoctypeSystem;
 	xalan::XalanDOMString outputStandalone;
 
-	return std::unique_ptr<xalan::FormatterToXML>(
-		new xalan::FormatterToXML(
-			*(formatter.getWriter()),
-			stylesheetRoot->getOutputVersion(outputVersion),
-			stylesheetRoot->getOutputIndent(),
-			xalan::FormatterToXML::eDefaultIndentAmount,
-			stylesheetRoot->getOutputEncoding(outputEncoding),
-			stylesheetRoot->getOutputMediaType(outputMediaType),
-			stylesheetRoot->getOutputDoctypeSystem(outputDoctypeSystem),
-			stylesheetRoot->getOutputDoctypePublic(outputDoctypePublic),
-			!stylesheetRoot->getOmitOutputXMLDecl(),
-			stylesheetRoot->getOutputStandalone(outputStandalone)
-		)
+	return std::make_unique<xalan::FormatterToXML>(
+		*(formatter.getWriter()),
+		stylesheetRoot->getOutputVersion(outputVersion),
+		stylesheetRoot->getOutputIndent(),
+		xalan::FormatterToXML::eDefaultIndentAmount,
+		stylesheetRoot->getOutputEncoding(outputEncoding),
+		stylesheetRoot->getOutputMediaType(outputMediaType),
+		stylesheetRoot->getOutputDoctypeSystem(outputDoctypeSystem),
+		stylesheetRoot->getOutputDoctypePublic(outputDoctypePublic),
+		!stylesheetRoot->getOmitOutputXMLDecl(),
+		stylesheetRoot->getOutputStandalone(outputStandalone)
 	);
 }
 

@@ -4,7 +4,7 @@ namespace InputXSLT {
 
 ErrorCapacitor::ErrorCapacitor(ErrorMultiplexer* multiplexer):
 	ErrorMultiplexer::receiver(multiplexer),
-	error_cache_(new error_cache()) { }
+	error_cache_(std::make_unique<error_cache>()) { }
 
 void ErrorCapacitor::discharge() {
 	if ( !this->error_cache_->empty() ) {
@@ -21,7 +21,7 @@ void ErrorCapacitor::receive(
 	}
 }
 
-ErrorCapacitor::exception::exception(error_cache_ptr ptr):
+ErrorCapacitor::exception::exception(std::unique_ptr<error_cache> ptr):
 	error_cache_(std::move(ptr)) { }
 
 auto ErrorCapacitor::exception::operator*() const -> const error_cache& {

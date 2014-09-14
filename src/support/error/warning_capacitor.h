@@ -9,7 +9,7 @@ namespace InputXSLT {
 
 class WarningCapacitor : public ErrorMultiplexer::receiver {
 	public:
-		typedef std::vector<std::string> warning_cache;
+		typedef std::vector<std::string>       warning_cache;
 		typedef std::unique_ptr<warning_cache> warning_cache_ptr;
 
 		WarningCapacitor(ErrorMultiplexer*);

@@ -42,8 +42,10 @@ class StreamInputSource {
 			const boost::filesystem::path& actualPath,
 			const boost::filesystem::path& contextPath
 		):
-			file_(actualPath),
-			source_(file_) {
+			file_(std::make_unique<boost::filesystem::ifstream>(
+				actualPath
+			)),
+			source_(*file_) {
 			this->source_.setSystemId(
 				*InputXSLT::XercesStringGuard<XMLCh>(
 					"file://" + contextPath.string()
@@ -56,7 +58,7 @@ class StreamInputSource {
 		}
 
 	private:
-		boost::filesystem::ifstream file_;
+		std::unique_ptr<std::istream> file_;
 		xalan::XSLTInputSource source_;
 
 };

@@ -4,14 +4,16 @@ namespace InputXSLT {
 
 WarningCapacitor::WarningCapacitor(ErrorMultiplexer* multiplexer):
 	ErrorMultiplexer::receiver(multiplexer),
-	warning_cache_(new warning_cache()) { }
+	warning_cache_(std::make_unique<warning_cache>()) { }
 
 auto WarningCapacitor::discharge() -> warning_cache_ptr {
-	warning_cache_ptr tmp(std::move(this->warning_cache_));
+	warning_cache_ptr tmp(
+		std::make_unique<warning_cache>()
+	);
 
-	this->warning_cache_.reset(new warning_cache());
+	std::swap(tmp, this->warning_cache_);
 
-	return std::move(tmp);
+	return tmp;
 }
 
 void WarningCapacitor::receive(
