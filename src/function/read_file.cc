@@ -68,7 +68,8 @@ DomDocumentCache::document_ptr FunctionReadFile::constructDocument(
 	);
 
 	ResultNodeFacade result(domDocument.get(), "file");
-	result.setAttribute("path", filePath.string());
+	result.setAttribute("name", filePath.filename().string());
+	result.setAttribute("base", filePath.parent_path().string());
 
 	if ( boost::filesystem::is_regular_file(filePath) ) {
 		try {
