@@ -120,12 +120,7 @@ class FunctionBase : public xalan::Function {
 			const xalan::Locator*       locator,
 			Sequence<Index...>
 		) const {
-			const FilesystemContext context(
-				IncludeEntityResolver::getPathFromSystemId(
-					locator->getSystemId()
-				)
-			);
-
+			const FilesystemContext context;
 			XObjectValue valueGetter(&context, this->include_resolver_);
 
 			return this->document_cache_->create(

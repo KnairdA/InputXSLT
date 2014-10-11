@@ -22,6 +22,7 @@ class FilesystemContext {
 
 		explicit FilesystemContext(const boost::filesystem::path&);
 		explicit FilesystemContext(const std::string&);
+		FilesystemContext();
 
 		boost::filesystem::path resolve(const xalan::XalanDOMString&) const;
 		boost::filesystem::path resolve(const boost::filesystem::path&) const;

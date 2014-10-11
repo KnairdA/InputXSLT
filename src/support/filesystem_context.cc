@@ -64,6 +64,9 @@ FilesystemContext::FilesystemContext(const boost::filesystem::path& path):
 FilesystemContext::FilesystemContext(const std::string& path):
 	FilesystemContext(boost::filesystem::path(path)) { }
 
+FilesystemContext::FilesystemContext():
+	path_(workingDirectory) { }
+
 boost::filesystem::path FilesystemContext::resolve(
 	const xalan::XalanDOMString& path) const {
 	return this->resolve(toString(path));
