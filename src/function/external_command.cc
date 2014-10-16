@@ -15,19 +15,22 @@ namespace {
 
 using InputXSLT::XercesStringGuard;
 
-inline xercesc::DOMNode* importDocumentElement(
-	boost::process::pistream& outputStream,
-	xercesc::DOMDocument* const domDocument
-) {
-	std::stringstream xmlStream(
+inline std::unique_ptr<std::stringstream> readOutput(
+	boost::process::pistream& outputStream) {
+	return std::make_unique<std::stringstream>(
 		"<output>" + std::string(
 			(std::istreambuf_iterator<char>(outputStream)),
 			(std::istreambuf_iterator<char>())
 		) + "</output>"
 	);
+}
 
+inline xercesc::DOMNode* importDocumentElement(
+	std::stringstream*    const outputStream,
+	xercesc::DOMDocument* const domDocument
+) {
 	xercesc::XercesDOMParser parser;
-	parser.parse(xalan::XSLTInputSource(xmlStream));
+	parser.parse(xalan::XSLTInputSource(*outputStream));
 
 	return domDocument->importNode(
 		parser.getDocument()->getDocumentElement(),
@@ -66,8 +69,11 @@ DomDocumentCache::document_ptr FunctionExternalCommand::constructDocument(
 		inputStream.close();
 	}
 
-	boost::process::pistream& outputStream = commandProcess.get_stdout();
-	boost::process::status status          = commandProcess.wait();
+	std::unique_ptr<std::stringstream> outputStream{
+		readOutput(commandProcess.get_stdout())
+	};
+
+	boost::process::status status = commandProcess.wait();
 
 	ResultNodeFacade result(domDocument.get(), "command");
 	result.setAttribute("executed", command);
@@ -77,7 +83,7 @@ DomDocumentCache::document_ptr FunctionExternalCommand::constructDocument(
 		try {
 			result.setContent(
 				importDocumentElement(
-					outputStream,
+					outputStream.get(),
 					domDocument.get()
 				)->getChildNodes()
 			);
