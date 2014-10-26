@@ -117,7 +117,7 @@ class FunctionBase : public xalan::Function {
 		template <std::size_t... Index>
 		inline xalan::XalanDocument* callConstructDocument(
 			const XObjectArgVectorType& parameters,
-			const xalan::Locator*       locator,
+			const xalan::Locator*,
 			Sequence<Index...>
 		) const {
 			const FilesystemContext context;

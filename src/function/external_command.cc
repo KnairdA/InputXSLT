@@ -5,6 +5,7 @@
 #include <xercesc/parsers/XercesDOMParser.hpp>
 
 #include <boost/process.hpp>
+#include <boost/optional.hpp>
 
 #include <sstream>
 
@@ -15,27 +16,54 @@ namespace {
 
 using InputXSLT::XercesStringGuard;
 
-inline std::unique_ptr<std::stringstream> readOutput(
-	boost::process::pistream& outputStream) {
-	return std::make_unique<std::stringstream>(
-		"<output>" + std::string(
-			(std::istreambuf_iterator<char>(outputStream)),
-			(std::istreambuf_iterator<char>())
-		) + "</output>"
+inline std::string wrapOutput(const std::string& rawOutput) {
+	return std::string(
+		"<inputxslt_wrapper>" + rawOutput + "</inputxslt_wrapper>"
 	);
 }
 
-inline xercesc::DOMNode* importDocumentElement(
+inline bool isWrappedOutput(const XMLCh* nodeName) {
+	return xercesc::XMLString::equals(
+		nodeName,
+		*XercesStringGuard<XMLCh>("inputxslt_wrapper")
+	);
+}
+
+inline std::unique_ptr<std::stringstream> readOutput(
+	boost::process::pistream& outputStream) {
+	const std::string rawOutput(
+		(std::istreambuf_iterator<char>(outputStream)),
+		(std::istreambuf_iterator<char>())
+	);
+
+	if ( rawOutput.substr(0, 5) == "<?xml" ) {
+		return std::make_unique<std::stringstream>(
+			rawOutput
+		);
+	} else {
+		return std::make_unique<std::stringstream>(
+			wrapOutput(rawOutput)
+		);
+	}
+}
+
+inline boost::optional<xercesc::DOMNode*> importDocumentElement(
 	std::stringstream*    const outputStream,
 	xercesc::DOMDocument* const domDocument
 ) {
 	xercesc::XercesDOMParser parser;
 	parser.parse(xalan::XSLTInputSource(*outputStream));
 
-	return domDocument->importNode(
-		parser.getDocument()->getDocumentElement(),
-		true
-	);
+	if ( parser.getErrorCount() == 0 ) {
+		return boost::make_optional(
+			domDocument->importNode(
+				parser.getDocument()->getDocumentElement(),
+				true
+			)
+		);
+	} else {
+		return boost::optional<xercesc::DOMNode*>();
+	}
 }
 
 }
@@ -72,7 +100,6 @@ DomDocumentCache::document_ptr FunctionExternalCommand::constructDocument(
 	std::unique_ptr<std::stringstream> outputStream{
 		readOutput(commandProcess.get_stdout())
 	};
-
 	boost::process::status status = commandProcess.wait();
 
 	ResultNodeFacade result(domDocument.get(), "command");
@@ -81,14 +108,24 @@ DomDocumentCache::document_ptr FunctionExternalCommand::constructDocument(
 
 	if ( status.exited() ) {
 		try {
-			result.setContent(
+			if ( boost::optional<xercesc::DOMNode*> documentElement{
 				importDocumentElement(
 					outputStream.get(),
 					domDocument.get()
-				)->getChildNodes()
-			);
+				)
+			} ) {
+				if ( isWrappedOutput((*documentElement)->getNodeName()) ) {
+					result.setContent(
+						(*documentElement)->getChildNodes()
+					);
+				} else {
+					result.setContent(*documentElement);
+				}
 
-			result.setAttribute("result", "success");
+				result.setAttribute("result", "success");
+			} else {
+				result.setAttribute("result", "error");
+			}
 		}
 		catch ( const xercesc::DOMException& exception ) {
 			result.setAttribute("result", "error");
