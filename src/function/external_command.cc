@@ -52,6 +52,7 @@ inline boost::optional<xercesc::DOMNode*> importDocumentElement(
 	xercesc::DOMDocument* const domDocument
 ) {
 	xercesc::XercesDOMParser parser;
+	parser.setDoNamespaces(true);
 	parser.parse(xalan::XSLTInputSource(*outputStream));
 
 	if ( parser.getErrorCount() == 0 ) {

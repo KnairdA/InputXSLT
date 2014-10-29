@@ -56,7 +56,6 @@ class FunctionBase : public xalan::Function {
 			xalan::XalanDocument* const domDocument(
 				this->callConstructDocument(
 					parameters,
-					locator,
 					typename IndexSequence<maximum_parameter_count>::type()
 				)
 			);
@@ -117,7 +116,6 @@ class FunctionBase : public xalan::Function {
 		template <std::size_t... Index>
 		inline xalan::XalanDocument* callConstructDocument(
 			const XObjectArgVectorType& parameters,
-			const xalan::Locator*,
 			Sequence<Index...>
 		) const {
 			const FilesystemContext context;

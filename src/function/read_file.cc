@@ -25,6 +25,7 @@ boost::optional<xercesc::DOMNode*> readXmlFile(
 	);
 
 	xercesc::XercesDOMParser parser;
+	parser.setDoNamespaces(true);
 	parser.parse(file);
 
 	if ( parser.getErrorCount() == 0 ) {
