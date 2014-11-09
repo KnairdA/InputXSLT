@@ -14,7 +14,7 @@ namespace {
 using InputXSLT::XercesStringGuard;
 using InputXSLT::ErrorMultiplexer;
 
-inline std::string getMessage(const xercesc::SAXParseException& exception) {
+std::string getMessage(const xercesc::SAXParseException& exception) {
 	return (
 		std::string(*XercesStringGuard<char>(exception.getMessage()))
 		+ ". (Occurred in entity '"
@@ -27,7 +27,7 @@ inline std::string getMessage(const xercesc::SAXParseException& exception) {
 	);
 }
 
-inline ErrorMultiplexer::error_type toErrorType(
+ErrorMultiplexer::error_type toErrorType(
 	const xalan::ProblemListenerBase::eClassification classification) {
 	switch ( classification ) {
 		case xalan::ProblemListenerBase::eClassification::eMessage ||

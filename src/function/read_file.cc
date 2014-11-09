@@ -21,7 +21,7 @@ boost::optional<xercesc::DOMNode*> readXmlFile(
 	xercesc::DOMDocument* const domDocument
 ) {
 	const xercesc::LocalFileInputSource file(
-		*InputXSLT::XercesStringGuard<XMLCh>(filePath.string().data())
+		*InputXSLT::XercesStringGuard<XMLCh>(filePath.string())
 	);
 
 	xercesc::XercesDOMParser parser;
@@ -79,7 +79,7 @@ DomDocumentCache::document_ptr FunctionReadFile::constructDocument(
 
 				if ( auto importedNode = readXmlFile(
 					filePath,
-					domDocument.get()) 
+					domDocument.get())
 				) {
 					result.setContent(*importedNode);
 

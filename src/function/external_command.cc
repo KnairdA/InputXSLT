@@ -29,7 +29,7 @@ inline bool isWrappedOutput(const XMLCh* nodeName) {
 	);
 }
 
-inline std::unique_ptr<std::stringstream> readOutput(
+std::unique_ptr<std::stringstream> readOutput(
 	boost::process::pistream& outputStream) {
 	const std::string rawOutput(
 		(std::istreambuf_iterator<char>(outputStream)),
@@ -47,7 +47,7 @@ inline std::unique_ptr<std::stringstream> readOutput(
 	}
 }
 
-inline boost::optional<xercesc::DOMNode*> importDocumentElement(
+boost::optional<xercesc::DOMNode*> importDocumentElement(
 	std::stringstream*    const outputStream,
 	xercesc::DOMDocument* const domDocument
 ) {
@@ -81,7 +81,7 @@ DomDocumentCache::document_ptr FunctionExternalCommand::constructDocument(
 	);
 
 	boost::process::context context;
-	context.environment     = boost::process::self::get_environment(); 
+	context.environment     = boost::process::self::get_environment();
 	context.stdout_behavior = boost::process::capture_stream();
 	context.stdin_behavior  = boost::process::capture_stream();
 	context.work_directory  = boost::filesystem::canonical(

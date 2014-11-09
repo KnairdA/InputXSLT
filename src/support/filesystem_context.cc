@@ -9,7 +9,7 @@ namespace {
 
 const std::string workingDirectory(".");
 
-inline boost::filesystem::path determineBasePath(
+boost::filesystem::path determineBasePath(
 	const boost::filesystem::path& path) {
 	const boost::filesystem::path basePath(
 		boost::filesystem::is_directory(path) ? path : path.parent_path()

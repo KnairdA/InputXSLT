@@ -28,7 +28,7 @@ class XercesStringGuard {
 			);
 		}
 
-		inline const Type* operator*() const {
+		const Type* operator*() const {
 			return this->string_;
 		}
 

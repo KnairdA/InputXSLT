@@ -15,8 +15,8 @@ boost::optional<boost::filesystem::path> extractFilePath(
 	const std::size_t closingDelimiter = rawPath.find_last_of(']');
 
 	if ( leadingDelimiter != std::string::npos &&
-		 closingDelimiter != std::string::npos &&
-		 leadingDelimiter <  closingDelimiter ) {
+	     closingDelimiter != std::string::npos &&
+	     leadingDelimiter <  closingDelimiter ) {
 		return boost::make_optional(
 			boost::filesystem::path(
 				rawPath.substr(

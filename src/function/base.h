@@ -96,7 +96,7 @@ class FunctionBase : public xalan::Function {
 			if ( minimum_parameter_count == maximum_parameter_count ) {
 				result.assign(std::string(
 					startText
-					+ std::to_string(minimum_parameter_count) 
+					+ std::to_string(minimum_parameter_count)
 					+ endText
 				).data());
 			} else {
@@ -114,7 +114,7 @@ class FunctionBase : public xalan::Function {
 		}
 
 		template <std::size_t... Index>
-		inline xalan::XalanDocument* callConstructDocument(
+		xalan::XalanDocument* callConstructDocument(
 			const XObjectArgVectorType& parameters,
 			Sequence<Index...>
 		) const {
@@ -136,7 +136,7 @@ class FunctionBase : public xalan::Function {
 			);
 		}
 
-		inline void validateParameters(
+		void validateParameters(
 			const XObjectArgVectorType&   parameters,
 			xalan::XPathExecutionContext& executionContext,
 			xalan::XalanNode*             context,
