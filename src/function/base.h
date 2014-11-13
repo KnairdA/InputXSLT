@@ -9,13 +9,13 @@
 
 #include <memory>
 #include <tuple>
+#include <utility>
 
 #include "common.h"
 #include "support/xalan_string.h"
 #include "support/filesystem_context.h"
 #include "support/include_entity_resolver.h"
 #include "support/dom/document_cache.h"
-#include "support/type/sequence.h"
 #include "support/type/filter.h"
 #include "support/type/xobject_value.h"
 
@@ -56,7 +56,7 @@ class FunctionBase : public xalan::Function {
 			xalan::XalanDocument* const domDocument(
 				this->callConstructDocument(
 					parameters,
-					typename IndexSequence<maximum_parameter_count>::type()
+					std::make_integer_sequence<std::size_t, maximum_parameter_count>()
 				)
 			);
 
@@ -103,9 +103,9 @@ class FunctionBase : public xalan::Function {
 				result.assign(std::string(
 					startText
 					+ "between "
-					+ std::to_string(minimum_parameter_count) 
+					+ std::to_string(minimum_parameter_count)
 					+ " and "
-					+ std::to_string(maximum_parameter_count) 
+					+ std::to_string(maximum_parameter_count)
 					+ endText
 				).data());
 			}
@@ -116,7 +116,7 @@ class FunctionBase : public xalan::Function {
 		template <std::size_t... Index>
 		xalan::XalanDocument* callConstructDocument(
 			const XObjectArgVectorType& parameters,
-			Sequence<Index...>
+			std::integer_sequence<std::size_t, Index...>
 		) const {
 			const FilesystemContext context;
 			XObjectValue valueGetter(&context, this->include_resolver_);
