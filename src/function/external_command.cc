@@ -16,12 +16,6 @@ namespace {
 
 using InputXSLT::XercesStringGuard;
 
-inline std::string wrapOutput(const std::string& rawOutput) {
-	return std::string(
-		"<inputxslt_wrapper>" + rawOutput + "</inputxslt_wrapper>"
-	);
-}
-
 inline bool isWrappedOutput(const XMLCh* nodeName) {
 	return xercesc::XMLString::equals(
 		nodeName,
@@ -42,7 +36,7 @@ std::unique_ptr<std::stringstream> readOutput(
 		);
 	} else {
 		return std::make_unique<std::stringstream>(
-			wrapOutput(rawOutput)
+			"<inputxslt_wrapper>" + rawOutput + "</inputxslt_wrapper>"
 		);
 	}
 }
@@ -67,6 +61,20 @@ boost::optional<xercesc::DOMNode*> importDocumentElement(
 	}
 }
 
+boost::process::context createContext(
+	const InputXSLT::FilesystemContext& fsContext) {
+	boost::process::context context;
+
+	context.environment     = boost::process::self::get_environment();
+	context.stdout_behavior = boost::process::capture_stream();
+	context.stdin_behavior  = boost::process::capture_stream();
+	context.work_directory  = boost::filesystem::canonical(
+		fsContext.getBase().parent_path()
+	).string();
+
+	return context;
+}
+
 }
 
 namespace InputXSLT {
@@ -76,21 +84,13 @@ DomDocumentCache::document_ptr FunctionExternalCommand::constructDocument(
 	std::string                  command,
 	boost::optional<std::string> input
 ) const {
-	DomDocumentCache::document_ptr domDocument(
+	DomDocumentCache::document_ptr domDocument{
 		DomDocumentCache::createDocument("content")
-	);
+	};
 
-	boost::process::context context;
-	context.environment     = boost::process::self::get_environment();
-	context.stdout_behavior = boost::process::capture_stream();
-	context.stdin_behavior  = boost::process::capture_stream();
-	context.work_directory  = boost::filesystem::canonical(
-		fsContext.getBase().parent_path()
-	).string();
-
-	boost::process::child commandProcess(
-		boost::process::launch_shell(command, context)
-	);
+	boost::process::child commandProcess{
+		boost::process::launch_shell(command, createContext(fsContext))
+	};
 
 	if ( input ) {
 		boost::process::postream& inputStream = commandProcess.get_stdin();
@@ -139,7 +139,6 @@ DomDocumentCache::document_ptr FunctionExternalCommand::constructDocument(
 	} else {
 		result.setAttribute("result", "error");
 	}
-
 
 	return domDocument;
 }

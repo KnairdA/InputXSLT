@@ -33,7 +33,7 @@ DomDocumentCache::document_ptr FunctionGenerate::constructDocument(
 			result.setAttribute("path", (*targetPath).string());
 
 			boost::filesystem::create_directories(
-				(*targetPath).parent_path()
+				boost::filesystem::absolute(*targetPath).parent_path()
 			);
 
 			boost::filesystem::ofstream file(*targetPath);

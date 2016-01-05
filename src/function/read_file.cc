@@ -12,17 +12,17 @@
 namespace {
 
 inline bool isXmlFile(const boost::filesystem::path& filePath) {
-	return filePath.extension() == ".xml" ||
-	       filePath.extension() == ".xsl";
+	return filePath.extension() == ".xml"
+	    || filePath.extension() == ".xsl";
 }
 
 boost::optional<xercesc::DOMNode*> readXmlFile(
 	const boost::filesystem::path& filePath,
 	xercesc::DOMDocument* const domDocument
 ) {
-	const xercesc::LocalFileInputSource file(
+	const xercesc::LocalFileInputSource file{
 		*InputXSLT::XercesStringGuard<XMLCh>(filePath.string())
-	);
+	};
 
 	xercesc::XercesDOMParser parser;
 	parser.setDoNamespaces(true);
@@ -79,8 +79,8 @@ DomDocumentCache::document_ptr FunctionReadFile::constructDocument(
 
 				if ( auto importedNode = readXmlFile(
 					filePath,
-					domDocument.get())
-				) {
+					domDocument.get()
+				) ) {
 					result.setContent(*importedNode);
 
 					result.setAttribute("result", "success");

@@ -9,11 +9,11 @@ DomDocumentCache::document_ptr FunctionReadDirectory::constructDocument(
 	const FilesystemContext&,
 	boost::filesystem::path  directoryPath
 ) const {
-	DomDocumentCache::document_ptr domDocument(
+	DomDocumentCache::document_ptr domDocument{
 		DomDocumentCache::createDocument("content")
-	);
+	};
 
-	ResultNodeFacade result(domDocument.get(), "directory");
+	ResultNodeFacade result{domDocument.get(), "directory"};
 	result.setAttribute("path", directoryPath.string());
 
 	if ( boost::filesystem::is_directory(directoryPath) ) {

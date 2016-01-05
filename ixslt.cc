@@ -19,7 +19,7 @@ namespace {
 class WarningGuard {
 	public:
 		WarningGuard(InputXSLT::TransformerFacade* transformer):
-			transformer_(transformer) { };
+			transformer_(transformer) { }
 
 		~WarningGuard() {
 			InputXSLT::WarningCapacitor::warning_cache_ptr warnings(
@@ -29,7 +29,7 @@ class WarningGuard {
 			for ( auto&& warning : *warnings ) {
 				std::cerr << warning << std::endl;
 			}
-		};
+		}
 
 	private:
 		InputXSLT::TransformerFacade* const transformer_;
