@@ -67,3 +67,10 @@ add_custom_target(
 	DEPENDS
 	ixslt
 )
+
+install(
+	TARGETS
+		ixslt
+	DESTINATION
+		bin
+)
