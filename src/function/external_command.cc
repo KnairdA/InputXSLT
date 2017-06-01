@@ -24,13 +24,14 @@ inline bool isWrappedOutput(const XMLCh* nodeName) {
 }
 
 std::unique_ptr<std::stringstream> readOutput(
-	boost::process::pistream& outputStream) {
+	boost::process::ipstream& outputStream) {
 	const std::string rawOutput(
 		(std::istreambuf_iterator<char>(outputStream)),
 		(std::istreambuf_iterator<char>())
 	);
 
-	if ( rawOutput.substr(0, 5) == "<?xml" ) {
+	if (    rawOutput.substr(0, 5) == "<?xml"
+	     || rawOutput.substr(0,2) == "<!" ) {
 		return std::make_unique<std::stringstream>(
 			rawOutput
 		);
@@ -61,20 +62,6 @@ boost::optional<xercesc::DOMNode*> importDocumentElement(
 	}
 }
 
-boost::process::context createContext(
-	const InputXSLT::FilesystemContext& fsContext) {
-	boost::process::context context;
-
-	context.environment     = boost::process::self::get_environment();
-	context.stdout_behavior = boost::process::capture_stream();
-	context.stdin_behavior  = boost::process::capture_stream();
-	context.work_directory  = boost::filesystem::canonical(
-		fsContext.getBase().parent_path()
-	).string();
-
-	return context;
-}
-
 }
 
 namespace InputXSLT {
@@ -84,60 +71,62 @@ DomDocumentCache::document_ptr FunctionExternalCommand::constructDocument(
 	std::string                  command,
 	boost::optional<std::string> input
 ) const {
+	namespace bp = boost::process;
+
 	DomDocumentCache::document_ptr domDocument{
-		DomDocumentCache::createDocument("content")
-	};
-
-	boost::process::child commandProcess{
-		boost::process::launch_shell(command, createContext(fsContext))
-	};
-
-	if ( input ) {
-		boost::process::postream& inputStream = commandProcess.get_stdin();
-		inputStream << *input;
-		inputStream.close();
-	}
-
-	std::unique_ptr<std::stringstream> outputStream{
-		readOutput(commandProcess.get_stdout())
-	};
-	boost::process::status status = commandProcess.wait();
-
+		DomDocumentCache::createDocument("content")};
 	ResultNodeFacade result(domDocument.get(), "command");
-	result.setAttribute("executed", command);
-	result.setAttribute("code",     std::to_string(status.exit_status()));
 
-	if ( status.exited() ) {
-		try {
-			if ( boost::optional<xercesc::DOMNode*> documentElement{
-				importDocumentElement(
-					outputStream.get(),
-					domDocument.get()
-				)
-			} ) {
-				if ( isWrappedOutput((*documentElement)->getNodeName()) ) {
-					result.setContent(
-						(*documentElement)->getChildNodes()
-					);
-				} else {
-					result.setContent(*documentElement);
-				}
+	try {
+		bp::ipstream commandOutput;
+		bp::opstream commandInput;
 
-				result.setAttribute("result", "success");
+		bp::child commandProcess{
+			command,
+			bp::start_dir = boost::filesystem::canonical(fsContext.getBase().parent_path()),
+			bp::std_out   = commandOutput,
+			bp::std_in    = commandInput
+		};
+
+		if ( input ) {
+			commandInput << *input;
+			commandInput.flush();
+		}
+		commandInput.pipe().close();
+
+		std::unique_ptr<std::stringstream> outputStream{
+			readOutput(commandOutput)};
+		commandProcess.wait();
+
+		result.setAttribute("executed", command);
+		result.setAttribute("code",     std::to_string(commandProcess.exit_code()));
+
+		if ( boost::optional<xercesc::DOMNode*> documentElement{
+			importDocumentElement(outputStream.get(), domDocument.get())
+		} ) {
+			if ( isWrappedOutput((*documentElement)->getNodeName()) ) {
+				result.setContent(
+					(*documentElement)->getChildNodes()
+				);
 			} else {
-				result.setAttribute("result", "error");
+				result.setContent(*documentElement);
 			}
-		}
-		catch ( const xercesc::DOMException& exception ) {
-			result.setAttribute("result", "error");
 
-			result.setValueNode(
-				"error",
-				*XercesStringGuard<char>(exception.msg)
-			);
+			result.setAttribute("result", "success");
+		} else {
+			result.setAttribute("result", "error");
 		}
-	} else {
+	}
+	catch ( const std::system_error& exception ) {
 		result.setAttribute("result", "error");
+	}
+	catch ( const xercesc::DOMException& exception ) {
+		result.setAttribute("result", "error");
+
+		result.setValueNode(
+			"error",
+			*XercesStringGuard<char>(exception.msg)
+		);
 	}
 
 	return domDocument;
