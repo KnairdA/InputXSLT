@@ -10,62 +10,53 @@ include_directories(
 	src/
 )
 
-set(
-	Libraries
-	InputXSLT
-	xalan-c
-	xerces-c
-	boost_system
-	boost_filesystem
-	boost_program_options
-)
-
-set(
-	Sources
-	src/platform_guard.cc
-	src/transformer_facade.cc
-	src/function/read_file.cc
-	src/function/write_file.cc
-	src/function/read_directory.cc
-	src/function/generate.cc
-	src/function/external_command.cc
-	src/support/filesystem_context.cc
-	src/support/xalan_string.cc
-	src/support/include_entity_resolver.cc
-	src/support/error/error_multiplexer.cc
-	src/support/error/error_capacitor.cc
-	src/support/error/warning_capacitor.cc
-	src/support/type/xobject_value.cc
-	src/support/dom/document_cache.cc
-	src/support/dom/document_cache_item.cc
-	src/support/dom/result_node_facade.cc
-)
-
 add_executable(
 	ixslt
-	ixslt.cc
+		ixslt.cc
 )
 
 add_library(
 	InputXSLT
 	STATIC
-	${Sources}
+		src/platform_guard.cc
+		src/transformer_facade.cc
+		src/function/read_file.cc
+		src/function/write_file.cc
+		src/function/read_directory.cc
+		src/function/generate.cc
+		src/function/external_command.cc
+		src/support/filesystem_context.cc
+		src/support/xalan_string.cc
+		src/support/include_entity_resolver.cc
+		src/support/error/error_multiplexer.cc
+		src/support/error/error_capacitor.cc
+		src/support/error/warning_capacitor.cc
+		src/support/type/xobject_value.cc
+		src/support/dom/document_cache.cc
+		src/support/dom/document_cache_item.cc
+		src/support/dom/result_node_facade.cc
 )
 
 target_link_libraries(
 	ixslt
-	${Libraries}
+		InputXSLT
+		xalan-c
+		xerces-c
+		pthread
+		boost_system
+		boost_filesystem
+		boost_program_options
 )
 
 add_custom_target(
 	testcase
 	ALL
 	WORKING_DIRECTORY
-	${CMAKE_CURRENT_SOURCE_DIR}/test/
+		${CMAKE_CURRENT_SOURCE_DIR}/test/
 	COMMAND
-	sh check.sh
+		sh check.sh
 	DEPENDS
-	ixslt
+		ixslt
 )
 
 install(
