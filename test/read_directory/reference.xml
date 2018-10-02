@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <test_case>
 <item type="file">
-<name>Session</name>
-</item>
-<item type="file">
 <name>check</name>
 <extension>.sh</extension>
 </item>
