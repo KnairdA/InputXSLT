@@ -8,22 +8,17 @@
 #include <mutex>
 #include <stack>
 #include <memory>
+#include <functional>
 
 #include "common.h"
 
 namespace InputXSLT {
 
 class DomDocumentCache {
-	class document_deleter {
-		friend std::unique_ptr<xercesc::DOMDocument, document_deleter>;
-
-		void operator()(xercesc::DOMDocument*);
-	};
-
 	public:
 		typedef std::unique_ptr<
 			xercesc::DOMDocument,
-			document_deleter
+			std::function<void(xercesc::DOMDocument*)>
 		> document_ptr;
 
 		static document_ptr createDocument();

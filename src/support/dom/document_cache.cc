@@ -11,7 +11,10 @@ namespace InputXSLT {
 
 auto DomDocumentCache::createDocument() -> document_ptr {
 	return document_ptr(
-		xercesc::DOMImplementation::getImplementation()->createDocument()
+		xercesc::DOMImplementation::getImplementation()->createDocument(),
+		[](xercesc::DOMDocument* ptr) {
+			ptr->release();
+		}
 	);
 }
 
@@ -21,7 +24,10 @@ auto DomDocumentCache::createDocument(const std::string& name) -> document_ptr {
 			nullptr,
 			*XercesStringGuard<XMLCh>(name),
 			nullptr
-		)
+		),
+		[](xercesc::DOMDocument* ptr) {
+			ptr->release();
+		}
 	);
 }
 
@@ -39,11 +45,6 @@ xalan::XalanDocument* DomDocumentCache::create(document_ptr&& document) {
 	);
 
 	return this->cache_.top()->getXalanDocument();
-}
-
-void DomDocumentCache::document_deleter::operator()(
-	xercesc::DOMDocument* document) {
-	document->release();
 }
 
 }
